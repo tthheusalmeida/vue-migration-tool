@@ -1,0 +1,270 @@
+{
+  "template": {
+    "ast": {
+      "type": 1,
+      "tag": "template",
+      "attrsList": [],
+      "attrsMap": {},
+      "rawAttrsMap": {},
+      "children": [
+        {
+          "type": 1,
+          "tag": "div",
+          "attrsList": [
+            {
+              "name": "@click",
+              "value": "openPokemonDetails"
+            }
+          ],
+          "attrsMap": {
+            "class": "card",
+            ":style": "backgroundColor(types[0])",
+            "@click": "openPokemonDetails"
+          },
+          "rawAttrsMap": {},
+          "children": [
+            {
+              "type": 1,
+              "tag": "div",
+              "attrsList": [],
+              "attrsMap": {
+                "v-if": "isThereData"
+              },
+              "rawAttrsMap": {},
+              "children": [
+                {
+                  "type": 1,
+                  "tag": "div",
+                  "attrsList": [],
+                  "attrsMap": {
+                    "class": "card_id",
+                    ":style": "getBorderStyle(types[0])"
+                  },
+                  "rawAttrsMap": {},
+                  "children": [
+                    {
+                      "type": 2,
+                      "expression": "\"\\r\\n        n°\"+_s(id)+\"\\r\\n      \"",
+                      "tokens": [
+                        "\r\n        n°",
+                        {
+                          "@binding": "id"
+                        },
+                        "\r\n      "
+                      ],
+                      "text": "\r\n        n°{{ id }}\r\n      ",
+                      "static": false
+                    }
+                  ],
+                  "plain": false,
+                  "staticClass": "\"card_id\"",
+                  "styleBinding": "getBorderStyle(types[0])",
+                  "static": false,
+                  "staticRoot": false
+                },
+                {
+                  "type": 3,
+                  "text": " ",
+                  "static": true
+                },
+                {
+                  "type": 1,
+                  "tag": "div",
+                  "attrsList": [],
+                  "attrsMap": {
+                    "class": "card_img",
+                    ":style": "getBorderStyle(types[0])"
+                  },
+                  "rawAttrsMap": {},
+                  "children": [
+                    {
+                      "type": 1,
+                      "tag": "img",
+                      "attrsList": [
+                        {
+                          "name": ":src",
+                          "value": "img"
+                        },
+                        {
+                          "name": ":alt",
+                          "value": "name"
+                        }
+                      ],
+                      "attrsMap": {
+                        ":src": "img",
+                        ":alt": "name"
+                      },
+                      "rawAttrsMap": {},
+                      "children": [],
+                      "plain": false,
+                      "hasBindings": true,
+                      "attrs": [
+                        {
+                          "name": "src",
+                          "value": "img",
+                          "dynamic": false
+                        },
+                        {
+                          "name": "alt",
+                          "value": "name",
+                          "dynamic": false
+                        }
+                      ],
+                      "static": false,
+                      "staticRoot": false
+                    }
+                  ],
+                  "plain": false,
+                  "staticClass": "\"card_img\"",
+                  "styleBinding": "getBorderStyle(types[0])",
+                  "static": false,
+                  "staticRoot": false
+                },
+                {
+                  "type": 3,
+                  "text": " ",
+                  "static": true
+                },
+                {
+                  "type": 1,
+                  "tag": "div",
+                  "attrsList": [],
+                  "attrsMap": {
+                    "class": "card_name"
+                  },
+                  "rawAttrsMap": {},
+                  "children": [
+                    {
+                      "type": 2,
+                      "expression": "\"\\r\\n        \"+_s(pokemonName)+\"\\r\\n      \"",
+                      "tokens": [
+                        "\r\n        ",
+                        {
+                          "@binding": "pokemonName"
+                        },
+                        "\r\n      "
+                      ],
+                      "text": "\r\n        {{ pokemonName }}\r\n      ",
+                      "static": false
+                    }
+                  ],
+                  "plain": false,
+                  "staticClass": "\"card_name\"",
+                  "static": false,
+                  "staticRoot": false
+                },
+                {
+                  "type": 3,
+                  "text": " ",
+                  "static": true
+                },
+                {
+                  "type": 1,
+                  "tag": "div",
+                  "attrsList": [],
+                  "attrsMap": {
+                    "class": "card_types"
+                  },
+                  "rawAttrsMap": {},
+                  "children": [
+                    {
+                      "type": 1,
+                      "tag": "div",
+                      "attrsList": [],
+                      "attrsMap": {
+                        "class": "type",
+                        ":style": "getTypeStyle(type)",
+                        "v-for": "(type, index) in types",
+                        ":key": "index"
+                      },
+                      "rawAttrsMap": {},
+                      "children": [
+                        {
+                          "type": 2,
+                          "expression": "\"\\r\\n            \"+_s(type)+\"\\r\\n        \"",
+                          "tokens": [
+                            "\r\n            ",
+                            {
+                              "@binding": "type"
+                            },
+                            "\r\n        "
+                          ],
+                          "text": "\r\n            {{ type }}\r\n        ",
+                          "static": false
+                        }
+                      ],
+                      "for": "types",
+                      "alias": "type",
+                      "iterator1": "index",
+                      "key": "index",
+                      "plain": false,
+                      "staticClass": "\"type\"",
+                      "styleBinding": "getTypeStyle(type)",
+                      "static": false,
+                      "staticRoot": false,
+                      "forProcessed": true
+                    }
+                  ],
+                  "plain": false,
+                  "staticClass": "\"card_types\"",
+                  "static": false,
+                  "staticRoot": false
+                }
+              ],
+              "if": "isThereData",
+              "ifConditions": [
+                {
+                  "exp": "isThereData"
+                },
+                {
+                  "block": {
+                    "type": 1,
+                    "tag": "Loading",
+                    "attrsList": [],
+                    "attrsMap": {
+                      "v-else": ""
+                    },
+                    "rawAttrsMap": {},
+                    "children": [],
+                    "else": true,
+                    "plain": true,
+                    "static": false,
+                    "staticRoot": false
+                  }
+                }
+              ],
+              "plain": true,
+              "static": false,
+              "staticRoot": false,
+              "ifProcessed": true
+            }
+          ],
+          "plain": false,
+          "staticClass": "\"card\"",
+          "styleBinding": "backgroundColor(types[0])",
+          "hasBindings": true,
+          "events": {
+            "click": {
+              "value": "openPokemonDetails",
+              "dynamic": false
+            }
+          },
+          "static": false,
+          "staticRoot": false
+        }
+      ],
+      "plain": true,
+      "static": false,
+      "staticRoot": false
+    },
+    "render": "with(this){return [_c('div',{staticClass:\"card\",style:(backgroundColor(types[0])),on:{\"click\":openPokemonDetails}},[(isThereData)?_c('div',[_c('div',{staticClass:\"card_id\",style:(getBorderStyle(types[0]))},[_v(\"\\r\\n        n°\"+_s(id)+\"\\r\\n      \")]),_v(\" \"),_c('div',{staticClass:\"card_img\",style:(getBorderStyle(types[0]))},[_c('img',{attrs:{\"src\":img,\"alt\":name}})]),_v(\" \"),_c('div',{staticClass:\"card_name\"},[_v(\"\\r\\n        \"+_s(pokemonName)+\"\\r\\n      \")]),_v(\" \"),_c('div',{staticClass:\"card_types\"},_l((types),function(type,index){return _c('div',{key:index,staticClass:\"type\",style:(getTypeStyle(type))},[_v(\"\\r\\n            \"+_s(type)+\"\\r\\n        \")])}),0)]):_c('Loading')],1)]}",
+    "staticRenderFns": [],
+    "errors": [
+      "Cannot use <template> as component root element because it may contain multiple nodes.",
+      "Templates should only be responsible for mapping the state to the UI. Avoid placing tags with side-effects in your templates, such as <script>, as they will not be parsed.",
+      "Templates should only be responsible for mapping the state to the UI. Avoid placing tags with side-effects in your templates, such as <style>, as they will not be parsed."
+    ],
+    "tips": []
+  },
+  "script": {}
+}
