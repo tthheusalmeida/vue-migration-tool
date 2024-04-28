@@ -14,7 +14,7 @@ function runParser(fileName = '') {
 
   return {
     template: getTemplateAst(fileContent),
-    script: getScriptAst(fileContent),
+    // script: getScriptAst(fileContent), TODO remove commented line when working with script
   };
 }
 
