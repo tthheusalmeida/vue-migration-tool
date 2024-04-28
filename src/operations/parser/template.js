@@ -1,13 +1,10 @@
 'use strict';
 
-const fs = require('fs');
 const {
   compile
 } = require('vue-template-compiler');
 
-function getTemplateAst(fileName = '') {
-  const fileContent = fs.readFileSync(fileName, 'utf8');
-
+function getTemplateAst(fileContent = '') {
   return compile(fileContent);
 }
 
