@@ -9,7 +9,7 @@ const {
   replaceExtensionVueToJson
 } = require('./utils/string');
 
-const fileName = './validation/Template.vue';
+const fileName = './src/migration_src/Template.vue';
 const ast = runParser(fileName);
 const astObject = stringifyCircularStructureToJson(ast);
 const fileToSave = replaceExtensionVueToJson(fileName);
