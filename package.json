@@ -4,12 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "test": "jest src/test",
+    "test:coverage": "jest --coverage"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "vue-template-compiler": "^2.7.16"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
