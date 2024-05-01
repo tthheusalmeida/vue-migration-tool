@@ -129,5 +129,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# validation folder
-/validation/*.json
+# migration_src folder
+src/migration_src/*.json
