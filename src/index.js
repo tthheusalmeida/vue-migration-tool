@@ -6,13 +6,20 @@ const {
   stringifyCircularStructureToJson,
 } = require('./utils/object');
 const {
-  replaceExtensionVueToJson
+  replaceExtensionVueToJson,
 } = require('./utils/string');
+const {
+  renderTemplate,
+} = require('./operations/compiler/render');
 
 const fileName = './src/migration_src/Template.vue';
-const ast = runParser(fileName);
-const astObject = stringifyCircularStructureToJson(ast);
-const fileToSave = replaceExtensionVueToJson(fileName);
+const fileNameToSave = './src/migration_src/NewTemplate.vue';
+const rawAst = runParser(fileName);
+const stringifiedAst = stringifyCircularStructureToJson(rawAst);
+const vueTemplateRender = renderTemplate(JSON.parse(stringifiedAst).template.ast);
 
-fs.writeFileSync(fileToSave, astObject);
+// const jsonToSave = replaceExtensionVueToJson(fileName);
+// fs.writeFileSync(jsonToSave, astObject);
+
+fs.writeFileSync(fileNameToSave, vueTemplateRender);
 

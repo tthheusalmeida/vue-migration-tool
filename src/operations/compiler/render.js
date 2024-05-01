@@ -3,6 +3,10 @@ const {
   SELF_CLOSING_TAGS,
 } = require('./constants.js');
 
+function renderTemplate(ast) {
+  return renderTag(ast);
+}
+
 function renderTag(node) {
   const upperTag = node?.tag ? node.tag.toUpperCase() : '';
 
@@ -26,20 +30,20 @@ function renderTagByType(node) {
         renderedTag += `${renderTag(childNode)}`;
       });
     }
-
-    const hasIfConditions = node.ifConditions?.length;
-    if (hasIfConditions) {
-      node.ifConditions.forEach(item => {
-        renderedTag += `${renderTag(item.block)}`;
-      });
-    }
-
     renderedTag += renderCloseTag(node);
   } else if (node?.type === NODE_TYPE.TEMPLATE_STRING) {
     renderedTag += node.text.replace(/^\s+|\s+$/g, '');
   } else {
     renderedTag += '';
   }
+
+  const hasIfConditions = node?.ifConditions ? node.ifConditions.length : '';
+  if (hasIfConditions) {
+    node.ifConditions.forEach(item => {
+      renderedTag += `${renderTag(item.block)}`;
+    });
+  }
+
   return renderedTag;
 }
 
@@ -75,6 +79,7 @@ function renderCloseTag(node) {
 }
 
 module.exports = {
+  renderTemplate,
   renderTag,
   renderTagByType,
   renderAttrsMap,

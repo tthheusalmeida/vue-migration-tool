@@ -52,7 +52,7 @@ describe('render', () => {
           }
         ],
       };
-      const expected = '<div><div v-if="isThereData"></div><Loading v-else></Loading></div>';
+      const expected = '<div><div v-if="isThereData"></div></div><Loading v-else></Loading>';
 
       expect(renderTagByType(node)).toBe(expected);
     });
