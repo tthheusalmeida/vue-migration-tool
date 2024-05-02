@@ -12,7 +12,7 @@ const {
   renderTemplate,
 } = require('./operations/compiler/render');
 
-function runVueMigrationTool() {
+async function runVueMigrationTool() {
   const fileName = './src/migration_src/Template.vue';
   const newFileName = './src/migration_src/NewTemplate.vue';
 
@@ -23,7 +23,7 @@ function runVueMigrationTool() {
   const jsonFileName = replaceExtensionVueToJson(fileName);
   fs.writeFileSync(jsonFileName, stringAst);
 
-  const vueTemplateRender = renderTemplate(ast);
+  const vueTemplateRender = await renderTemplate(ast);
   fs.writeFileSync(newFileName, vueTemplateRender);
 }
 

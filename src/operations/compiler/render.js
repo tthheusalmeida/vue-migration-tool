@@ -2,9 +2,21 @@ const {
   NODE_TYPE,
   SELF_CLOSING_TAGS,
 } = require('./constants.js');
+const {
+  format,
+} = require('prettier');
 
-function renderTemplate(ast) {
-  return renderTag(ast);
+jest.mock('prettier', () => ({
+  format: jest.fn(code => code),
+}));
+
+async function renderTemplate(ast) {
+  const renderedTag = renderTag(ast);
+  const formattedTemplate = await format(renderedTag, {
+    parser: 'vue',
+  });
+
+  return formattedTemplate;
 }
 
 function renderTag(node) {

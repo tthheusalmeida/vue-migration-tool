@@ -9,7 +9,7 @@ const {
 
 describe('render', () => {
   describe('renderTemplate()', () => {
-    test('When passes template ast, should render template.', () => {
+    test('When passes template ast, should render template.', async () => {
       const template = {
         type: 1,
         tag: 'template',
@@ -58,7 +58,8 @@ describe('render', () => {
       };
       const expected = '<template><div class="example-component"><p>{{ message }}</p><button @click="reverseMessage"></button></div></template>';
 
-      expect(renderTemplate(template)).toBe(expected);
+      const result = await renderTemplate(template);
+      expect(result).toBe(expected);
     });
   });
 

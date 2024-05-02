@@ -1,1 +1,26 @@
-<template><div class="card" :style="backgroundColor(types[0])" @click="openPokemonDetails"><div v-if="isThereData"><div class="card_id" :style="getBorderStyle(types[0])">n°{{ id }}</div><div class="card_img" :style="getBorderStyle(types[0])"><img :src="img" :alt="name"></div><div class="card_name">{{ pokemonName }}</div><div class="card_types"><div class="type" :style="getTypeStyle(type)" v-for="(type, index) in types" :key="index">{{ type }}</div></div></div><Loading v-else></Loading></div></template>
+<template>
+  <div
+    class="card"
+    :style="backgroundColor(types[0])"
+    @click="openPokemonDetails"
+  >
+    <div v-if="isThereData">
+      <div class="card_id" :style="getBorderStyle(types[0])">n°{{ id }}</div>
+      <div class="card_img" :style="getBorderStyle(types[0])">
+        <img :src="img" :alt="name" />
+      </div>
+      <div class="card_name">{{ pokemonName }}</div>
+      <div class="card_types">
+        <div
+          class="type"
+          :style="getTypeStyle(type)"
+          v-for="(type, index) in types"
+          :key="index"
+        >
+          {{ type }}
+        </div>
+      </div>
+    </div>
+    <Loading v-else></Loading>
+  </div>
+</template>
