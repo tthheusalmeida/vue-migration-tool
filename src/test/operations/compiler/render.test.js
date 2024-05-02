@@ -1,4 +1,6 @@
 const {
+  renderTemplate,
+  renderTag,
   renderTagByType,
   renderAttrsMap,
   renderOpenTag,
@@ -6,6 +8,86 @@ const {
 } = require('../../../operations/compiler/render.js');
 
 describe('render', () => {
+  describe('renderTemplate()', () => {
+    test('When passes template ast, should render template.', () => {
+      const template = {
+        type: 1,
+        tag: 'template',
+        attrsMap: {},
+        children: [
+          {
+            type: 1,
+            tag: 'div',
+            attrsMap: {
+              class: 'example-component'
+            },
+            children: [
+              {
+                type: 1,
+                tag: 'p',
+                attrsMap: {},
+                children: [
+                  {
+                    type: 2,
+                    text: '{{ message }}',
+                  }
+                ],
+              },
+              {
+                type: 3,
+                text: ' ',
+                static: true
+              },
+              {
+                type: 1,
+                tag: 'button',
+                attrsMap: {
+                  '@click': 'reverseMessage',
+                },
+                children: [
+                  {
+                    type: 3,
+                    text: 'Reverse Message',
+                    static: true
+                  }
+                ],
+              }
+            ],
+          }
+        ],
+      };
+      const expected = '<template><div class="example-component"><p>{{ message }}</p><button @click="reverseMessage"></button></div></template>';
+
+      expect(renderTemplate(template)).toBe(expected);
+    });
+  });
+
+  describe('renderTag()', () => {
+    test('When passes node, should render tag.', () => {
+      const node = {
+        type: 1,
+        tag: 'div',
+        children: [
+          {
+            type: 1,
+            tag: 'img',
+            attrsMap: {
+              ':src': 'img',
+              ':alt': 'name',
+            },
+          }
+        ]
+      };
+      const expected = '<div><img :src="img" :alt="name"></div>';
+
+      expect(renderTag(node)).toBe(expected);
+    });
+
+    test('When passes empty node, should not render any tag.', () => {
+      expect(renderTag({})).toBe('');
+    });
+  });
+
   describe('renderTagByType()', () => {
     test('When passes node type equal NODE_TYPE.TAG and it has children, should render tag and children.', () => {
       const node = {
