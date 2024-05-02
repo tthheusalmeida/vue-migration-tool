@@ -6,10 +6,6 @@ const {
   format,
 } = require('prettier');
 
-jest.mock('prettier', () => ({
-  format: jest.fn(code => code),
-}));
-
 async function renderTemplate(ast) {
   const renderedTag = renderTag(ast);
   const formattedTemplate = await format(renderedTag, {

@@ -7,6 +7,10 @@ const {
   renderCloseTag,
 } = require('../../../operations/compiler/render.js');
 
+jest.mock('prettier', () => ({
+  format: jest.fn(code => code),
+}));
+
 describe('render', () => {
   describe('renderTemplate()', () => {
     test('When passes template ast, should render template.', async () => {
