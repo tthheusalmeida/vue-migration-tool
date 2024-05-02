@@ -3,10 +3,10 @@
 const fs = require('fs');
 const {
   getTemplateAst,
-} = require('./parser/template');
-const {
-  getScriptAst,
-} = require('./parser/script');
+} = require('./template');
+// const {
+//   getScriptAst,
+// } = require('./script');
 
 function runParser(fileName = '') {
   console.log(`=> Running parse for ${fileName}.\n`);
