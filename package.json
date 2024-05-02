@@ -8,7 +8,7 @@
     "test": "jest src/test",
     "test:coverage": "jest --coverage"
   },
-  "author": "",
+  "author": "Matheus Henrique dos Santos Almeida",
   "license": "ISC",
   "dependencies": {
     "vue-template-compiler": "^2.7.16"
