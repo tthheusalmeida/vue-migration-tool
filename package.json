@@ -9,6 +9,14 @@
     "test:unit": "jest --coverage --verbose",
     "test:coverage": "jest --coverage"
   },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/operations/compiler/**/*.js",
+      "src/operations/parser/**/*.js",
+      "src/utils/**/*.js"
+    ]
+  },
   "author": "Matheus Henrique dos Santos Almeida",
   "license": "MIT",
   "dependencies": {
