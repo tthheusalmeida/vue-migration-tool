@@ -33,7 +33,16 @@ function getScriptContent(fileContent) {
   return getTagContent(
     fileContent,
     '<script>',
-    '</script>'
+    '</script>',
+  );
+}
+
+function getStyleContent(fileContent) {
+  return getTagContent(
+    fileContent,
+    '<style lang="scss">',
+    '</style>',
+    true,
   );
 }
 
@@ -41,4 +50,5 @@ module.exports = {
   replaceExtensionVueToJson,
   getTemplateContent,
   getScriptContent,
+  getStyleContent,
 }

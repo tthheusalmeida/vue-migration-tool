@@ -10,6 +10,7 @@ const {
 } = require('./utils/string');
 const {
   renderTemplate,
+  renderScript,
 } = require('./operations/compiler/render');
 
 async function runVueMigrationTool() {
@@ -18,13 +19,18 @@ async function runVueMigrationTool() {
 
   const rawAst = runParser(fileName);
   const stringAst = stringifyCircularStructureToJson(rawAst);
-  const ast = JSON.parse(stringAst).template.ast;
+  const ast = JSON.parse(stringAst);
 
+  // TODO remove save file as json when finish all compiler modules {
   const jsonFileName = replaceExtensionVueToJson(fileName);
   fs.writeFileSync(jsonFileName, stringAst);
+  // }
 
-  const vueTemplateRender = await renderTemplate(ast);
-  fs.writeFileSync(newFileName, vueTemplateRender);
+  const vueTemplateRendered = await renderTemplate(ast.template.ast);
+  const vueScriptRendered = await renderScript(ast.script, ast.scriptString);
+  const compiledVueComponent = `${vueTemplateRendered}\n${vueScriptRendered}\n${rawAst.styleString}\n`;
+
+  fs.writeFileSync(newFileName, compiledVueComponent);
 }
 
 runVueMigrationTool();

@@ -5,7 +5,12 @@ const {
 const {
   format,
 } = require('prettier');
+const generator = require('@babel/generator');
+const {
+  transformFromAstSync,
+} = require('@babel/core');
 
+// Template render
 async function renderTemplate(ast) {
   const renderedTag = renderTag(ast);
   const formattedTemplate = await format(renderedTag, {
@@ -86,7 +91,17 @@ function renderCloseTag(node) {
   return `</${node.tag}>`;
 }
 
+// Script render
+function renderScript(ast, code, plugins = []) {
+  return `<script>\n${transformFromAstSync(
+    ast,
+    code,
+    { plugins }
+  ).code}\n</script>\n`;
+}
+
 module.exports = {
+  renderScript,
   renderTemplate,
   renderTag,
   renderTagByType,

@@ -4,9 +4,13 @@ const fs = require('fs');
 const {
   getTemplateAst,
 } = require('./template');
-// const {
-//   getScriptAst,
-// } = require('./script');
+const {
+  getScriptAst,
+} = require('./script');
+const {
+  getScriptContent,
+  getStyleContent,
+} = require('../../utils/string');
 
 function runParser(fileName = '') {
   console.log(`=> Running parse for ${fileName}.\n`);
@@ -14,7 +18,9 @@ function runParser(fileName = '') {
 
   return {
     template: getTemplateAst(fileContent),
-    // script: getScriptAst(fileContent), TODO remove commented line when working with script
+    script: getScriptAst(fileContent),
+    scriptString: getScriptContent(fileContent),
+    styleString: getStyleContent(fileContent),
   };
 }
 

@@ -9,7 +9,7 @@
     "test:coverage": "jest --coverage"
   },
   "author": "Matheus Henrique dos Santos Almeida",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "vue-template-compiler": "^2.7.16"
   },
