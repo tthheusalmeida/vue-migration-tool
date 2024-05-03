@@ -1,11 +1,7 @@
 'use strict';
 
-const {
-  parse
-} = require('@babel/parser');
-const {
-  getScriptContent,
-} = require('../../utils/string');
+const { parse } = require('@babel/parser');
+const { getScriptContent } = require('../../utils/string');
 
 function getScriptAst(fileContent = '') {
   const script = getScriptContent(fileContent);

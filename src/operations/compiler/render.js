@@ -1,14 +1,9 @@
+const { format } = require('prettier');
+const { transformFromAstSync } = require('@babel/core');
 const {
   NODE_TYPE,
   SELF_CLOSING_TAGS,
 } = require('./constants.js');
-const {
-  format,
-} = require('prettier');
-const generator = require('@babel/generator');
-const {
-  transformFromAstSync,
-} = require('@babel/core');
 
 // Template render
 async function renderTemplate(ast) {
@@ -101,11 +96,11 @@ function renderScript(ast, code, plugins = []) {
 }
 
 module.exports = {
-  renderScript,
   renderTemplate,
   renderTag,
   renderTagByType,
   renderAttrsMap,
   renderOpenTag,
   renderCloseTag,
+  renderScript,
 }

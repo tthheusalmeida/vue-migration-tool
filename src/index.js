@@ -1,13 +1,7 @@
 const fs = require('fs');
-const {
-  runParser,
-} = require('./operations/parser/index');
-const {
-  stringifyCircularStructureToJson,
-} = require('./utils/object');
-const {
-  replaceExtensionVueToJson,
-} = require('./utils/string');
+const { runParser } = require('./operations/parser/index');
+const { stringifyCircularStructureToJson } = require('./utils/object');
+const { replaceExtensionVueToJson } = require('./utils/string');
 const {
   renderTemplate,
   renderScript,

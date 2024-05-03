@@ -1,12 +1,8 @@
 'use strict';
 
 const fs = require('fs');
-const {
-  getTemplateAst,
-} = require('./template');
-const {
-  getScriptAst,
-} = require('./script');
+const { getTemplateAst } = require('./template');
+const { getScriptAst } = require('./script');
 const {
   getScriptContent,
   getStyleContent,
