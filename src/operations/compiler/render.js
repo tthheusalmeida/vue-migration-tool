@@ -1,4 +1,5 @@
 const { format } = require('prettier');
+// const { stringifyCircularStructureToJson } = require('../../utils/object.js');
 const { transformFromAstSync } = require('@babel/core');
 const {
   NODE_TYPE,
@@ -88,11 +89,13 @@ function renderCloseTag(node) {
 
 // Script render
 function renderScript(ast, code, plugins = []) {
-  return `<script>\n${transformFromAstSync(
+  const renderdedCode = transformFromAstSync(
     ast,
     code,
     { plugins }
-  ).code}\n</script>\n`;
+  ).code;
+
+  return `<script>\n${renderdedCode}\n</script>\n`;
 }
 
 module.exports = {

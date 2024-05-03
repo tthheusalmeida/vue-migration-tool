@@ -48,6 +48,7 @@ function getStyleContent(fileContent) {
 
 module.exports = {
   replaceExtensionVueToJson,
+  getTagContent,
   getTemplateContent,
   getScriptContent,
   getStyleContent,

@@ -22,6 +22,7 @@ async function runVueMigrationTool() {
 
   const vueTemplateRendered = await renderTemplate(ast.template.ast);
   const vueScriptRendered = await renderScript(ast.script, ast.scriptString);
+
   const compiledVueComponent = `${vueTemplateRendered}\n${vueScriptRendered}\n${rawAst.styleString}\n`;
 
   fs.writeFileSync(newFileName, compiledVueComponent);

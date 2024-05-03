@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "jest src/test",
+    "test": "jest test",
+    "test:unit": "jest --coverage --verbose",
     "test:coverage": "jest --coverage"
   },
   "author": "Matheus Henrique dos Santos Almeida",

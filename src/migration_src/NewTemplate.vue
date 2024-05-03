@@ -26,60 +26,17 @@
 </template>
 
 <script>
-import Loading from '@/components/base/Loading.vue';
-import { removeDashFromString } from '@/utils/formatter';
-import { getCardBackgroundColor, getSolidColor } from '@/utils/color';
-import { mapActions } from 'vuex';
 export default {
   name: 'PokeCard',
-  components: {
-    Loading
-  },
   props: {
     id: {
-      type: String,
-      required: true
-    },
-    name: {
-      type: String,
-      required: true
-    },
-    types: {
-      type: Array,
-      required: true
-    },
-    img: {
       type: String,
       required: true
     }
   },
   computed: {
     isThereData() {
-      return this.id && this.name && this.types && this.img;
-    },
-    pokemonName() {
-      return removeDashFromString(this.name);
-    }
-  },
-  methods: {
-    ...mapActions('card', ['toggleDetails', 'setPokemonDetails']),
-    getTypeStyle(type) {
-      return `
-        color: var(--${type}-type);
-        background: var(--background-${type}-type);
-      `;
-    },
-    getBorderStyle(type) {
-      return `border: 2px solid var(--background-${getSolidColor(type)}-type);`;
-    },
-    backgroundColor(type) {
-      return getCardBackgroundColor(type);
-    },
-    openPokemonDetails() {
-      this.setPokemonDetails({
-        id: this.id
-      });
-      this.toggleDetails();
+      return this.id;
     }
   }
 };

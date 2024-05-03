@@ -54,7 +54,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss">
 .example-component {
   /* Estilos para a classe example-component */
   background-color: #f0f0f0;
