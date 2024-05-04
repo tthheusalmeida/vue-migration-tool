@@ -1,6 +1,5 @@
+const generator = require('@babel/generator').default;
 const { format } = require('prettier');
-// const { stringifyCircularStructureToJson } = require('../../utils/object.js');
-const { transformFromAstSync } = require('@babel/core');
 const {
   NODE_TYPE,
   SELF_CLOSING_TAGS,
@@ -88,14 +87,8 @@ function renderCloseTag(node) {
 }
 
 // Script render
-function renderScript(ast, code, plugins = []) {
-  const renderdedCode = transformFromAstSync(
-    ast,
-    code,
-    { plugins }
-  ).code;
-
-  return `<script>\n${renderdedCode}\n</script>\n`;
+function renderScript(ast) {
+  return `<script>\n${generator(ast).code}\n</script>\n`;
 }
 
 module.exports = {

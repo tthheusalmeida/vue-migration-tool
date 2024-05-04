@@ -14,12 +14,16 @@
     "collectCoverageFrom": [
       "src/operations/compiler/**/*.js",
       "src/operations/parser/**/*.js",
+      "src/operations/transforme/**/*.js",
       "src/utils/**/*.js"
     ]
   },
   "author": "Matheus Henrique dos Santos Almeida",
   "license": "MIT",
   "dependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/generator": "^7.24.5",
+    "@babel/traverse": "^7.24.5",
     "vue-template-compiler": "^2.7.16"
   },
   "devDependencies": {
