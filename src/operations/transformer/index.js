@@ -9,14 +9,14 @@ function runTransformer(ast) {
     beforeDestroyToBeforeUnmount
   ];
 
-  let transformedAst = { ...ast.script };
+  let newScriptAst = { ...ast.script };
   scriptRules.forEach(currentFunction => {
-    transformedAst = currentFunction(transformedAst);
+    newScriptAst = currentFunction(newScriptAst);
   });
 
   return {
     template: ast.template,
-    script: transformedAst,
+    script: newScriptAst,
     styleString: ast.styleString,
   }
 }
