@@ -9,6 +9,9 @@
 export default {
   destroyed() {
     console.log('destroyed hook');
+  },
+  beforeDestroy() {
+    console.log('beforeDestroy hook');
   }
 };
 </script>

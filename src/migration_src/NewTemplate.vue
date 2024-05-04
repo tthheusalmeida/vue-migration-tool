@@ -9,6 +9,9 @@
 export default {
   unmounted() {
     console.log('destroyed hook');
+  },
+  beforeUnmount() {
+    console.log('beforeDestroy hook');
   }
 };
 </script>

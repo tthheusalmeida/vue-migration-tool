@@ -8,6 +8,7 @@ const {
 } = require('./operations/compiler/render');
 const {
   destroyedToUnmouted,
+  beforeDestroyToBeforeUnmount,
 } = require('./operations/transforme/index');
 
 async function runVueMigrationTool() {
@@ -23,7 +24,15 @@ async function runVueMigrationTool() {
   fs.writeFileSync(jsonFileName, stringAst);
 
   // Run ast transforme
-  const modifiedAst = destroyedToUnmouted(ast.script);
+  const scriptTransforme = [
+    destroyedToUnmouted,
+    beforeDestroyToBeforeUnmount
+  ];
+
+  let modifiedAst = { ...ast.script };
+  scriptTransforme.forEach(currentFunction => {
+    modifiedAst = currentFunction(modifiedAst);
+  });
 
   // Render code after tranform the breaking changes
   const vueTemplateRendered = await renderTemplate(ast.template.ast);

@@ -1,5 +1,6 @@
 const SUCESSFULL_MESSAGE = {
-  DESTROYED_TO_UNMOUNTED: '- The "destroyed" lifecycle option has been renamed to "unmounted".\n',
+  DESTROYED_TO_UNMOUNTED: '- The "destroyed" lifecycle option has been renamed to "unmounted".',
+  BEFORE_DESTROY_TO_BEFORE_UNMOUNT: '- The "beforeDestroy" lifecycle option has been renamed to "beforeUnmount".',
 }
 
 const traverse = require('@babel/traverse').default;
@@ -22,6 +23,23 @@ function destroyedToUnmouted(ast) {
   return currentAst;
 }
 
+// - The beforeDestroy lifecycle option has been renamed to beforeUnmount
+function beforeDestroyToBeforeUnmount(ast) {
+  const currentAst = { ...ast };
+  traverse(currentAst, {
+    enter(path) {
+      if (path.isIdentifier({ name: 'beforeDestroy' })) {
+        path.node.name = 'beforeUnmount';
+
+        console.info(SUCESSFULL_MESSAGE.BEFORE_DESTROY_TO_BEFORE_UNMOUNT);
+      }
+    }
+  });
+
+  return currentAst;
+}
+
 module.exports = {
   destroyedToUnmouted,
+  beforeDestroyToBeforeUnmount,
 }
