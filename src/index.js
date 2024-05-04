@@ -9,7 +9,7 @@ const {
 const {
   destroyedToUnmouted,
   beforeDestroyToBeforeUnmount,
-} = require('./operations/transforme/index');
+} = require('./operations/transformer/index');
 
 async function runVueMigrationTool() {
   const fileName = './src/migration_src/SimpleTemplate.vue';

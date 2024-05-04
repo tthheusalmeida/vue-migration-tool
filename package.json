@@ -14,7 +14,7 @@
     "collectCoverageFrom": [
       "src/operations/compiler/**/*.js",
       "src/operations/parser/**/*.js",
-      "src/operations/transforme/**/*.js",
+      "src/operations/transformer/**/*.js",
       "src/utils/**/*.js"
     ]
   },
