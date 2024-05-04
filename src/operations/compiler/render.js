@@ -9,8 +9,7 @@ async function runRender(ast) {
   const vueTemplateRendered = await renderTemplate(ast.template.ast);
   const vueScriptRendered = await renderScript(ast.script);
 
-  const component = `${vueTemplateRendered}\n${vueScriptRendered}\n${ast.styleString}\n`;
-  return component;
+  return `${vueTemplateRendered}\n${vueScriptRendered}\n${ast.styleString}\n`;
 }
 
 // Template render
