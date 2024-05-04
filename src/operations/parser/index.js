@@ -1,11 +1,11 @@
 'use strict';
 
 const fs = require('fs');
-const { getTemplateAst } = require('./template');
-const { getScriptAst } = require('./script');
-const {
-  getStyleContent,
-} = require('../../utils/string');
+const { parse } = require('@babel/parser');
+const { compile } = require('vue-template-compiler');
+const { getTemplateContent } = require('../../utils/string');
+const { getScriptContent } = require('../../utils/string');
+const { getStyleContent } = require('../../utils/string');
 
 function runParser(fileName = '') {
   console.log(`=> Running parse for ${fileName}.\n`);
@@ -18,6 +18,23 @@ function runParser(fileName = '') {
   };
 }
 
+function getTemplateAst(fileContent = '') {
+  const template = getTemplateContent(fileContent);
+
+  return compile(template);
+}
+
+function getScriptAst(fileContent = '') {
+  const script = getScriptContent(fileContent);
+
+  return parse(
+    script,
+    { sourceType: 'module' },
+  );
+}
+
 module.exports = {
   runParser,
+  getTemplateAst,
+  getScriptAst,
 }
