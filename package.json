@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "test": "jest test",
-    "test:unit": "jest --coverage --verbose",
-    "test:coverage": "jest --coverage"
+    "test:unit": "jest --coverage --verbose --silent",
+    "test:coverage": "jest --coverage --silent"
   },
   "jest": {
     "collectCoverage": true,

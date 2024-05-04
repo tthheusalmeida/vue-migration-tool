@@ -19,12 +19,20 @@ function runParser(fileName = '') {
 }
 
 function getTemplateAst(fileContent = '') {
+  if (fileContent === '') {
+    return {};
+  }
+
   const template = getTemplateContent(fileContent);
 
   return compile(template);
 }
 
 function getScriptAst(fileContent = '') {
+  if (fileContent === '') {
+    return {};
+  }
+
   const script = getScriptContent(fileContent);
 
   return parse(
