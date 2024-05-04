@@ -5,6 +5,14 @@ const {
   SELF_CLOSING_TAGS,
 } = require('./constants.js');
 
+async function runRender(ast) {
+  const vueTemplateRendered = await renderTemplate(ast.template.ast);
+  const vueScriptRendered = await renderScript(ast.script);
+
+  const component = `${vueTemplateRendered}\n${vueScriptRendered}\n${ast.styleString}\n`;
+  return component;
+}
+
 // Template render
 async function renderTemplate(ast) {
   const renderedTag = renderTag(ast);
@@ -92,6 +100,7 @@ function renderScript(ast) {
 }
 
 module.exports = {
+  runRender,
   renderTemplate,
   renderTag,
   renderTagByType,
