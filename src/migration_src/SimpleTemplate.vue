@@ -1,7 +1,9 @@
 <template>
   <div class="example-component">
     <p>{{ message }}</p>
-    <button @click="reverseMessage">Reverse Message</button>
+    <div @hook:destroyed="destroyed"></div>
+    <div @hook:beforeDestroy="beforeDestroy"></div>
+    <div @hook:mounted="mounted"></div>
   </div>
 </template>
 
@@ -12,6 +14,9 @@ export default {
   },
   beforeDestroy() {
     console.log('beforeDestroy hook');
+  },
+  mounted() {
+    console.log('mounted hook');
   }
 };
 </script>

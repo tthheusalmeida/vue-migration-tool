@@ -3,7 +3,19 @@ const {
   beforeDestroyToBeforeUnmount,
 } = require('./script');
 
+const { eventsPrefixChanged } = require('./template');
+
+
 function runTransformer(ast) {
+  const templateRules = [
+    eventsPrefixChanged,
+  ];
+
+  let newTemplateAst = { ...ast.template };
+  templateRules.forEach(currentFunction => {
+    newTemplateAst.ast = currentFunction(newTemplateAst.ast);
+  });
+
   const scriptRules = [
     destroyedToUnmouted,
     beforeDestroyToBeforeUnmount
@@ -15,7 +27,7 @@ function runTransformer(ast) {
   });
 
   return {
-    template: ast.template,
+    template: newTemplateAst,
     script: newScriptAst,
     styleString: ast.styleString,
   }

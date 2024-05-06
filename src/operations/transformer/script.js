@@ -1,8 +1,6 @@
-const SUCESSFULL_MESSAGE = {
-  DESTROYED_TO_UNMOUNTED: '- The "destroyed" lifecycle option has been renamed to "unmounted".',
-  BEFORE_DESTROY_TO_BEFORE_UNMOUNT: '- The "beforeDestroy" lifecycle option has been renamed to "beforeUnmount".',
-}
+'use strict';
 
+const { SUCESSFULL_MESSAGE } = require('./constants');
 const traverse = require('@babel/traverse').default;
 
 // Other Minor Changes | https://v3-migration.vuejs.org/breaking-changes/#other-minor-changes

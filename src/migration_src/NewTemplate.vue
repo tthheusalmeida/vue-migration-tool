@@ -1,7 +1,9 @@
 <template>
   <div class="example-component">
     <p>{{ message }}</p>
-    <button @click="reverseMessage"></button>
+    <div @vue:unmounted="unmounted"></div>
+    <div @vue:beforeUnmount="beforeUnmount"></div>
+    <div @vue:mounted="mounted"></div>
   </div>
 </template>
 
@@ -12,6 +14,9 @@ export default {
   },
   beforeUnmount() {
     console.log('beforeDestroy hook');
+  },
+  mounted() {
+    console.log('mounted hook');
   }
 };
 </script>
