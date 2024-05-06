@@ -4,6 +4,7 @@
     <div @vue:unmounted="unmounted"></div>
     <div @vue:beforeUnmount="beforeUnmount"></div>
     <div @vue:mounted="mounted"></div>
+    <input v-on:keyup.enter="submit" />
   </div>
 </template>
 

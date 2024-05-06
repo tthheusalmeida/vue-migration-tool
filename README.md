@@ -45,7 +45,7 @@ Documentation with breaking changes can be found [here](https://v3-migration.vue
 - [x] Lifecycle hook: events prefix changed to vnode-
 
 ## Removed APIs
-- [ ] keyCode support as v-on modifiers
+- [x] keyCode support as v-on modifiers
 - [ ] $on, $off and $once instance methods
 - [ ] Filters
 - [ ] Inline templates attributes

@@ -4,6 +4,7 @@
     <div @hook:destroyed="destroyed"></div>
     <div @hook:beforeDestroy="beforeDestroy"></div>
     <div @hook:mounted="mounted"></div>
+    <input v-on:keyup.13="submit" />
   </div>
 </template>
 

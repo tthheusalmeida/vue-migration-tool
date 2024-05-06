@@ -1,6 +1,11 @@
 'use strict';
 
-const { SUCESSFULL_MESSAGE } = require('../constants');
+const {
+  SUCESSFULL_MESSAGE,
+  ERROR_MESSAGE,
+  KEY_CODE_KEBAB_CASE,
+} = require('../constants');
+const { REGEX } = require('../regex');
 const { traverseTemplate } = require('./traverse');
 
 // Other Minor Changes | https://v3-migration.vuejs.org/breaking-changes/#other-minor-changes
@@ -12,24 +17,20 @@ function eventsPrefixChanged(ast) {
 
   traverseTemplate(currentAst, {
     action: (node) => {
-      const regexDestroyed = /@hook:destroyed/g;
-      const regexBeforeDestroy = /@hook:beforeDestroy/g;
-      const regexHook = /@hook/g;
-
       if (node?.attrsMap) {
         Object.keys(node.attrsMap).forEach(item => {
-          if (item.match(regexDestroyed)) {
+          if (item.match(REGEX.DESTROYED)) {
             node.attrsMap['@vue:unmounted'] = 'unmounted';
             delete node.attrsMap[item];
 
             console.info(SUCESSFULL_MESSAGE.EVENTS_PREFIX_CHANGED);
-          } else if (item.match(regexBeforeDestroy)) {
+          } else if (item.match(REGEX.BEFORE_DESTROY)) {
             node.attrsMap['@vue:beforeUnmount'] = 'beforeUnmount';
             delete node.attrsMap[item];
 
             console.info(SUCESSFULL_MESSAGE.EVENTS_PREFIX_CHANGED);
-          } else if (item.match(regexHook)) {
-            const newKey = item.replace(regexHook, '@vue');
+          } else if (item.match(REGEX.HOOK)) {
+            const newKey = item.replace(REGEX.HOOK, '@vue');
             node.attrsMap[newKey] = node.attrsMap[item];
             delete node.attrsMap[item];
 
@@ -43,6 +44,42 @@ function eventsPrefixChanged(ast) {
   return currentAst;
 }
 
+// keyCode support as v-on modifiers
+// https://v3-migration.vuejs.org/breaking-changes/keycode-modifiers.html
+function keyCodeModifiers(ast) {
+  const currentAst = { ...ast };
+
+  traverseTemplate(currentAst, {
+    action: (node) => {
+      if (node?.attrsMap) {
+        Object.keys(node.attrsMap).forEach(item => {
+          const keyCode = item.match(REGEX.DIGIT);
+          const isThereVOn = item.match(REGEX.V_ON);
+          if (isThereVOn && keyCode) {
+            const isThereKeyCodeMapped = KEY_CODE_KEBAB_CASE[keyCode[0]];
+
+            try {
+              if (!isThereKeyCodeMapped) {
+                throw new Error(`"${keyCode}" ${ERROR_MESSAGE.KEY_CODE_IS_NOT_DEFINED}`);
+              }
+              const newKey = item.replace(REGEX.DIGIT, isThereKeyCodeMapped);
+              node.attrsMap[newKey] = node.attrsMap[item];
+              delete node.attrsMap[item];
+
+              console.info(SUCESSFULL_MESSAGE.KEY_CODE_MODIFIERS);
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        });
+      }
+    }
+  });
+
+  return currentAst;
+}
+
 module.exports = {
   eventsPrefixChanged,
+  keyCodeModifiers,
 }
