@@ -5,7 +5,7 @@
     <div @vue:beforeUnmount="beforeUnmount"></div>
     <div @vue:mounted="mounted"></div>
     <input v-on:keyup.enter="submit" />
-    <div><input type="text" v-bind="$attrs" @click="test()" /></div>
+    <div><input type="text" @click="test()" v-bind="$attrs" /></div>
   </div>
 </template>
 

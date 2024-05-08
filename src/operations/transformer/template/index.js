@@ -16,7 +16,14 @@ function templateListenersRemoved(ast) {
 
   traverseTemplate(currentAst, {
     action: (node) => {
-      if (node?.attrsMap && node.attrsMap['v-on'] === '$listeners') {
+      const isThereListeners = node?.attrsMap && node.attrsMap['v-on'] === '$listeners';
+      const isThereListenersAndAttributes = isThereListeners && node.attrsMap['v-bind'] === '$attrs';
+      if (isThereListeners) {
+        node.attrsMap['v-bind'] = '$attrs';
+        delete node.attrsMap['v-on'];
+
+        console.info(SUCESSFULL_MESSAGE.LISTENERS_REMOVED);
+      } else if (isThereListenersAndAttributes) {
         delete node.attrsMap['v-on'];
 
         console.info(SUCESSFULL_MESSAGE.LISTENERS_REMOVED);

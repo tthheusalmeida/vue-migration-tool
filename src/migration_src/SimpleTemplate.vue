@@ -6,7 +6,7 @@
     <div @hook:mounted="mounted"></div>
     <input v-on:keyup.13="submit" />
     <div>
-      <input type="text" v-bind="$attrs" v-on="$listeners" @click="test()" />
+      <input type="text" v-on="$listeners" @click="test()" />
     </div>
   </div>
 </template>
