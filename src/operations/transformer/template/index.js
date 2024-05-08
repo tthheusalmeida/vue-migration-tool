@@ -8,6 +8,25 @@ const {
 const { REGEX } = require('../regex');
 const { traverseTemplate } = require('./traverse');
 
+// Render Function
+
+// $listeners has been removed / merged into $attrs
+function templateListenersRemoved(ast) {
+  const currentAst = { ...ast };
+
+  traverseTemplate(currentAst, {
+    action: (node) => {
+      if (node?.attrsMap && node.attrsMap['v-on'] === '$listeners') {
+        delete node.attrsMap['v-on'];
+
+        console.info(SUCESSFULL_MESSAGE.LISTENERS_REMOVED);
+      }
+    }
+  });
+
+  return currentAst;
+}
+
 // Other Minor Changes | https://v3-migration.vuejs.org/breaking-changes/#other-minor-changes
 
 // - Lifecycle hook: events prefix changed to vnode
@@ -82,4 +101,5 @@ function keyCodeModifiers(ast) {
 module.exports = {
   eventsPrefixChanged,
   keyCodeModifiers,
+  templateListenersRemoved,
 }

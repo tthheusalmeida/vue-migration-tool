@@ -3,6 +3,7 @@ const SUCESSFULL_MESSAGE = {
   BEFORE_DESTROY_TO_BEFORE_UNMOUNT: '- The "beforeDestroy" lifecycle option has been renamed to "beforeUnmount".',
   EVENTS_PREFIX_CHANGED: '- Events prefix on Lifecycle hook changed to vnode.',
   KEY_CODE_MODIFIERS: '- KeyCode support as v-on modifiers.',
+  LISTENERS_REMOVED: '- $listeners has been removed / merged into $attrs.',
 };
 
 const ERROR_MESSAGE = {

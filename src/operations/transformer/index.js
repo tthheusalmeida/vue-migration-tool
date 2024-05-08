@@ -6,6 +6,7 @@ const {
 const {
   eventsPrefixChanged,
   keyCodeModifiers,
+  templateListenersRemoved,
 } = require('./template');
 
 
@@ -13,6 +14,7 @@ function runTransformer(ast) {
   const templateRules = [
     eventsPrefixChanged,
     keyCodeModifiers,
+    templateListenersRemoved,
   ];
   const scriptRules = [
     destroyedToUnmouted,
