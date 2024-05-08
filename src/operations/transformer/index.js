@@ -14,29 +14,34 @@ function runTransformer(ast) {
     eventsPrefixChanged,
     keyCodeModifiers,
   ];
-
-  let newTemplateAst = { ...ast.template };
-  templateRules.forEach(currentFunction => {
-    newTemplateAst.ast = currentFunction(newTemplateAst.ast);
-  });
-
   const scriptRules = [
     destroyedToUnmouted,
     beforeDestroyToBeforeUnmount,
   ];
 
-  let newScriptAst = { ...ast.script };
-  scriptRules.forEach(currentFunction => {
-    newScriptAst = currentFunction(newScriptAst);
-  });
+  const newTemplateAst = transformerInRulesList(ast.template.ast, templateRules);
+  const newScriptAst = transformerInRulesList(ast.script, scriptRules);
 
+  const template = { ast: newTemplateAst };
+  const script = newScriptAst;
   return {
-    template: newTemplateAst,
-    script: newScriptAst,
+    template,
+    script,
     styleString: ast.styleString,
   }
 }
 
+function transformerInRulesList(ast, rulesList) {
+  let newAst = { ...ast };
+
+  rulesList.forEach(currentFunction => {
+    newAst = currentFunction(newAst);
+  });
+
+  return newAst;
+}
+
 module.exports = {
   runTransformer,
+  transformerInRulesList,
 }

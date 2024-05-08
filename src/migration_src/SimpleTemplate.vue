@@ -5,11 +5,16 @@
     <div @hook:beforeDestroy="beforeDestroy"></div>
     <div @hook:mounted="mounted"></div>
     <input v-on:keyup.13="submit" />
+    <div>
+      <input type="text" v-bind="$attrs" v-on="$listeners" @click="test()" />
+    </div>
   </div>
 </template>
 
 <script>
 export default {
+  name: 'SimpleTemplate',
+  inheritAttrs: false,
   destroyed() {
     console.log('destroyed hook');
   },
@@ -18,6 +23,13 @@ export default {
   },
   mounted() {
     console.log('mounted hook');
+  },
+  methods: {
+    test() {
+      const { submit } = this.$listeners;
+
+      console.log('SUBMIT: ', submit);
+    }
   }
 };
 </script>

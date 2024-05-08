@@ -5,11 +5,16 @@
     <div @vue:beforeUnmount="beforeUnmount"></div>
     <div @vue:mounted="mounted"></div>
     <input v-on:keyup.enter="submit" />
+    <div>
+      <input type="text" v-bind="$attrs" v-on="$listeners" @click="test()" />
+    </div>
   </div>
 </template>
 
 <script>
 export default {
+  name: 'SimpleTemplate',
+  inheritAttrs: false,
   unmounted() {
     console.log('destroyed hook');
   },
@@ -18,6 +23,14 @@ export default {
   },
   mounted() {
     console.log('mounted hook');
+  },
+  methods: {
+    test() {
+      const {
+        submit
+      } = this.$listeners;
+      console.log('SUBMIT: ', submit);
+    }
   }
 };
 </script>
