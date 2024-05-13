@@ -106,7 +106,7 @@ function keyCodeModifiers(ast) {
 }
 
 module.exports = {
+  templateListenersRemoved,
   eventsPrefixChanged,
   keyCodeModifiers,
-  templateListenersRemoved,
 }
