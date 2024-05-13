@@ -1,6 +1,7 @@
 const {
   destroyedToUnmouted,
   beforeDestroyToBeforeUnmount,
+  dataOptions,
 } = require('./script');
 
 const {
@@ -11,6 +12,12 @@ const {
 
 
 function runTransformer(ast) {
+  if (Object.keys(ast.template).length === 0
+    && Object.keys(ast.script).length === 0
+    && ast.styleString === '') {
+    return ast;
+  }
+
   const templateRules = [
     eventsPrefixChanged,
     keyCodeModifiers,
@@ -19,6 +26,7 @@ function runTransformer(ast) {
   const scriptRules = [
     destroyedToUnmouted,
     beforeDestroyToBeforeUnmount,
+    dataOptions,
   ];
 
   const newTemplateAst = transformerInRulesList(ast.template.ast, templateRules);

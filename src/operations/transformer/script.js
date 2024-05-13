@@ -2,6 +2,7 @@
 
 const { SUCESSFULL_MESSAGE } = require('./constants');
 const traverse = require('@babel/traverse').default;
+const babelTypes = require('@babel/types');
 
 // Other Minor Changes | https://v3-migration.vuejs.org/breaking-changes/#other-minor-changes
 
@@ -37,7 +38,49 @@ function beforeDestroyToBeforeUnmount(ast) {
   return currentAst;
 }
 
+// - The data option should always be declared as a function
+function dataOptions(ast) {
+  const currentAst = { ...ast };
+
+  traverse(currentAst, {
+    VariableDeclaration(path) {
+      const declarator = path.node.declarations[0];
+      if (babelTypes.isNewExpression(declarator.init) && declarator.init.callee.name === 'Vue') {
+        // Remove 'const' keyword
+        path.node.kind = '';
+
+        // Replace 'new Vue' with 'createApp'
+        declarator.init.callee = babelTypes.identifier('createApp');
+
+        // Modify data property to return an object
+        const dataProperty = declarator.init.arguments[0].properties.find(prop => prop.key.name === 'data');
+        dataProperty.value = babelTypes.arrowFunctionExpression([], dataProperty.value);
+
+        // Remove 'el' property
+        const elPropertyIndex = declarator.init.arguments[0].properties.findIndex(prop => prop.key.name === 'el');
+        declarator.init.arguments[0].properties.splice(elPropertyIndex, 1);
+
+        // Add .mount('#app')
+        const mountCallExpression = babelTypes.callExpression(babelTypes.memberExpression(declarator.init, babelTypes.identifier('mount')), [babelTypes.stringLiteral('#app')]);
+        path.insertAfter(mountCallExpression);
+
+        // Remove original declaration
+        path.remove();
+
+        // Add import declaration if not added yet
+        const importDeclaration = babelTypes.importDeclaration([babelTypes.importSpecifier(babelTypes.identifier('createApp'), babelTypes.identifier('createApp'))], babelTypes.stringLiteral('vue'));
+        ast.program.body.unshift(importDeclaration);
+
+        console.info(SUCESSFULL_MESSAGE.DATA_OPTIONS);
+      }
+    }
+  });
+
+  return currentAst;
+}
+
 module.exports = {
   destroyedToUnmouted,
   beforeDestroyToBeforeUnmount,
+  dataOptions,
 }

@@ -4,6 +4,7 @@ const SUCESSFULL_MESSAGE = {
   EVENTS_PREFIX_CHANGED: '- Events prefix on Lifecycle hook changed to vnode.',
   KEY_CODE_MODIFIERS: '- KeyCode support as v-on modifiers.',
   LISTENERS_REMOVED: '- $listeners has been removed / merged into $attrs.',
+  DATA_OPTIONS: '- The data option should always be declared as a function.'
 };
 
 const ERROR_MESSAGE = {

@@ -4,9 +4,13 @@ function replaceExtensionVueToJson(string) {
   return string.replace(/\.vue$/, ".json");
 }
 
-function getTagContent(fileContent, startTag, endTag, includeTag = false) {
+function getTagContent(fileContent, startTag = '', endTag = '', includeTag = false) {
   const indexStart = fileContent.indexOf(startTag);
   const indexEnd = fileContent.indexOf(endTag);
+
+  if (indexStart < 0 || indexEnd < 0) {
+    return '';
+  }
 
   if (includeTag) {
     return fileContent.substring(
@@ -14,6 +18,7 @@ function getTagContent(fileContent, startTag, endTag, includeTag = false) {
       indexEnd + endTag.length,
     ).trim();
   }
+
   return fileContent.substring(
     indexStart + startTag.length,
     indexEnd,

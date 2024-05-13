@@ -95,6 +95,10 @@ function renderCloseTag(node) {
 
 // Script render
 function renderScript(ast) {
+  if (Object.keys(ast).length === 0) {
+    return '';
+  }
+
   return `<script>\n${generator(ast).code}\n</script>\n`;
 }
 
