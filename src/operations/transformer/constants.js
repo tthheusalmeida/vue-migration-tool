@@ -4,7 +4,8 @@ const SUCESSFULL_MESSAGE = {
   EVENTS_PREFIX_CHANGED: '- Events prefix on Lifecycle hook changed to vnode.',
   KEY_CODE_MODIFIERS: '- KeyCode support as v-on modifiers.',
   LISTENERS_REMOVED: '- $listeners has been removed / merged into $attrs.',
-  DATA_OPTIONS: '- The data option should always be declared as a function.'
+  DATA_OPTIONS: '- The data option should always be declared as a function.',
+  NEW_VUE: ' - [Global API] new Vue now is createApp, an app instance from new concept in Vue 3.'
 };
 
 const ERROR_MESSAGE = {

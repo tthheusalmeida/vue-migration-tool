@@ -43,6 +43,28 @@ function dataOptions(ast) {
   const currentAst = { ...ast };
 
   traverse(currentAst, {
+    ObjectProperty(path) {
+      if (path.node.key.name === 'data' && babelTypes.isObjectExpression(path.node.value)) {
+        const newDataMethod = babelTypes.objectMethod(
+          'method',
+          babelTypes.identifier('data'),
+          [],
+          babelTypes.blockStatement([babelTypes.returnStatement(path.node.value)])
+        );
+        path.replaceWith(newDataMethod);
+
+        console.info(SUCESSFULL_MESSAGE.DATA_OPTIONS);
+      }
+    }
+  });
+
+  return currentAst;
+}
+
+function globalApiNewVue(ast) {
+  const currentAst = { ...ast };
+
+  traverse(currentAst, {
     VariableDeclaration(path) {
       const declarator = path.node.declarations[0];
       if (babelTypes.isNewExpression(declarator.init) && declarator.init.callee.name === 'Vue') {
@@ -51,10 +73,6 @@ function dataOptions(ast) {
 
         // Replace 'new Vue' with 'createApp'
         declarator.init.callee = babelTypes.identifier('createApp');
-
-        // Modify data property to return an object
-        const dataProperty = declarator.init.arguments[0].properties.find(prop => prop.key.name === 'data');
-        dataProperty.value = babelTypes.arrowFunctionExpression([], dataProperty.value);
 
         // Remove 'el' property
         const elPropertyIndex = declarator.init.arguments[0].properties.findIndex(prop => prop.key.name === 'el');
@@ -71,7 +89,7 @@ function dataOptions(ast) {
         const importDeclaration = babelTypes.importDeclaration([babelTypes.importSpecifier(babelTypes.identifier('createApp'), babelTypes.identifier('createApp'))], babelTypes.stringLiteral('vue'));
         ast.program.body.unshift(importDeclaration);
 
-        console.info(SUCESSFULL_MESSAGE.DATA_OPTIONS);
+        console.info(SUCESSFULL_MESSAGE.NEW_VUE);
       }
     }
   });
@@ -83,4 +101,5 @@ module.exports = {
   destroyedToUnmouted,
   beforeDestroyToBeforeUnmount,
   dataOptions,
+  globalApiNewVue,
 }

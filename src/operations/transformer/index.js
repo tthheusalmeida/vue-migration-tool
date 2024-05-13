@@ -1,6 +1,7 @@
 const {
   destroyedToUnmouted,
   beforeDestroyToBeforeUnmount,
+  globalApiNewVue,
   dataOptions,
 } = require('./script');
 
@@ -26,6 +27,7 @@ function runTransformer(ast) {
   const scriptRules = [
     destroyedToUnmouted,
     beforeDestroyToBeforeUnmount,
+    globalApiNewVue,
     dataOptions,
   ];
 
