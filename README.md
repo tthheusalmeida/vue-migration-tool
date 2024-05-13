@@ -34,7 +34,7 @@ Documentation with breaking changes can be found [here](https://v3-migration.vue
 - [x] The beforeDestroy lifecycle option has been renamed to beforeUnmount
 - [ ] Props default factory function no longer has access to this context
 - [ ] Custom directive API changed to align with component lifecycle and binding.expression removed
-- [ ] The data option should always be declared as a function
+- [x] The data option should always be declared as a function
 - [ ] The data option from mixins is now merged shallowly
 - [ ] Attributes coercion strategy changed
 - [ ] Some transition classes got a rename
