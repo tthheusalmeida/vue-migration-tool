@@ -6,6 +6,6 @@
     },
     created: function () {
       console.log('Vue instance has been created!');
-    }
+    },
   });
 </script>

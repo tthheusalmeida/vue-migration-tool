@@ -2,7 +2,7 @@
 <script>
 import { createApp } from "vue";
 new createApp({
-  data () {
+  data() {
     return {
       name: 'Tony'
     };
