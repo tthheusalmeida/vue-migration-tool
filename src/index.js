@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 
 const { runParser } = require('./operations/parser/index');
 const { runTransformer } = require('./operations/transformer/index');
@@ -15,10 +14,9 @@ async function runVueMigrationTool() {
   const promises = filesPath.map(async (filePath, index) => {
     const ast = runParser(filePath);
     const tranformedAst = runTransformer(ast);
+    const renderedComponent = await runRender(tranformedAst);
 
-    const newRenderedComponent = await runRender(tranformedAst);
-
-    fs.writeFileSync(filesPathToSave[index], newRenderedComponent);
+    fs.writeFileSync(filesPathToSave[index], renderedComponent);
   });
 
   await Promise.all(promises);
