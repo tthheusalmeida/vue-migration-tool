@@ -7,11 +7,10 @@ const { getTemplateContent } = require('../../utils/string');
 const { getScriptContent } = require('../../utils/string');
 const { getStyleContent } = require('../../utils/string');
 const { stringifyCircularStructureToJson } = require('../../utils/object');
-// const { replaceExtensionVueToJson } = require('../../utils/string');
 
-function runParser(fileName = '') {
-  console.info(`=> Running parse for ${fileName}.`);
-  const fileContent = fs.readFileSync(fileName, 'utf8');
+function runParser(filePath = '') {
+  console.info(`\n=> Running parse for "${splitfilePath(filePath)}".`);
+  const fileContent = fs.readFileSync(filePath, 'utf8');
 
   if (!fileContent) {
     return {
@@ -57,6 +56,15 @@ function getScriptAst(fileContent = '') {
     script,
     { sourceType: 'module' },
   );
+}
+
+const splitfilePath = (filePath) => {
+  const parts = filePath.split('src\\');
+  if (parts.length > 1) {
+    return parts[1];
+  } else {
+    return filePath;
+  }
 }
 
 module.exports = {

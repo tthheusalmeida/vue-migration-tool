@@ -1,18 +1,27 @@
 const fs = require('fs');
+const path = require('path');
+
 const { runParser } = require('./operations/parser/index');
 const { runTransformer } = require('./operations/transformer/index');
 const { runRender } = require('./operations/compiler/render');
+const { getFilesInfo } = require('./operations/file/index');
 
 async function runVueMigrationTool() {
-  const fileName = './src/book_example/yellow_belt.vue';
-  const newFileName = './src/book_example/yellow_belt_migrated.vue';
+  const {
+    filesPath,
+    filesPathToSave
+  } = await getFilesInfo(__dirname);
 
-  const ast = runParser(fileName);
-  const tranformedAst = runTransformer(ast);
+  const promises = filesPath.map(async (filePath, index) => {
+    const ast = runParser(filePath);
+    const tranformedAst = runTransformer(ast);
 
-  const newRenderedComponent = await runRender(tranformedAst);
+    const newRenderedComponent = await runRender(tranformedAst);
 
-  fs.writeFileSync(newFileName, newRenderedComponent);
+    fs.writeFileSync(filesPathToSave[index], newRenderedComponent);
+  });
+
+  await Promise.all(promises);
 }
 
 runVueMigrationTool();
