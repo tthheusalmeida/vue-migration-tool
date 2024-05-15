@@ -11,15 +11,19 @@ async function runVueMigrationTool() {
     filesPathToSave
   } = await getFilesInfo(__dirname);
 
-  const promises = filesPath.map(async (filePath, index) => {
-    const ast = runParser(filePath);
-    const tranformedAst = runTransformer(ast);
-    const renderedComponent = await runRender(tranformedAst);
-
-    fs.writeFileSync(filesPathToSave[index], renderedComponent);
-  });
+  const promises = filesPath.map(
+    (filePath, index) => migrateSingleFile(filePath, filesPathToSave[index])
+  );
 
   await Promise.all(promises);
+}
+
+async function migrateSingleFile(filePath, filePathToSave) {
+  const ast = runParser(filePath);
+  const tranformedAst = runTransformer(ast);
+  const renderedComponent = await runRender(tranformedAst);
+
+  fs.writeFileSync(filePathToSave, renderedComponent);
 }
 
 runVueMigrationTool();
