@@ -79,14 +79,20 @@ function globalApiNewVue(ast) {
         declarator.init.arguments[0].properties.splice(elPropertyIndex, 1);
 
         // Add .mount('#app')
-        const mountCallExpression = babelTypes.callExpression(babelTypes.memberExpression(declarator.init, babelTypes.identifier('mount')), [babelTypes.stringLiteral('#app')]);
+        const mountCallExpression = babelTypes.callExpression(
+          babelTypes.memberExpression(declarator.init, babelTypes.identifier('mount')),
+          [babelTypes.stringLiteral('#app')]
+        );
         path.insertAfter(mountCallExpression);
 
         // Remove original declaration
         path.remove();
 
         // Add import declaration if not added yet
-        const importDeclaration = babelTypes.importDeclaration([babelTypes.importSpecifier(babelTypes.identifier('createApp'), babelTypes.identifier('createApp'))], babelTypes.stringLiteral('vue'));
+        const importDeclaration = babelTypes.importDeclaration(
+          [babelTypes.importSpecifier(babelTypes.identifier('createApp'),
+            babelTypes.identifier('createApp'))], babelTypes.stringLiteral('vue')
+        );
         ast.program.body.unshift(importDeclaration);
 
         console.info(SUCESSFULL_MESSAGE.NEW_VUE);
