@@ -1,6 +1,6 @@
 'use strict';
 
-const { SUCESSFULL_MESSAGE } = require('./constants');
+const { MIGRATION } = require('./constants');
 const traverse = require('@babel/traverse').default;
 const babelTypes = require('@babel/types');
 
@@ -14,7 +14,7 @@ function destroyedToUnmouted(ast) {
       if (path.isIdentifier({ name: 'destroyed' })) {
         path.node.name = 'unmounted';
 
-        console.info(SUCESSFULL_MESSAGE.DESTROYED_TO_UNMOUNTED);
+        console.info(MIGRATION.SUCESSFULL.DESTROYED_TO_UNMOUNTED);
       }
     }
   });
@@ -30,7 +30,7 @@ function beforeDestroyToBeforeUnmount(ast) {
       if (path.isIdentifier({ name: 'beforeDestroy' })) {
         path.node.name = 'beforeUnmount';
 
-        console.info(SUCESSFULL_MESSAGE.BEFORE_DESTROY_TO_BEFORE_UNMOUNT);
+        console.info(MIGRATION.SUCESSFULL.BEFORE_DESTROY_TO_BEFORE_UNMOUNT);
       }
     }
   });
@@ -53,7 +53,7 @@ function dataOptions(ast) {
         );
         path.replaceWith(newDataMethod);
 
-        console.info(SUCESSFULL_MESSAGE.DATA_OPTIONS);
+        console.info(MIGRATION.SUCESSFULL.DATA_OPTIONS);
       }
     }
   });
@@ -95,7 +95,7 @@ function globalApiNewVue(ast) {
         );
         ast.program.body.unshift(importDeclaration);
 
-        console.info(SUCESSFULL_MESSAGE.NEW_VUE);
+        console.info(MIGRATION.SUCESSFULL.NEW_VUE);
       }
     }
   });

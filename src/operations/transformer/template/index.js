@@ -1,11 +1,10 @@
 'use strict';
 
 const {
-  SUCESSFULL_MESSAGE,
-  ERROR_MESSAGE,
+  MIGRATION,
   KEY_CODE_KEBAB_CASE,
 } = require('../constants');
-const { REGEX } = require('../regex');
+const { REGEX } = require('../../../utils/regex');
 const { traverseTemplate } = require('./traverse');
 
 // Render Function
@@ -22,11 +21,11 @@ function templateListenersRemoved(ast) {
         node.attrsMap['v-bind'] = '$attrs';
         delete node.attrsMap['v-on'];
 
-        console.info(SUCESSFULL_MESSAGE.LISTENERS_REMOVED);
+        console.info(MIGRATION.SUCESSFULL.LISTENERS_REMOVED);
       } else if (isThereListenersAndAttributes) {
         delete node.attrsMap['v-on'];
 
-        console.info(SUCESSFULL_MESSAGE.LISTENERS_REMOVED);
+        console.info(MIGRATION.SUCESSFULL.LISTENERS_REMOVED);
       }
     }
   });
@@ -45,22 +44,22 @@ function eventsPrefixChanged(ast) {
     action: (node) => {
       if (node?.attrsMap) {
         Object.keys(node.attrsMap).forEach(item => {
-          if (item.match(REGEX.DESTROYED)) {
+          if (item.match(REGEX.TRANSFORMER.DESTROYED)) {
             node.attrsMap['@vue:unmounted'] = 'unmounted';
             delete node.attrsMap[item];
 
-            console.info(SUCESSFULL_MESSAGE.EVENTS_PREFIX_CHANGED);
-          } else if (item.match(REGEX.BEFORE_DESTROY)) {
+            console.info(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
+          } else if (item.match(REGEX.TRANSFORMER.BEFORE_DESTROY)) {
             node.attrsMap['@vue:beforeUnmount'] = 'beforeUnmount';
             delete node.attrsMap[item];
 
-            console.info(SUCESSFULL_MESSAGE.EVENTS_PREFIX_CHANGED);
-          } else if (item.match(REGEX.HOOK)) {
-            const newKey = item.replace(REGEX.HOOK, '@vue');
+            console.info(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
+          } else if (item.match(REGEX.TRANSFORMER.HOOK)) {
+            const newKey = item.replace(REGEX.TRANSFORMER.HOOK, '@vue');
             node.attrsMap[newKey] = node.attrsMap[item];
             delete node.attrsMap[item];
 
-            console.info(SUCESSFULL_MESSAGE.EVENTS_PREFIX_CHANGED);
+            console.info(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
           }
         });
       }
@@ -79,20 +78,20 @@ function keyCodeModifiers(ast) {
     action: (node) => {
       if (node?.attrsMap) {
         Object.keys(node.attrsMap).forEach(item => {
-          const keyCode = item.match(REGEX.DIGIT);
-          const isThereVOn = item.match(REGEX.V_ON);
+          const keyCode = item.match(REGEX.TRANSFORMER.DIGIT);
+          const isThereVOn = item.match(REGEX.TRANSFORMER.V_ON);
           if (isThereVOn && keyCode) {
             const isThereKeyCodeMapped = KEY_CODE_KEBAB_CASE[keyCode[0]];
 
             try {
               if (!isThereKeyCodeMapped) {
-                throw new Error(`"${keyCode}" ${ERROR_MESSAGE.KEY_CODE_IS_NOT_DEFINED}`);
+                throw new Error(`"${keyCode}" ${MIGRATION.ERROR.KEY_CODE_IS_NOT_DEFINED}`);
               }
-              const newKey = item.replace(REGEX.DIGIT, isThereKeyCodeMapped);
+              const newKey = item.replace(REGEX.TRANSFORMER.DIGIT, isThereKeyCodeMapped);
               node.attrsMap[newKey] = node.attrsMap[item];
               delete node.attrsMap[item];
 
-              console.info(SUCESSFULL_MESSAGE.KEY_CODE_MODIFIERS);
+              console.info(MIGRATION.SUCESSFULL.KEY_CODE_MODIFIERS);
             } catch (e) {
               console.error(e);
             }
