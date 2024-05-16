@@ -6,6 +6,8 @@ const { runRender } = require('./operations/compiler/render');
 const { getFilesInfo } = require('./operations/file/index');
 
 async function runVueMigrationTool() {
+  console.log('\tVue Migration Tool(2.x -> 3.x)')
+
   const {
     filesPath,
     filesPathToSave
