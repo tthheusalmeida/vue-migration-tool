@@ -145,7 +145,7 @@ describe('=> operations/compiler/render', () => {
       expect(renderTagByType(node)).toBe(expected);
     });
 
-    test('When passes node type equal NODE_TYPE.TEMPLATE_STRING, should render tag with template string.', () => {
+    test('When passes node type equal NODE_TYPE.STRING_LITERAL, should render tag with template string.', () => {
       const node = {
         type: 1,
         tag: 'div',

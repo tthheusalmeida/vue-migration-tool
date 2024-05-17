@@ -47,7 +47,7 @@ Documentation with breaking changes can be found [here](https://v3-migration.vue
 ## Removed APIs
 - [x] keyCode support as v-on modifiers
 - [ ] $on, $off and $once instance methods
-- [ ] Filters
+- [x] Filters
 - [ ] Inline templates attributes
 - [ ] $children instance property
 - [ ] propsData option

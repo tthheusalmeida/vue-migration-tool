@@ -10,7 +10,7 @@ new createApp({
       name: 'john doe'
     };
   },
-  filters: {
+  methods: {
     upper: function (value) {
       return value.toUpperCase();
     }

@@ -48,8 +48,8 @@ function renderTagByType(node) {
       });
     }
     renderedTag += renderCloseTag(node);
-  } else if (node?.type === NODE_TYPE.TEMPLATE_STRING) {
-    renderedTag += renderTemplateString(node);
+  } else if (node?.type === NODE_TYPE.STRING_LITERAL) {
+    renderedTag += renderStringLiteral(node);
   } else {
     renderedTag += '';
   }
@@ -95,7 +95,7 @@ function renderCloseTag(node) {
   return `</${node.tag}>`;
 }
 
-function renderTemplateString(node) {
+function renderStringLiteral(node) {
   const { tokens } = node;
   if (!tokens) {
     return '';

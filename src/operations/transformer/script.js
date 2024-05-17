@@ -106,11 +106,47 @@ function dataOptions(ast) {
   return currentAst;
 }
 
+// Removed APIs
 
+// - Filters
+function filters(ast) {
+  const currentAst = { ...ast };
+
+  traverse(currentAst, {
+    ObjectExpression(path) {
+      let filtersNode = null;
+      let methodsNode = null;
+
+      path.node.properties.forEach((property) => {
+        if (property.key.name === 'filters' && path.parent.type === 'NewExpression') {
+          filtersNode = property;
+        } else if (property.key.name === 'methods') {
+          methodsNode = property;
+        }
+      });
+
+      if (filtersNode) {
+        if (methodsNode) {
+          methodsNode.value.properties.push(...filtersNode.value.properties);
+          path.node.properties = path.node.properties.filter(property => property !== filtersNode);
+
+          console.info(MIGRATION.SUCESSFULL.FILTERS);
+        } else {
+          filtersNode.key.name = 'methods';
+
+          console.info(MIGRATION.SUCESSFULL.FILTERS);
+        }
+      }
+    }
+  });
+
+  return currentAst;
+}
 
 module.exports = {
   globalApiNewVue,
   destroyedToUnmouted,
   beforeDestroyToBeforeUnmount,
   dataOptions,
+  filters,
 }

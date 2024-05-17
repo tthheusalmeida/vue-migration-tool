@@ -1,16 +1,16 @@
 const {
-  destroyedToUnmouted,
-  beforeDestroyToBeforeUnmount,
-  globalApiNewVue,
-  dataOptions,
-} = require('./script');
-
-const {
   eventsPrefixChanged,
   keyCodeModifiers,
   templateListenersRemoved,
 } = require('./template');
 
+const {
+  globalApiNewVue,
+  destroyedToUnmouted,
+  beforeDestroyToBeforeUnmount,
+  dataOptions,
+  filters,
+} = require('./script');
 
 function runTransformer(ast) {
   if (Object.keys(ast.template).length === 0
@@ -25,10 +25,11 @@ function runTransformer(ast) {
     templateListenersRemoved,
   ];
   const scriptRules = [
+    globalApiNewVue,
     destroyedToUnmouted,
     beforeDestroyToBeforeUnmount,
-    globalApiNewVue,
     dataOptions,
+    filters,
   ];
 
   const newTemplateAst = transformerInRulesList(ast.template.ast, templateRules);

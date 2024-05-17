@@ -1,6 +1,6 @@
 const NODE_TYPE = {
   TAG: 1,
-  TEMPLATE_STRING: 2,
+  STRING_LITERAL: 2,
   EMPTY: 3,
 };
 
