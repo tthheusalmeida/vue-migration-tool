@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "20.11.1",
+    "npm": "10.2.4"
+  },
   "scripts": {
     "start": "node src/index.js",
     "test": "jest test",
