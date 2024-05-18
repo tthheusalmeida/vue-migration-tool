@@ -13,6 +13,10 @@ const MIGRATION = {
   },
   ERROR: {
     KEY_CODE_IS_NOT_DEFINED: 'key code is not defined.',
+    CREATE_DIRECTORY: 'Error creating directory',
+  },
+  WARNING: {
+    EMPTY_DIRECTORY: 'There are no files to perform the migration.',
   }
 }
 

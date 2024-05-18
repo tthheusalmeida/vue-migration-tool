@@ -2,21 +2,12 @@
 
 const fs = require('fs');
 const path = require('path');
-
-async function getFilesInfo(projectDir) {
-  const folderName = 'code';
-  const folderNameToSave = 'migrated';
-
-  const directory = path.join(projectDir, folderName);
-  const filesPath = await getFilesPath(directory);
-  const filesPathToSave = getNewPathToSave(filesPath, folderName, folderNameToSave);
-
-  return {
-    directory,
-    filesPath,
-    filesPathToSave,
-  }
-}
+const fsExtra = require('fs-extra');
+const recursive = require('recursive-readdir');
+const { runParser } = require('../parser/index');
+const { runTransformer } = require('../transformer/index');
+const { runRender } = require('../compiler/render');
+const { MIGRATION } = require('../../utils/message');
 
 async function getFilesPath(directory) {
   let fullPathFiles = [];
@@ -46,8 +37,111 @@ function getNewPathToSave(filesFullPath, currentFolderName, newFolderName) {
   return filesFullPath.map(file => file.replace(currentFolderName, newFolderName));
 }
 
+function getProjectFileStructure(directory) {
+  return recursive(directory)
+    .then(files => {
+      const fileStructure = {};
+
+      files.forEach(file => {
+        const relativePath = path.relative(directory, file);
+        const parts = relativePath.split(path.sep);
+
+        parts.reduce((acc, part, index) => {
+          if (index === parts.length - 1) {
+            if (!acc._files) {
+              acc._files = [];
+            }
+
+            acc._files.push(part);
+          } else {
+            if (!acc[part]) {
+              acc[part] = {};
+            }
+          }
+
+          return acc[part];
+        }, fileStructure);
+      });
+
+      return fileStructure;
+    })
+    .catch(err => console.error(err));
+}
+
+async function createFoldersForMigration(sourceDirectory) {
+  const projectStructure = await getProjectFileStructure(sourceDirectory);
+
+  const isThereProject = !Object.keys(projectStructure);
+  if (isThereProject) {
+    console.warn(MIGRATION.WARNING.EMPTY_DIRECTORY);
+    return false;
+  }
+
+  const directories = extractDirectories(sourceDirectory, projectStructure);
+  const promises = directories.map(async (folderPath) => {
+    try {
+      fsExtra.ensureDir(folderPath);
+    } catch (err) {
+      console.error(`${MIGRATION.ERROR.CREATE_DIRECTORY} ${folderPath}:`, err);
+    }
+  });
+
+  await Promise.all[promises];
+  return true;
+}
+
+function extractDirectories(basePath, projectStructure, directories = []) {
+  for (const key in projectStructure) {
+    if (key === '_files') continue;
+
+    const currentPath = path.join(basePath, key);
+    directories.push(currentPath);
+
+    extractDirectories(currentPath, projectStructure[key], directories);
+  }
+  return directories;
+}
+
+async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
+  try {
+    await fsExtra.ensureDir(targetDirectory);
+
+    const files = await fsExtra.readdir(sourceDirectory);
+
+    for (const file of files) {
+      const sourceFilePath = path.join(sourceDirectory, file);
+      const targetFilePath = path.join(targetDirectory, file);
+      const fileExtension = path.extname(file);
+
+      const fileStat = await fsExtra.stat(sourceFilePath);
+      if (fileStat.isFile()) {
+        if (fileExtension !== '.vue' && fileExtension !== '.js') {
+          await fsExtra.copy(sourceFilePath, targetFilePath);
+        } else {
+          // migrateSingleFile(sourceFilePath, targetFilePath)
+        }
+      } else if (fileStat.isDirectory()) {
+        await copyOrMigrateFiles(sourceFilePath, targetFilePath, fileExtension);
+      }
+    }
+  } catch (err) {
+    console.error(`Error copying files: ${err}`);
+  }
+}
+
+async function migrateSingleFile(sourceFilePath, targetFilePath, fileExtension) {
+  const ast = runParser(sourceFilePath);
+  const tranformedAst = runTransformer(ast);
+  const renderedComponent = await runRender(tranformedAst, fileExtension);
+
+  fs.writeFileSync(targetFilePath, renderedComponent);
+}
+
 module.exports = {
-  getFilesInfo,
   getFilesPath,
   getNewPathToSave,
+  getProjectFileStructure,
+  createFoldersForMigration,
+  copyOrMigrateFiles,
+  migrateSingleFile,
 }

@@ -7,9 +7,9 @@ const {
   SELF_CLOSING_TAGS,
 } = require('./constants.js');
 
-async function runRender(ast) {
+async function runRender(ast, fileExtension) {
   const vueTemplateRendered = await renderTemplate(ast.template.ast);
-  const vueScriptRendered = await renderScript(ast.script);
+  const vueScriptRendered = await renderScript(ast.script, fileExtension);
 
   return `${vueTemplateRendered}\n${vueScriptRendered}\n${ast.styleString}\n`;
 }
@@ -147,12 +147,16 @@ function renderFiltersWithParam(data, index = 0) {
 
 
 // Script render
-function renderScript(ast) {
+function renderScript(ast, fileExtension) {
   if (Object.keys(ast).length === 0) {
     return '';
   }
 
-  return `<script>\n${generator(ast).code}\n</script>\n`;
+  if (fileExtension === '.vue') {
+    return `<script>\n${generator(ast).code}\n</script>\n`;
+  }
+
+  return generator(ast).code;
 }
 
 module.exports = {

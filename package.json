@@ -28,6 +28,8 @@
     "@babel/core": "^7.24.5",
     "@babel/generator": "^7.24.5",
     "@babel/traverse": "^7.24.5",
+    "fs-extra": "^11.2.0",
+    "recursive-readdir": "^2.2.3",
     "vue-template-compiler": "^2.7.16"
   },
   "devDependencies": {
