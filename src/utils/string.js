@@ -43,12 +43,28 @@ function getScriptContent(fileContent) {
 }
 
 function getStyleContent(fileContent) {
-  return getTagContent(
+  const scss = getTagContent(
     fileContent,
     '<style lang="scss">',
     '</style>',
     true,
   );
+
+  const css = getTagContent(
+    fileContent,
+    '<style lang="css">',
+    '</style>',
+    true,
+  );
+
+  const empty = getTagContent(
+    fileContent,
+    '<style>',
+    '</style>',
+    true,
+  );
+
+  return scss || css || empty;
 }
 
 module.exports = {

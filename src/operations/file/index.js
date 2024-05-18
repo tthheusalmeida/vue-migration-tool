@@ -112,13 +112,22 @@ async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
       const sourceFilePath = path.join(sourceDirectory, file);
       const targetFilePath = path.join(targetDirectory, file);
       const fileExtension = path.extname(file);
+      // console.log(file, fileExtension);
 
       const fileStat = await fsExtra.stat(sourceFilePath);
       if (fileStat.isFile()) {
-        if (fileExtension !== '.vue' && fileExtension !== '.js') {
+        if (isConfigFile(file)
+          || isDocFile(file)
+          || isNodeFile(file)
+          || isTestFile(file)
+        ) {
           await fsExtra.copy(sourceFilePath, targetFilePath);
-        } else {
-          // migrateSingleFile(sourceFilePath, targetFilePath)
+        }
+        else if (fileExtension !== '.vue' && fileExtension !== '.js') {
+          await fsExtra.copy(sourceFilePath, targetFilePath);
+        }
+        else {
+          migrateSingleFile(sourceFilePath, targetFilePath, fileExtension);
         }
       } else if (fileStat.isDirectory()) {
         await copyOrMigrateFiles(sourceFilePath, targetFilePath, fileExtension);
@@ -135,6 +144,48 @@ async function migrateSingleFile(sourceFilePath, targetFilePath, fileExtension) 
   const renderedComponent = await runRender(tranformedAst, fileExtension);
 
   fs.writeFileSync(targetFilePath, renderedComponent);
+}
+
+function isConfigFile(file) {
+  if (file.startsWith('.', 0)
+    || file.match('.config.')) {
+    return true;
+  }
+
+  return false;
+};
+
+function isDocFile(file) {
+  const docFiles = [
+    'LICENSE',
+    'README.md',
+  ]
+
+  if (docFiles.includes(file)) {
+    return true;
+  }
+
+  return false;
+};
+
+function isNodeFile(file) {
+  const docFiles = [
+    'package-lock.json',
+    'package.json'
+  ]
+
+  if (docFiles.includes(file)) {
+    return true;
+  }
+
+  return false;
+};
+
+function isTestFile(file) {
+  if (file.match('.spec.')
+    || file.match('.test.')) {
+    return true;
+  }
 }
 
 module.exports = {

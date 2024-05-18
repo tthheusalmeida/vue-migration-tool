@@ -51,7 +51,7 @@ function renderTagByType(node) {
   } else if (node?.type === NODE_TYPE.STRING_LITERAL) {
     renderedTag += renderStringLiteral(node);
   } else {
-    renderedTag += '';
+    renderedTag += node?.text ? node.text.trim() : '';
   }
 
   const hasIfConditions = node?.ifConditions ? node.ifConditions.length : '';

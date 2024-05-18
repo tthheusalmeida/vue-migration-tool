@@ -61,7 +61,7 @@ function getScriptAst(fileContent = '') {
 const splitfilePath = (filePath) => {
   const parts = filePath.split('src\\');
   if (parts.length > 1) {
-    return parts[1];
+    return parts[2] || parts[1];
   } else {
     return filePath;
   }
