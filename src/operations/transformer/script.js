@@ -118,9 +118,9 @@ function filters(ast) {
       let methodsNode = null;
 
       path.node.properties.forEach((property) => {
-        if (property.key.name === 'filters' && path.parent.type === 'NewExpression') {
+        if (property.key?.name === 'filters' && path.parent.type === 'NewExpression') {
           filtersNode = property;
-        } else if (property.key.name === 'methods') {
+        } else if (property.key?.name === 'methods') {
           methodsNode = property;
         }
       });
