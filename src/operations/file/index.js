@@ -139,7 +139,7 @@ async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
 }
 
 async function migrateSingleFile(sourceFilePath, targetFilePath, fileExtension) {
-  const ast = runParser(sourceFilePath);
+  const ast = runParser(sourceFilePath, fileExtension);
   const tranformedAst = runTransformer(ast);
   const renderedComponent = await runRender(tranformedAst, fileExtension);
 

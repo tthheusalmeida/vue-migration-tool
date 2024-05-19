@@ -11,6 +11,10 @@ async function runRender(ast, fileExtension) {
   const vueTemplateRendered = await renderTemplate(ast.template.ast);
   const vueScriptRendered = await renderScript(ast.script, fileExtension);
 
+  if (fileExtension === '.js') {
+    return `${vueScriptRendered}\n`;
+  }
+
   return `${vueTemplateRendered}\n${vueScriptRendered}\n${ast.styleString}\n`;
 }
 

@@ -8,7 +8,7 @@ const { getScriptContent } = require('../../utils/string');
 const { getStyleContent } = require('../../utils/string');
 const { stringifyCircularStructureToJson } = require('../../utils/object');
 
-function runParser(filePath = '') {
+function runParser(filePath = '', fileExtension) {
   console.info(`\n=> Running parse for "${splitfilePath(filePath)}".`);
   const fileContent = fs.readFileSync(filePath, 'utf8');
 
@@ -22,7 +22,7 @@ function runParser(filePath = '') {
 
   const rawAst = {
     template: getTemplateAst(fileContent),
-    script: getScriptAst(fileContent),
+    script: getScriptAst(fileContent, fileExtension),
     styleString: getStyleContent(fileContent),
   };
 
@@ -45,12 +45,12 @@ function getTemplateAst(fileContent = '') {
   return compile(template);
 }
 
-function getScriptAst(fileContent = '') {
+function getScriptAst(fileContent = '', fileExtension) {
   if (fileContent === '') {
     return {};
   }
 
-  const script = getScriptContent(fileContent);
+  const script = getScriptContent(fileContent, fileExtension);
 
   return parse(
     script,

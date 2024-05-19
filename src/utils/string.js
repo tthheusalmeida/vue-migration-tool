@@ -34,12 +34,16 @@ function getTemplateContent(fileContent) {
   );
 }
 
-function getScriptContent(fileContent) {
-  return getTagContent(
-    fileContent,
-    '<script>',
-    '</script>',
-  );
+function getScriptContent(fileContent, fileExtension) {
+  if (fileExtension?.endsWith('.vue')) {
+    return getTagContent(
+      fileContent,
+      '<script>',
+      '</script>',
+    );
+  }
+
+  return fileContent;
 }
 
 function getStyleContent(fileContent) {
