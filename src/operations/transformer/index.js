@@ -5,6 +5,7 @@ const {
 } = require('./template');
 
 const {
+  setDefaultLoc,
   globalApiNewVue,
   destroyedToUnmouted,
   beforeDestroyToBeforeUnmount,
@@ -25,6 +26,7 @@ function runTransformer(ast) {
     templateListenersRemoved,
   ];
   const scriptRules = [
+    setDefaultLoc,
     globalApiNewVue,
     destroyedToUnmouted,
     beforeDestroyToBeforeUnmount,

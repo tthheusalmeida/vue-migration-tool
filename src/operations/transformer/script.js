@@ -4,6 +4,22 @@ const { MIGRATION } = require('./constants');
 const traverse = require('@babel/traverse').default;
 const babelTypes = require('@babel/types');
 
+// Default value for empty loc
+// If not treated, it breaks babel, as there is no plugin that accepts empty loc.
+function setDefaultLoc(ast) {
+  const currentAst = { ...ast };
+
+  traverse(currentAst, {
+    enter(path) {
+      if (!path.node?.loc) {
+        path.node.loc = { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } };
+      }
+    }
+  });
+
+  return currentAst;
+};
+
 // Global API
 
 // - [Global API] new Vue now is createApp, an app instance from new concept in Vue 3.
@@ -43,6 +59,13 @@ function globalApiNewVue(ast) {
 
         console.info(MIGRATION.SUCESSFULL.NEW_VUE);
       }
+
+      // Handle loc property
+      if (path.node?.loc) {
+        if (!path.node.loc.start || !path.node.loc.start.line) {
+          delete path.node.loc;
+        }
+      }
     }
   });
 
@@ -61,6 +84,13 @@ function destroyedToUnmouted(ast) {
 
         console.info(MIGRATION.SUCESSFULL.DESTROYED_TO_UNMOUNTED);
       }
+
+      // Handle loc property
+      if (path.node?.loc) {
+        if (!path.node.loc.start || !path.node.loc.start.line) {
+          delete path.node.loc;
+        }
+      }
     }
   });
 
@@ -76,6 +106,13 @@ function beforeDestroyToBeforeUnmount(ast) {
         path.node.name = 'beforeUnmount';
 
         console.info(MIGRATION.SUCESSFULL.BEFORE_DESTROY_TO_BEFORE_UNMOUNT);
+      }
+
+      // Handle loc property
+      if (path.node?.loc) {
+        if (!path.node.loc.start || !path.node.loc.start.line) {
+          delete path.node.loc;
+        }
       }
     }
   });
@@ -99,6 +136,13 @@ function dataOptions(ast) {
         path.replaceWith(newDataMethod);
 
         console.info(MIGRATION.SUCESSFULL.DATA_OPTIONS);
+      }
+
+      // Handle loc property
+      if (path.node?.loc) {
+        if (!path.node.loc.start || !path.node.loc.start.line) {
+          delete path.node.loc;
+        }
       }
     }
   });
@@ -137,6 +181,13 @@ function filters(ast) {
           console.info(MIGRATION.SUCESSFULL.FILTERS);
         }
       }
+
+      // Handle loc property
+      if (path.node?.loc) {
+        if (!path.node.loc.start || !path.node.loc.start.line) {
+          delete path.node.loc;
+        }
+      }
     }
   });
 
@@ -144,6 +195,7 @@ function filters(ast) {
 }
 
 module.exports = {
+  setDefaultLoc,
   globalApiNewVue,
   destroyedToUnmouted,
   beforeDestroyToBeforeUnmount,
