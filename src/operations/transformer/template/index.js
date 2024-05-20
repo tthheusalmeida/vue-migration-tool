@@ -4,6 +4,7 @@ const {
   MIGRATION,
   KEY_CODE_KEBAB_CASE,
 } = require('../constants');
+const { showLog } = require('../../../utils/message');
 const { REGEX } = require('../../../utils/regex');
 const { traverseTemplate } = require('./traverse');
 
@@ -21,11 +22,11 @@ function templateListenersRemoved(ast) {
         node.attrsMap['v-bind'] = '$attrs';
         delete node.attrsMap['v-on'];
 
-        console.info(MIGRATION.SUCESSFULL.LISTENERS_REMOVED);
+        showLog(MIGRATION.SUCESSFULL.LISTENERS_REMOVED);
       } else if (isThereListenersAndAttributes) {
         delete node.attrsMap['v-on'];
 
-        console.info(MIGRATION.SUCESSFULL.LISTENERS_REMOVED);
+        showLog(MIGRATION.SUCESSFULL.LISTENERS_REMOVED);
       }
     }
   });
@@ -48,18 +49,18 @@ function eventsPrefixChanged(ast) {
             node.attrsMap['@vue:unmounted'] = 'unmounted';
             delete node.attrsMap[item];
 
-            console.info(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
+            showLog(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
           } else if (item.match(REGEX.TRANSFORMER.BEFORE_DESTROY)) {
             node.attrsMap['@vue:beforeUnmount'] = 'beforeUnmount';
             delete node.attrsMap[item];
 
-            console.info(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
+            showLog(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
           } else if (item.match(REGEX.TRANSFORMER.HOOK)) {
             const newKey = item.replace(REGEX.TRANSFORMER.HOOK, '@vue');
             node.attrsMap[newKey] = node.attrsMap[item];
             delete node.attrsMap[item];
 
-            console.info(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
+            showLog(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
           }
         });
       }
@@ -91,7 +92,7 @@ function keyCodeModifiers(ast) {
               node.attrsMap[newKey] = node.attrsMap[item];
               delete node.attrsMap[item];
 
-              console.info(MIGRATION.SUCESSFULL.KEY_CODE_MODIFIERS);
+              showLog(MIGRATION.SUCESSFULL.KEY_CODE_MODIFIERS);
             } catch (e) {
               console.error(e);
             }

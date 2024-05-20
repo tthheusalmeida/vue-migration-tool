@@ -1,7 +1,10 @@
 const generator = require('@babel/generator').default;
 const { format } = require('prettier');
-const { MIGRATION } = require('../../utils/message.js');
 const { REGEX } = require('../../utils/regex.js');
+const {
+  MIGRATION,
+  showLog,
+} = require('../../utils/message.js');
 const {
   NODE_TYPE,
   SELF_CLOSING_TAGS,
@@ -118,7 +121,6 @@ function renderStringLiteral(node) {
       let methodsList = template.match(regex);
       const isFilterOnTemplate = template.match(REGEX.COMPILER.RENDER.FILTER_FUNCTION);
       if (isFilterOnTemplate) {
-        console.info(MIGRATION.SUCESSFULL.FILTERS);
         methodsList = methodsList?.map(item =>
           item
             .replace(REGEX.COMPILER.RENDER.FILTER, '')
@@ -128,6 +130,8 @@ function renderStringLiteral(node) {
         );
 
         render += '{{ ' + renderFiltersWithParam(methodsList) + ' }}';
+
+        showLog(MIGRATION.SUCESSFULL.FILTERS);
         return;
       }
 

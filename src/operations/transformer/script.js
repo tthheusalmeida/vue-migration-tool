@@ -1,6 +1,7 @@
 'use strict';
 
 const { MIGRATION } = require('./constants');
+const { showLog } = require('../../utils/message');
 const traverse = require('@babel/traverse').default;
 const babelTypes = require('@babel/types');
 
@@ -57,7 +58,7 @@ function globalApiNewVue(ast) {
         );
         ast.program.body.unshift(importDeclaration);
 
-        console.info(MIGRATION.SUCESSFULL.NEW_VUE);
+        showLog(MIGRATION.SUCESSFULL.NEW_VUE);
       }
 
       // Handle loc property
@@ -82,7 +83,7 @@ function destroyedToUnmouted(ast) {
       if (path.isIdentifier({ name: 'destroyed' })) {
         path.node.name = 'unmounted';
 
-        console.info(MIGRATION.SUCESSFULL.DESTROYED_TO_UNMOUNTED);
+        showLog(MIGRATION.SUCESSFULL.DESTROYED_TO_UNMOUNTED);
       }
 
       // Handle loc property
@@ -105,7 +106,7 @@ function beforeDestroyToBeforeUnmount(ast) {
       if (path.isIdentifier({ name: 'beforeDestroy' })) {
         path.node.name = 'beforeUnmount';
 
-        console.info(MIGRATION.SUCESSFULL.BEFORE_DESTROY_TO_BEFORE_UNMOUNT);
+        showLog(MIGRATION.SUCESSFULL.BEFORE_DESTROY_TO_BEFORE_UNMOUNT);
       }
 
       // Handle loc property
@@ -135,7 +136,7 @@ function dataOptions(ast) {
         );
         path.replaceWith(newDataMethod);
 
-        console.info(MIGRATION.SUCESSFULL.DATA_OPTIONS);
+        showLog(MIGRATION.SUCESSFULL.DATA_OPTIONS);
       }
 
       // Handle loc property
@@ -174,11 +175,11 @@ function filters(ast) {
           methodsNode.value.properties.push(...filtersNode.value.properties);
           path.node.properties = path.node.properties.filter(property => property !== filtersNode);
 
-          console.info(MIGRATION.SUCESSFULL.FILTERS);
+          showLog(MIGRATION.SUCESSFULL.FILTERS);
         } else {
           filtersNode.key.name = 'methods';
 
-          console.info(MIGRATION.SUCESSFULL.FILTERS);
+          showLog(MIGRATION.SUCESSFULL.FILTERS);
         }
       }
 

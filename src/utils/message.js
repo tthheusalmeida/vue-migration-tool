@@ -20,6 +20,14 @@ const MIGRATION = {
   }
 }
 
+function showLog(log) {
+  const isShowLog = process.env.SHOW_LOG === 'true';
+  if (isShowLog && !!log) {
+    console.info(log);
+  }
+}
+
 module.exports = {
   MIGRATION,
+  showLog
 }
