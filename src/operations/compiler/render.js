@@ -34,8 +34,8 @@ async function renderTemplate(ast) {
 function renderTag(node) {
   const upperTag = node?.tag ? node.tag.toUpperCase() : '';
 
-  const isSelfClosingTag = SELF_CLOSING_TAGS[upperTag] || SELF_CLOSING_TAGS[`CAPITAL_${upperTag}`];
-  if (isSelfClosingTag) {
+  const isHtmlSelfClosingTag = SELF_CLOSING_TAGS[upperTag] || SELF_CLOSING_TAGS[`CAPITAL_${upperTag}`];
+  if (isHtmlSelfClosingTag) {
     return renderOpenTag(node);
   } else {
     return renderTagByType(node)
@@ -46,15 +46,37 @@ function renderTagByType(node) {
   let renderedTag = '';
 
   if (node?.type === NODE_TYPE.TAG) {
-    renderedTag += renderOpenTag(node);
+    const isKebabCaseTag = node.tag.match(REGEX.COMPILER.RENDER.VUE_COMPONENT_NAME_KEBAB_CASE);
+    const isPascalCaseTag = node.tag.match(REGEX.COMPILER.RENDER.VUE_COMPONENT_NAME_PASCAL_CASE);
 
-    const hasChildren = node.children?.length;
-    if (hasChildren) {
-      node.children.forEach(childNode => {
-        renderedTag += `${renderTag(childNode)}`;
-      });
+    if (isKebabCaseTag || isPascalCaseTag) {
+      /*
+        kebab-case and Pascal Case are highly recommended way to write Vue component name
+        https://v2.vuejs.org/v2/guide/components-registration?redirect=true
+      */
+      const hasChildren = node.children?.length;
+      if (hasChildren) {
+        renderedTag += renderOpenTag(node);
+
+        node.children.forEach(childNode => {
+          renderedTag += `${renderTag(childNode)}`;
+        });
+
+        renderedTag += renderCloseTag(node);
+      } else {
+        renderedTag += renderSelfCloseVueTag(node);
+      }
+    } else {
+      renderedTag += renderOpenTag(node);
+
+      const hasChildren = node.children?.length;
+      if (hasChildren) {
+        node.children.forEach(childNode => {
+          renderedTag += `${renderTag(childNode)}`;
+        });
+      }
+      renderedTag += renderCloseTag(node);
     }
-    renderedTag += renderCloseTag(node);
   } else if (node?.type === NODE_TYPE.STRING_LITERAL) {
     renderedTag += renderStringLiteral(node);
   } else {
@@ -100,6 +122,15 @@ function renderCloseTag(node) {
   }
 
   return `</${node.tag}>`;
+}
+
+function renderSelfCloseVueTag(node) {
+  const isThereAttributes = Object.keys(node.attrsMap ? node.attrsMap : {}).length;
+  if (!isThereAttributes) {
+    return `<${node.tag} />`;
+  }
+
+  return `<${node.tag} ${renderAttrsMap(node.attrsMap)} />`;
 }
 
 function renderStringLiteral(node) {
@@ -175,5 +206,8 @@ module.exports = {
   renderAttrsMap,
   renderOpenTag,
   renderCloseTag,
+  renderSelfCloseVueTag,
+  renderStringLiteral,
+  renderFiltersWithParam,
   renderScript,
 }

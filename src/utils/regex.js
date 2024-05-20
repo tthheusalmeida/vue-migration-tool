@@ -17,6 +17,9 @@ const REGEX = {
       OPEN_BRACKETS: /\(/gm,
       CLOSE_BRACKETS: /\)/gm,
       DOUBLE_QUOTE: /\"/gm,
+      VUE_COMPONENT_NAME_PASCAL_CASE: /^[A-Z][a-z]+(?:[A-Z][a-z]+)*$/,
+      VUE_COMPONENT_NAME_KEBAB_CASE: /^[a-z]+(-[a-z]+)+$/,
+      VUE_ITEM_IN_ARRAY: /\(?([\w\s,]+)\)?\s*in\s*([\w\s]+)/,
     }
   }
 };
