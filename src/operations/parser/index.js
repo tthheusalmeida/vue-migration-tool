@@ -3,13 +3,15 @@
 const fs = require('fs');
 const { parse } = require('@babel/parser');
 const { compile } = require('vue-template-compiler');
+const { showLog } = require('../../utils/message');
 const { getTemplateContent } = require('../../utils/string');
 const { getScriptContent } = require('../../utils/string');
 const { getStyleContent } = require('../../utils/string');
 const { stringifyCircularStructureToJson } = require('../../utils/object');
 
 function runParser(filePath = '', fileExtension) {
-  console.info(`\n=> Running parse for "${splitfilePath(filePath)}".`);
+  showLog(' ');
+  console.info(`=> Running parse for "${splitfilePath(filePath)}".`);
   const fileContent = fs.readFileSync(filePath, 'utf8');
 
   if (!fileContent) {
