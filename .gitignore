@@ -129,5 +129,9 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# migration_src folder
-src/migration_src/*.json
+# migrated folder
+src/migrated
+
+# code folder
+src/code
+!src/code/*.vue
