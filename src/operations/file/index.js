@@ -3,104 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 const fsExtra = require('fs-extra');
-const recursive = require('recursive-readdir');
 const { runParser } = require('../parser/index');
 const { runTransformer } = require('../transformer/index');
 const { runRender } = require('../compiler/render');
-const { MIGRATION } = require('../../utils/message');
-
-async function getFilesPath(directory) {
-  let fullPathFiles = [];
-
-  const files = new Promise((resolve, reject) => {
-    return fs.readdir(
-      directory,
-      (err, filenames) => err != null ? reject(err) : resolve(filenames))
-  });
-
-  await Promise.all([files]).then(values => {
-    const [first, _] = values;
-    fullPathFiles = first;
-  });
-
-  return fullPathFiles?.map(file => path.join(directory, file));
-}
-
-function getNewPathToSave(filesFullPath, currentFolderName, newFolderName) {
-  if (!filesFullPath
-    || filesFullPath.lenght <= 0
-    || !currentFolderName
-    || !newFolderName) {
-    return [];
-  }
-
-  return filesFullPath.map(file => file.replace(currentFolderName, newFolderName));
-}
-
-function getProjectFileStructure(directory) {
-  return recursive(directory)
-    .then(files => {
-      const fileStructure = {};
-
-      files.forEach(file => {
-        const relativePath = path.relative(directory, file);
-        const parts = relativePath.split(path.sep);
-
-        parts.reduce((acc, part, index) => {
-          if (index === parts.length - 1) {
-            if (!acc._files) {
-              acc._files = [];
-            }
-
-            acc._files.push(part);
-          } else {
-            if (!acc[part]) {
-              acc[part] = {};
-            }
-          }
-
-          return acc[part];
-        }, fileStructure);
-      });
-
-      return fileStructure;
-    })
-    .catch(err => console.error(err));
-}
-
-async function createFoldersForMigration(sourceDirectory) {
-  const projectStructure = await getProjectFileStructure(sourceDirectory);
-
-  const isThereProject = !Object.keys(projectStructure);
-  if (isThereProject) {
-    console.warn(MIGRATION.WARNING.EMPTY_DIRECTORY);
-    return false;
-  }
-
-  const directories = extractDirectories(sourceDirectory, projectStructure);
-  const promises = directories.map(async (folderPath) => {
-    try {
-      fsExtra.ensureDir(folderPath);
-    } catch (err) {
-      console.error(`${MIGRATION.ERROR.CREATE_DIRECTORY} ${folderPath}:`, err);
-    }
-  });
-
-  await Promise.all[promises];
-  return true;
-}
-
-function extractDirectories(basePath, projectStructure, directories = []) {
-  for (const key in projectStructure) {
-    if (key === '_files') continue;
-
-    const currentPath = path.join(basePath, key);
-    directories.push(currentPath);
-
-    extractDirectories(currentPath, projectStructure[key], directories);
-  }
-  return directories;
-}
 
 async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
   try {
@@ -112,7 +17,6 @@ async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
       const sourceFilePath = path.join(sourceDirectory, file);
       const targetFilePath = path.join(targetDirectory, file);
       const fileExtension = path.extname(file);
-      // console.log(file, fileExtension);
 
       const fileStat = await fsExtra.stat(sourceFilePath);
       if (fileStat.isFile()) {
@@ -145,6 +49,7 @@ async function migrateSingleFile(sourceFilePath, targetFilePath, fileExtension) 
 
   fs.writeFileSync(targetFilePath, renderedComponent);
 }
+
 
 function isConfigFile(file) {
   if (file.startsWith('.', 0)
@@ -189,10 +94,10 @@ function isTestFile(file) {
 }
 
 module.exports = {
-  getFilesPath,
-  getNewPathToSave,
-  getProjectFileStructure,
-  createFoldersForMigration,
   copyOrMigrateFiles,
   migrateSingleFile,
+  isConfigFile,
+  isDocFile,
+  isNodeFile,
+  isTestFile,
 }
