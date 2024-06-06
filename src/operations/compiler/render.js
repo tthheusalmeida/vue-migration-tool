@@ -195,7 +195,11 @@ function renderScript(ast, fileExtension) {
     return `<script>\n${generator(ast).code}\n</script>\n`;
   }
 
-  return generator(ast).code;
+  return generator(ast, {
+    jsescOption: {
+      quotes: 'single',
+    },
+  }).code;
 }
 
 module.exports = {

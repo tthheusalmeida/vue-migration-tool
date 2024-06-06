@@ -30,9 +30,8 @@ function runParser(filePath = '', fileExtension) {
 
   const stringAst = stringifyCircularStructureToJson(rawAst);
 
-  // TODO remove save file as json when finish all compiler modules {
-  // const jsonFileName = replaceExtensionVueToJson(fileName);
-  // fs.writeFileSync(jsonFileName, stringAst);
+  // TODO remove save file as json when finish all compiler modules
+  // fs.writeFileSync('./main.json', stringAst);
 
   return JSON.parse(stringAst);
 }

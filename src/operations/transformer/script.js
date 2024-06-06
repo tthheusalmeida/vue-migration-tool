@@ -24,10 +24,69 @@ function setDefaultLoc(ast) {
 // Global API
 
 // - [Global API] new Vue now is createApp, an app instance from new concept in Vue 3.
+
+/*TODO https://v3-migration.vuejs.org/breaking-changes/global-api.html#a-new-global-api-createapp
+  Add treatment for:
+    - Vue.config.ignoredElements
+    - Vue.prototype
+*/
 function globalApiNewVue(ast) {
   const currentAst = { ...ast };
 
   traverse(currentAst, {
+    ImportDeclaration(path) {
+      if (path.node.source.value === 'vue') {
+        const specifier = path.node.specifiers.find(spec => spec.local.name === 'Vue');
+        if (specifier) {
+          path.replaceWith(
+            babelTypes.importDeclaration(
+              [babelTypes.importSpecifier(babelTypes.identifier('createApp'), babelTypes.identifier('createApp'))],
+              babelTypes.stringLiteral('vue')
+            )
+          );
+
+          showLog(MIGRATION.SUCESSFULL.GLOBAL_API.CREATE_APP);
+
+          // Handle loc property
+          if (path.node?.loc) {
+            if (!path.node.loc.start || !path.node.loc.start.line) {
+              delete path.node.loc;
+            }
+          }
+        }
+      }
+    },
+    Program(path) {
+      const isThereVueDeclaretion = path.node.body.filter((node) => node?.source?.value === 'vue').length;
+      if (!!isThereVueDeclaretion) {
+        let lastImportIndex = -1;
+        path.node.body.forEach((node, index) => {
+          if (babelTypes.isImportDeclaration(node)) {
+            lastImportIndex = index;
+          }
+        });
+
+        if (lastImportIndex !== -1) {
+          const newDeclaration = babelTypes.variableDeclaration('const', [
+            babelTypes.variableDeclarator(
+              babelTypes.identifier('app'),
+              babelTypes.callExpression(babelTypes.identifier('createApp'), [babelTypes.identifier('App')])
+            )
+          ]);
+
+          path.node.body.splice(lastImportIndex + 1, 0, newDeclaration);
+
+          showLog(MIGRATION.SUCESSFULL.GLOBAL_API.APP);
+
+          // Handle loc property
+          if (path.node?.loc) {
+            if (!path.node.loc.start || !path.node.loc.start.line) {
+              delete path.node.loc;
+            }
+          }
+        }
+      }
+    },
     VariableDeclaration(path) {
       const declarator = path.node.declarations[0];
       if (babelTypes.isNewExpression(declarator.init) && declarator.init.callee.name === 'Vue') {
@@ -58,7 +117,7 @@ function globalApiNewVue(ast) {
         );
         ast.program.body.unshift(importDeclaration);
 
-        showLog(MIGRATION.SUCESSFULL.NEW_VUE);
+        showLog(MIGRATION.SUCESSFULL.GLOBAL_API.NEW_VUE);
       }
 
       // Handle loc property
@@ -67,7 +126,35 @@ function globalApiNewVue(ast) {
           delete path.node.loc;
         }
       }
-    }
+    },
+    CallExpression(path) {
+      if (babelTypes.isMemberExpression(path.node.callee)
+        && babelTypes.isIdentifier(path.node.callee.object, { name: 'Vue' })) {
+        path.node.callee.object = babelTypes.identifier('app');
+
+        showLog(MIGRATION.SUCESSFULL.GLOBAL_API.CALL_EXPRESSION);
+
+        // Handle loc property
+        if (path.node?.loc) {
+          if (!path.node.loc.start || !path.node.loc.start.line) {
+            delete path.node.loc;
+          }
+        }
+      }
+    },
+    ExpressionStatement(path) {
+      const expression = path.node.expression;
+
+      if (babelTypes.isAssignmentExpression(expression)
+        && babelTypes.isMemberExpression(expression.left)
+        && babelTypes.isIdentifier(expression.left.object.object, { name: 'Vue' })
+        && babelTypes.isIdentifier(expression.left.object.property, { name: 'config' })
+        && babelTypes.isIdentifier(expression.left.property, { name: 'productionTip' })) {
+        path.remove();
+
+        showLog(MIGRATION.SUCESSFULL.GLOBAL_API.CALL_EXPRESSION_REMOVED);
+      }
+    },
   });
 
   return currentAst;

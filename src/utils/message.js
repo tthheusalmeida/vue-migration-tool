@@ -1,3 +1,4 @@
+
 'use strict';
 
 const MIGRATION = {
@@ -8,8 +9,14 @@ const MIGRATION = {
     KEY_CODE_MODIFIERS: '- KeyCode support as v-on modifiers.',
     LISTENERS_REMOVED: '- $listeners has been removed / merged into $attrs.',
     DATA_OPTIONS: ' - The data option should always be declared as a function.',
-    NEW_VUE: ' - [Global API] new Vue now is createApp, an app instance from new concept in Vue 3.',
-    FILTERS: ' - Filters are removed from Vue 3.0 and no longer supported.'
+    FILTERS: ' - Filters are removed from Vue 3.0 and no longer supported.',
+    GLOBAL_API: {
+      CREATE_APP: ' - [Global API] "import Vue" now is "{ createApp } ", an app instance from new concept in Vue 3.',
+      NEW_VUE: ' - [Global API] "new Vue" now is "createApp", an app instance from new concept in Vue 3.',
+      APP: ' - [Global API] Declare "const app" for "createApp", an app instance from new concept in Vue 3.',
+      CALL_EXPRESSION: ' - [Global API] API that globally mutate Vue behavior are now moved to the app instance.',
+      CALL_EXPRESSION_REMOVED: ' - [Global API] Vue.config.productionTip API was removed.',
+    }
   },
   ERROR: {
     KEY_CODE_IS_NOT_DEFINED: 'key code is not defined.',

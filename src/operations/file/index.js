@@ -31,7 +31,9 @@ async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
           await fsExtra.copy(sourceFilePath, targetFilePath);
         }
         else {
+          // if (file === 'main.js') { // TODO remove if
           migrateSingleFile(sourceFilePath, targetFilePath, fileExtension);
+          // }
         }
       } else if (fileStat.isDirectory()) {
         await copyOrMigrateFiles(sourceFilePath, targetFilePath, fileExtension);
