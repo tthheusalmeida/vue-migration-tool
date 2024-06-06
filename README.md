@@ -3,7 +3,8 @@ Migration tool Vue 2.0 application for Vue 3.0.<br>
 Documentation with breaking changes can be found [here](https://v3-migration.vuejs.org/breaking-changes/).
 
 ## Global API
-- [ ] Global Vue API is changed to use an application instance
+- [X] Global Vue API is changed to use an application instance
+  - TODO: Vue.config.ignoredElements and Vue.prototype
 - [ ] Global and internal APIs have been restructured to be tree-shakable
 
 ## Template Directives
