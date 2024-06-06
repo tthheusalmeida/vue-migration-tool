@@ -17,11 +17,9 @@ function runTransformer(ast) {
     ...VUE_SCRIPT_TRANSFORM_LIST,
   ];
 
-  const newTemplateAst = applyTransformerRules(ast.template.ast, templateRules);
-  const newScriptAst = applyTransformerRules(ast.script, scriptRules);
+  const template = { ast: applyTransformerRules(ast.template.ast, templateRules) };
+  const script = applyTransformerRules(ast.script, scriptRules);
 
-  const template = { ast: newTemplateAst };
-  const script = newScriptAst;
   return {
     template,
     script,
