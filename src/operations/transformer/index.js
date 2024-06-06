@@ -17,8 +17,8 @@ function runTransformer(ast) {
     ...VUE_SCRIPT_TRANSFORM_LIST,
   ];
 
-  const newTemplateAst = transformerInRulesList(ast.template.ast, templateRules);
-  const newScriptAst = transformerInRulesList(ast.script, scriptRules);
+  const newTemplateAst = applyTransformerRules(ast.template.ast, templateRules);
+  const newScriptAst = applyTransformerRules(ast.script, scriptRules);
 
   const template = { ast: newTemplateAst };
   const script = newScriptAst;
@@ -29,7 +29,7 @@ function runTransformer(ast) {
   }
 }
 
-function transformerInRulesList(ast, rulesList) {
+function applyTransformerRules(ast, rulesList) {
   let newAst = { ...ast };
 
   rulesList.forEach(currentFunction => {
@@ -41,5 +41,5 @@ function transformerInRulesList(ast, rulesList) {
 
 module.exports = {
   runTransformer,
-  transformerInRulesList,
+  applyTransformerRules,
 }
