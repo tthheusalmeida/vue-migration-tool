@@ -112,13 +112,13 @@ describe('=> utils/string', () => {
           }
         };`
 
-      expect(getScriptContent(fileContent)).toBe(expected);
+      expect(getScriptContent(fileContent, '.vue')).toBe(expected);
     });
 
     test('When passes Vue script tag empty, should return empty content.', () => {
       const fileContent = '';
 
-      expect(getScriptContent(fileContent)).toBe('');
+      expect(getScriptContent(fileContent, '.vue')).toBe('');
     });
   });
 

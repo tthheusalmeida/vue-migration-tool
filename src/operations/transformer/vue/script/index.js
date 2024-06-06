@@ -1,7 +1,7 @@
 'use strict';
 
-const { MIGRATION } = require('./constants');
-const { showLog } = require('../../utils/message');
+const { MIGRATION } = require('../../constants');
+const { showLog } = require('../../../../utils/message');
 const traverse = require('@babel/traverse').default;
 const babelTypes = require('@babel/types');
 
@@ -282,6 +282,15 @@ function filters(ast) {
   return currentAst;
 }
 
+const VUE_SCRIPT_TRANSFORM_LIST = [
+  setDefaultLoc,
+  globalApiNewVue,
+  destroyedToUnmouted,
+  beforeDestroyToBeforeUnmount,
+  dataOptions,
+  filters,
+]
+
 module.exports = {
   setDefaultLoc,
   globalApiNewVue,
@@ -289,4 +298,5 @@ module.exports = {
   beforeDestroyToBeforeUnmount,
   dataOptions,
   filters,
+  VUE_SCRIPT_TRANSFORM_LIST,
 }

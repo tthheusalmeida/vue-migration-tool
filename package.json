@@ -21,6 +21,10 @@
       "src/operations/parser/**/*.js",
       "src/operations/transformer/**/*.js",
       "src/utils/**/*.js"
+    ],
+    "modulePathIgnorePatterns": [
+      "src/code",
+      "src/migrated"
     ]
   },
   "author": "Matheus Henrique dos Santos Almeida",

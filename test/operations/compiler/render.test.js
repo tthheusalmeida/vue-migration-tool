@@ -61,7 +61,7 @@ describe('=> operations/compiler/render', () => {
           }
         ],
       };
-      const expected = '<template><div class="example-component"><p>{{ message }}</p><button @click="reverseMessage"></button></div></template>';
+      const expected = '<template><div class="example-component"><p></p><button @click="reverseMessage">Reverse Message</button></div></template>';
 
       const result = await renderTemplate(template);
       expect(result).toBe(expected);
@@ -140,12 +140,12 @@ describe('=> operations/compiler/render', () => {
           }
         ],
       };
-      const expected = '<div><div v-if="isThereData"></div></div><Loading v-else></Loading>';
+      const expected = '<div><div v-if="isThereData"></div></div><Loading v-else />';
 
       expect(renderTagByType(node)).toBe(expected);
     });
 
-    test('When passes node type equal NODE_TYPE.STRING_LITERAL, should render tag with template string.', () => {
+    test('When passes node type equal NODE_TYPE.STRING_LITERAL, should render tag with string literal.', () => {
       const node = {
         type: 1,
         tag: 'div',
@@ -157,10 +157,11 @@ describe('=> operations/compiler/render', () => {
           {
             type: 2,
             text: '\r\n        n°{{ id }}\r\n      ',
+            tokens: ['\n        n°', { '@binding': 'id' }, '\n      '],
           }
         ],
       };
-      const expected = '<div class="card_id" :style="getBorderStyle(types[0])">n°{{ id }}</div>';
+      const expected = '<div class="card_id" :style="getBorderStyle(types[0])">n° {{ id }}</div>';
 
       expect(renderTagByType(node)).toBe(expected);
     });
@@ -812,7 +813,7 @@ describe('=> operations/compiler/render', () => {
       };
 
       const expected = "<script>\nexport default {\n  name: 'PokeCard',\n  props: {\n    id: {\n      type: String,\n      required: true\n    }\n  },\n  computed: {\n    isThereData() {\n      return this.id;\n    }\n  }\n};\n</script>\n";
-      const result = await renderScript(script);
+      const result = await renderScript(script, '.vue');
       expect(result).toBe(expected);
     });
   });

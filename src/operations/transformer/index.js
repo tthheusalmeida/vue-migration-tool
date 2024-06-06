@@ -1,19 +1,7 @@
 'use strict';
 
-const {
-  eventsPrefixChanged,
-  keyCodeModifiers,
-  templateListenersRemoved,
-} = require('./template');
-
-const {
-  setDefaultLoc,
-  globalApiNewVue,
-  destroyedToUnmouted,
-  beforeDestroyToBeforeUnmount,
-  dataOptions,
-  filters,
-} = require('./script');
+const { VUE_TEMPLATE_TRANSFORM_LIST } = require('./vue/template');
+const { VUE_SCRIPT_TRANSFORM_LIST } = require('./vue/script');
 
 function runTransformer(ast) {
   if (Object.keys(ast.template).length === 0
@@ -23,17 +11,10 @@ function runTransformer(ast) {
   }
 
   const templateRules = [
-    eventsPrefixChanged,
-    keyCodeModifiers,
-    templateListenersRemoved,
+    ...VUE_TEMPLATE_TRANSFORM_LIST
   ];
   const scriptRules = [
-    setDefaultLoc,
-    globalApiNewVue,
-    destroyedToUnmouted,
-    beforeDestroyToBeforeUnmount,
-    dataOptions,
-    filters,
+    ...VUE_SCRIPT_TRANSFORM_LIST,
   ];
 
   const newTemplateAst = transformerInRulesList(ast.template.ast, templateRules);

@@ -3,10 +3,10 @@
 const {
   MIGRATION,
   KEY_CODE_KEBAB_CASE,
-} = require('../constants');
-const { showLog } = require('../../../utils/message');
-const { REGEX } = require('../../../utils/regex');
-const { traverseTemplate } = require('./traverse');
+} = require('../../constants');
+const { showLog } = require('../../../../utils/message');
+const { REGEX } = require('../../../../utils/regex');
+const { traverseTemplate } = require('../../../../utils/traverse');
 
 // Render Function
 
@@ -105,8 +105,15 @@ function keyCodeModifiers(ast) {
   return currentAst;
 }
 
+const VUE_TEMPLATE_TRANSFORM_LIST = [
+  templateListenersRemoved,
+  eventsPrefixChanged,
+  keyCodeModifiers,
+]
+
 module.exports = {
   templateListenersRemoved,
   eventsPrefixChanged,
   keyCodeModifiers,
+  VUE_TEMPLATE_TRANSFORM_LIST
 }

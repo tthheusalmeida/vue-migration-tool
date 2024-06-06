@@ -1,7 +1,7 @@
 const {
   traverseTemplate,
   walk,
-} = require('../../../../src/operations/transformer/template/traverse');
+} = require('../../../../src/utils/traverse');
 
 describe('=> operations/transformer/template/traverse', () => {
   describe('traverseTemplate()', () => {
