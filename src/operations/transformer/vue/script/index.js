@@ -55,7 +55,7 @@ function globalApiNewVue(ast) {
     */
     newVueOtherProps: null,
     /*
-      Real example: { render: h => h(App) }
+      Real example: new Vue().mount('#app');
       AST store: { type: 'ExpressionStatement' }
     */
     newVueMount: null
