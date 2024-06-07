@@ -3,7 +3,7 @@
 const { MIGRATION } = require('../../constants');
 const { showLog } = require('../../../../utils/message');
 const traverse = require('@babel/traverse').default;
-const babelTypes = require('@babel/types');
+const t = require('@babel/types');
 
 // Default value for empty loc
 // If not treated, it breaks babel, as there is no plugin that accepts empty loc.
@@ -33,77 +33,114 @@ function setDefaultLoc(ast) {
 function globalApiNewVue(ast) {
   const currentAst = { ...ast };
 
+  const VALIDATION = {
+    isThereImportVue: true,
+    isThereNewVue: false,
+    isThereRenderProp: false,
+  }
+  const STORE = {
+    /*
+      Real example: import Vue from 'vue';
+      AST store: { type: 'ImportDeclaration' }
+    */
+    importVue: null,
+    /*
+      Real example: const app = ...
+      AST store: { type: 'VariableDeclaration' }
+    */
+    appVariableDeclaration: null,
+    /*
+      Real example: { store, router ...}
+      AST store: [{ type: 'ExpressionStatement' }, ...]
+    */
+    newVueOtherProps: null,
+    /*
+      Real example: { render: h => h(App) }
+      AST store: { type: 'ExpressionStatement' }
+    */
+    newVueMount: null
+  }
+
+  // Find validations
   traverse(currentAst, {
     ImportDeclaration(path) {
-      if (path.node.source.value === 'vue') {
-        const specifier = path.node.specifiers.find(spec => spec.local.name === 'Vue');
-        if (specifier) {
-          path.replaceWith(
-            babelTypes.importDeclaration(
-              [babelTypes.importSpecifier(babelTypes.identifier('createApp'), babelTypes.identifier('createApp'))],
-              babelTypes.stringLiteral('vue')
-            )
+      if (t.isImportDeclaration(path.node)
+        && t.isStringLiteral(path.node.source, { value: 'vue' })) {
+        VALIDATION.isThereImportVue = true;
+      }
+    },
+    NewExpression(path) {
+      if (t.isIdentifier(path.node.callee, { name: 'Vue' })) {
+        const args = path.node.arguments;
+        if (args.length === 1 && t.isObjectExpression(args[0])) {
+          const renderProp = args[0].properties.find(
+            (prop) => t.isObjectProperty(prop) && prop.key.name === 'render'
           );
-
-          showLog(MIGRATION.SUCESSFULL.GLOBAL_API.CREATE_APP);
-
-          // Handle loc property
-          if (path.node?.loc) {
-            if (!path.node.loc.start || !path.node.loc.start.line) {
-              delete path.node.loc;
-            }
+          if (!!renderProp) {
+            VALIDATION.isThereRenderProp = true;
           }
         }
       }
     },
-    Program(path) {
-      const isThereVueDeclaretion = path.node.body.filter((node) => node?.source?.value === 'vue').length;
-      if (!!isThereVueDeclaretion) {
-        let lastImportIndex = -1;
-        path.node.body.forEach((node, index) => {
-          if (babelTypes.isImportDeclaration(node)) {
-            lastImportIndex = index;
+    ExpressionStatement(path) {
+      const expression = path.node.expression;
+      if (t.isCallExpression(expression)
+        && t.isNewExpression(expression.callee.object)
+        && t.isIdentifier(expression.callee.object.callee, { name: 'Vue' })
+      ) {
+        VALIDATION.isThereNewVue = true;
+      }
+    }
+  });
+
+  // Modify, Remove nodes 
+  traverse(currentAst, {
+    ImportDeclaration(path) {
+      if (t.isImportDeclaration(path.node)
+        && t.isStringLiteral(path.node.source, { value: 'vue' })
+      ) {
+        const isThereImportVue = path.node.specifiers.find(spec => spec.local.name === 'Vue');
+        if (isThereImportVue) {
+          const createApp = t.importSpecifier(
+            t.identifier('createApp'), t.identifier('createApp')
+          );
+          const args = [createApp];
+          showLog(MIGRATION.SUCESSFULL.GLOBAL_API.CREATE_APP);
+
+          if (VALIDATION.isThereRenderProp) {
+            const h = t.importSpecifier(
+              t.identifier('h'), t.identifier('h')
+            );
+            args.push(h);
+
+            showLog(MIGRATION.SUCESSFULL.GLOBAL_API.H);
           }
-        });
 
-        if (lastImportIndex !== -1) {
-          const newDeclaration = babelTypes.variableDeclaration('const', [
-            babelTypes.variableDeclarator(
-              babelTypes.identifier('app'),
-              babelTypes.callExpression(babelTypes.identifier('createApp'), [babelTypes.identifier('App')])
-            )
-          ]);
-
-          path.node.body.splice(lastImportIndex + 1, 0, newDeclaration);
-
-          showLog(MIGRATION.SUCESSFULL.GLOBAL_API.APP);
-
-          // Handle loc property
-          if (path.node?.loc) {
-            if (!path.node.loc.start || !path.node.loc.start.line) {
-              delete path.node.loc;
-            }
-          }
+          STORE.importVue = t.importDeclaration(args, t.stringLiteral('vue'));
+          path.remove();
         }
       }
     },
     VariableDeclaration(path) {
       const declarator = path.node.declarations[0];
-      if (babelTypes.isNewExpression(declarator.init) && declarator.init.callee.name === 'Vue') {
+      if (t.isNewExpression(declarator.init)
+        && t.isIdentifier(declarator.init.callee, { name: 'Vue' })
+        && !VALIDATION.isThereNewVue
+      ) {
         // Remove 'const' keyword
         path.node.kind = '';
 
         // Replace 'new Vue' with 'createApp'
-        declarator.init.callee = babelTypes.identifier('createApp');
+        declarator.init.callee = t.identifier('createApp');
 
         // Remove 'el' property
         const elPropertyIndex = declarator.init.arguments[0].properties.findIndex(prop => prop.key.name === 'el');
         declarator.init.arguments[0].properties.splice(elPropertyIndex, 1);
 
         // Add .mount('#app')
-        const mountCallExpression = babelTypes.callExpression(
-          babelTypes.memberExpression(declarator.init, babelTypes.identifier('mount')),
-          [babelTypes.stringLiteral('#app')]
+        const mountCallExpression = t.callExpression(
+          t.memberExpression(declarator.init, t.identifier('mount')),
+          [t.stringLiteral('#app')]
         );
         path.insertAfter(mountCallExpression);
 
@@ -111,26 +148,26 @@ function globalApiNewVue(ast) {
         path.remove();
 
         // Add import declaration if not added yet
-        const importDeclaration = babelTypes.importDeclaration(
-          [babelTypes.importSpecifier(babelTypes.identifier('createApp'),
-            babelTypes.identifier('createApp'))], babelTypes.stringLiteral('vue')
+        const importDeclaration = t.importDeclaration(
+          [t.importSpecifier(t.identifier('createApp'), t.identifier('createApp'))], t.stringLiteral('vue')
         );
         ast.program.body.unshift(importDeclaration);
 
         showLog(MIGRATION.SUCESSFULL.GLOBAL_API.NEW_VUE);
-      }
 
-      // Handle loc property
-      if (path.node?.loc) {
-        if (!path.node.loc.start || !path.node.loc.start.line) {
-          delete path.node.loc;
+        // Handle loc property
+        if (path.node?.loc) {
+          if (!path.node.loc.start || !path.node.loc.start.line) {
+            delete path.node.loc;
+          }
         }
       }
     },
     CallExpression(path) {
-      if (babelTypes.isMemberExpression(path.node.callee)
-        && babelTypes.isIdentifier(path.node.callee.object, { name: 'Vue' })) {
-        path.node.callee.object = babelTypes.identifier('app');
+      if (t.isMemberExpression(path.node.callee)
+        && t.isIdentifier(path.node.callee.object, { name: 'Vue' })
+      ) {
+        path.node.callee.object = t.identifier('app');
 
         showLog(MIGRATION.SUCESSFULL.GLOBAL_API.CALL_EXPRESSION);
 
@@ -145,16 +182,90 @@ function globalApiNewVue(ast) {
     ExpressionStatement(path) {
       const expression = path.node.expression;
 
-      if (babelTypes.isAssignmentExpression(expression)
-        && babelTypes.isMemberExpression(expression.left)
-        && babelTypes.isIdentifier(expression.left.object.object, { name: 'Vue' })
-        && babelTypes.isIdentifier(expression.left.object.property, { name: 'config' })
-        && babelTypes.isIdentifier(expression.left.property, { name: 'productionTip' })) {
+      // Vue.config.productionTip
+      if (t.isAssignmentExpression(expression)
+        && t.isMemberExpression(expression.left)
+        && t.isIdentifier(expression.left.object.object, { name: 'Vue' })
+        && t.isIdentifier(expression.left.object.property, { name: 'config' })
+        && t.isIdentifier(expression.left.property, { name: 'productionTip' })
+      ) {
         path.remove();
 
         showLog(MIGRATION.SUCESSFULL.GLOBAL_API.CALL_EXPRESSION_REMOVED);
       }
+
+      // new Vue({...})
+      if (t.isCallExpression(expression)
+        && t.isNewExpression(expression.callee.object)
+        && t.isIdentifier(expression.callee.object.callee, { name: 'Vue' })
+      ) {
+        const args = expression?.callee?.object?.arguments;
+        if (args.length === 1 && t.isObjectExpression(args[0])) {
+          const properties = args[0]?.properties;
+          const renderPropIndex = properties.findIndex(
+            (prop) => t.isObjectProperty(prop) && prop.key.name === 'render'
+          );
+          const renderProp = properties[renderPropIndex];
+          const newFunctionForRenderProp = t.arrowFunctionExpression([], renderProp.value.body);
+
+          renderProp.value = newFunctionForRenderProp;
+          const otherProps = properties.filter((_, index) => index !== renderPropIndex);
+
+          STORE.appVariableDeclaration = t.variableDeclaration('const', [
+            t.variableDeclarator(
+              t.identifier('app'),
+              t.callExpression(t.identifier('createApp'), [
+                t.objectExpression(renderProp ? [renderProp] : []),
+              ])
+            ),
+          ]);
+          STORE.newVueOtherProps = otherProps.map((prop) =>
+            t.expressionStatement(
+              t.callExpression(
+                t.memberExpression(t.identifier('app'), t.identifier('use')),
+                [prop.value]
+              )
+            )
+          );
+          STORE.newVueMount = t.expressionStatement(
+            t.callExpression(
+              t.memberExpression(t.identifier('app'), t.identifier('mount')),
+              [t.stringLiteral('#app')]
+            )
+          );
+
+          path.remove();
+        }
+      }
     },
+  });
+
+  // Insert nodes
+  traverse(currentAst, {
+    Program(path) {
+      Object.keys(STORE).forEach(item => {
+        if (item === 'appVariableDeclaration' && STORE[item]) {
+          const lastImportIndex = path.node.body.reduce((lastIndex, node, index) => {
+            if (t.isImportDeclaration(node)) {
+              return index;
+            }
+            return lastIndex;
+          }, -1);
+
+          path.node.body.splice(
+            lastImportIndex + 1,
+            0,
+            STORE.appVariableDeclaration,
+          );
+        } else if (item === 'newVueOtherProps' && STORE[item]) {
+          path.node.body.push(...STORE[item]);
+        } else if (item === 'importVue' && STORE[item]) {
+          path.node.body.unshift(STORE.importVue);
+        } else if (STORE[item]) {
+          path.node.body.push(STORE[item]);
+        }
+      });
+    }
   });
 
   return currentAst;
@@ -214,12 +325,12 @@ function dataOptions(ast) {
 
   traverse(currentAst, {
     ObjectProperty(path) {
-      if (path.node.key.name === 'data' && babelTypes.isObjectExpression(path.node.value)) {
-        const newDataMethod = babelTypes.objectMethod(
+      if (path.node.key.name === 'data' && t.isObjectExpression(path.node.value)) {
+        const newDataMethod = t.objectMethod(
           'method',
-          babelTypes.identifier('data'),
+          t.identifier('data'),
           [],
-          babelTypes.blockStatement([babelTypes.returnStatement(path.node.value)])
+          t.blockStatement([t.returnStatement(path.node.value)])
         );
         path.replaceWith(newDataMethod);
 
