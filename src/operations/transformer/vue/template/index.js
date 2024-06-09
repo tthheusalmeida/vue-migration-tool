@@ -22,11 +22,11 @@ function templateListenersRemoved(ast) {
         node.attrsMap['v-bind'] = '$attrs';
         delete node.attrsMap['v-on'];
 
-        showLog(MIGRATION.SUCESSFULL.LISTENERS_REMOVED);
+        showLog(MIGRATION.VUE.LISTENERS_REMOVED);
       } else if (isThereListenersAndAttributes) {
         delete node.attrsMap['v-on'];
 
-        showLog(MIGRATION.SUCESSFULL.LISTENERS_REMOVED);
+        showLog(MIGRATION.VUE.LISTENERS_REMOVED);
       }
     }
   });
@@ -49,18 +49,18 @@ function eventsPrefixChanged(ast) {
             node.attrsMap['@vue:unmounted'] = 'unmounted';
             delete node.attrsMap[item];
 
-            showLog(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
+            showLog(MIGRATION.VUE.EVENTS_PREFIX_CHANGED);
           } else if (item.match(REGEX.TRANSFORMER.BEFORE_DESTROY)) {
             node.attrsMap['@vue:beforeUnmount'] = 'beforeUnmount';
             delete node.attrsMap[item];
 
-            showLog(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
+            showLog(MIGRATION.VUE.EVENTS_PREFIX_CHANGED);
           } else if (item.match(REGEX.TRANSFORMER.HOOK)) {
             const newKey = item.replace(REGEX.TRANSFORMER.HOOK, '@vue');
             node.attrsMap[newKey] = node.attrsMap[item];
             delete node.attrsMap[item];
 
-            showLog(MIGRATION.SUCESSFULL.EVENTS_PREFIX_CHANGED);
+            showLog(MIGRATION.VUE.EVENTS_PREFIX_CHANGED);
           }
         });
       }
@@ -92,7 +92,7 @@ function keyCodeModifiers(ast) {
               node.attrsMap[newKey] = node.attrsMap[item];
               delete node.attrsMap[item];
 
-              showLog(MIGRATION.SUCESSFULL.KEY_CODE_MODIFIERS);
+              showLog(MIGRATION.VUE.KEY_CODE_MODIFIERS);
             } catch (e) {
               console.error(e);
             }

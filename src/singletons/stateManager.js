@@ -10,6 +10,11 @@ class StateManager extends BaseSingleton {
         */
         importVue: null,
         /*
+          Real example: import Vuex from 'vuex';
+          AST store: { type: 'ImportDeclaration' }
+        */
+        importVuex: null,
+        /*
           Real example: const app = ...
           AST store: { type: 'VariableDeclaration' }
         */

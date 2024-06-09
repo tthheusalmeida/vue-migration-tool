@@ -4,6 +4,7 @@ const stateManager = require('../../singletons/stateManager');
 
 const { VUE_TEMPLATE_TRANSFORM_LIST } = require('./vue/template');
 const { VUE_SCRIPT_TRANSFORM_LIST } = require('./vue/script');
+const { VUEX_SCRIPT_TRANSFORM_LIST } = require('./vuex/script');
 
 function runTransformer(ast) {
   if (Object.keys(ast.template).length === 0
@@ -17,6 +18,7 @@ function runTransformer(ast) {
   ];
   const scriptRules = [
     ...VUE_SCRIPT_TRANSFORM_LIST,
+    ...VUEX_SCRIPT_TRANSFORM_LIST,
   ];
 
   const template = { ast: applyTransformerRules(ast.template.ast, templateRules) };

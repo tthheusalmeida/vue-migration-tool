@@ -89,7 +89,7 @@ function globalApiNewVue(ast) {
             t.identifier('createApp'), t.identifier('createApp')
           );
           const args = [createApp];
-          showLog(MIGRATION.SUCESSFULL.GLOBAL_API.CREATE_APP);
+          showLog(MIGRATION.VUE.GLOBAL_API.CREATE_APP);
 
           const isThereRenderProp = existenceChecker.get('renderProp');
           if (isThereRenderProp) {
@@ -98,7 +98,7 @@ function globalApiNewVue(ast) {
             );
             args.push(h);
 
-            showLog(MIGRATION.SUCESSFULL.GLOBAL_API.H);
+            showLog(MIGRATION.VUE.GLOBAL_API.H);
           }
 
           stateManager.set('importVue', t.importDeclaration(args, t.stringLiteral('vue')));
@@ -138,7 +138,7 @@ function globalApiNewVue(ast) {
         );
         ast.program.body.unshift(importDeclaration);
 
-        showLog(MIGRATION.SUCESSFULL.GLOBAL_API.NEW_VUE);
+        showLog(MIGRATION.VUE.GLOBAL_API.NEW_VUE);
 
         // Handle loc property
         if (path.node?.loc) {
@@ -151,10 +151,10 @@ function globalApiNewVue(ast) {
     CallExpression(path) {
       if (t.isMemberExpression(path.node.callee)
         && t.isIdentifier(path.node.callee.object, { name: 'Vue' })
+        && !existenceChecker.get('importVuex')
       ) {
         path.node.callee.object = t.identifier('app');
-
-        showLog(MIGRATION.SUCESSFULL.GLOBAL_API.CALL_EXPRESSION);
+        showLog(MIGRATION.VUE.GLOBAL_API.CALL_EXPRESSION);
 
         // Handle loc property
         if (path.node?.loc) {
@@ -176,7 +176,7 @@ function globalApiNewVue(ast) {
       ) {
         path.remove();
 
-        showLog(MIGRATION.SUCESSFULL.GLOBAL_API.CALL_EXPRESSION_REMOVED);
+        showLog(MIGRATION.VUE.GLOBAL_API.CALL_EXPRESSION_REMOVED);
       }
 
       // new Vue({...})
@@ -274,7 +274,7 @@ function destroyedToUnmouted(ast) {
       if (path.isIdentifier({ name: 'destroyed' })) {
         path.node.name = 'unmounted';
 
-        showLog(MIGRATION.SUCESSFULL.DESTROYED_TO_UNMOUNTED);
+        showLog(MIGRATION.VUE.DESTROYED_TO_UNMOUNTED);
       }
 
       // Handle loc property
@@ -297,7 +297,7 @@ function beforeDestroyToBeforeUnmount(ast) {
       if (path.isIdentifier({ name: 'beforeDestroy' })) {
         path.node.name = 'beforeUnmount';
 
-        showLog(MIGRATION.SUCESSFULL.BEFORE_DESTROY_TO_BEFORE_UNMOUNT);
+        showLog(MIGRATION.VUE.BEFORE_DESTROY_TO_BEFORE_UNMOUNT);
       }
 
       // Handle loc property
@@ -327,7 +327,7 @@ function dataOptions(ast) {
         );
         path.replaceWith(newDataMethod);
 
-        showLog(MIGRATION.SUCESSFULL.DATA_OPTIONS);
+        showLog(MIGRATION.VUE.DATA_OPTIONS);
       }
 
       // Handle loc property
@@ -366,11 +366,11 @@ function filters(ast) {
           methodsNode.value.properties.push(...filtersNode.value.properties);
           path.node.properties = path.node.properties.filter(property => property !== filtersNode);
 
-          showLog(MIGRATION.SUCESSFULL.FILTERS);
+          showLog(MIGRATION.VUE.FILTERS);
         } else {
           filtersNode.key.name = 'methods';
 
-          showLog(MIGRATION.SUCESSFULL.FILTERS);
+          showLog(MIGRATION.VUE.FILTERS);
         }
       }
 

@@ -1,7 +1,7 @@
 class BaseSingleton {
   constructor(state = {}) {
     if (new.target === BaseSingleton) {
-      throw new Error("Cannot instantiate BaseSingleton directly.");
+      throw new Error('cannot instantiate BaseSingleton directly.');
     }
 
     this.state = state;
@@ -9,7 +9,7 @@ class BaseSingleton {
 
   get(key) {
     if (this.state[key] === undefined) {
-      throw new Error(`Undefined key "${key}" can not be get on ${this.constructor.name}.`);
+      throw new Error(`undefined key "${key}" can not be get on ${this.constructor.name}.`);
     }
 
     return this.state[key];
@@ -21,7 +21,7 @@ class BaseSingleton {
 
   set(key, value) {
     if (!this.state[key] === undefined) {
-      throw new Error(`Undefined key "${key}" can not be set on ${this.constructor.name}.`);
+      throw new Error(`undefined key "${key}" can not be set on ${this.constructor.name}.`);
     }
 
     this.state[key] = value;

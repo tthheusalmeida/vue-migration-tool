@@ -162,7 +162,7 @@ function renderStringLiteral(node) {
 
         render += '{{ ' + renderFiltersWithParam(methodsList) + ' }}';
 
-        showLog(MIGRATION.SUCESSFULL.FILTERS);
+        showLog(MIGRATION.VUE.FILTERS);
         return;
       }
 
