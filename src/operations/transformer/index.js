@@ -1,4 +1,6 @@
 'use strict';
+const existenceChecker = require('../../singletons/existenceChecker');
+const stateManager = require('../../singletons/stateManager');
 
 const { VUE_TEMPLATE_TRANSFORM_LIST } = require('./vue/template');
 const { VUE_SCRIPT_TRANSFORM_LIST } = require('./vue/script');
@@ -20,6 +22,8 @@ function runTransformer(ast) {
   const template = { ast: applyTransformerRules(ast.template.ast, templateRules) };
   const script = applyTransformerRules(ast.script, scriptRules);
 
+  resetStoredData();
+
   return {
     template,
     script,
@@ -35,6 +39,11 @@ function applyTransformerRules(ast, rulesList) {
   });
 
   return newAst;
+}
+
+function resetStoredData() {
+  existenceChecker.reset();
+  stateManager.reset();
 }
 
 module.exports = {

@@ -4,6 +4,8 @@ const { MIGRATION } = require('../../constants');
 const { showLog } = require('../../../../utils/message');
 const traverse = require('@babel/traverse').default;
 const t = require('@babel/types');
+const existenceChecker = require('../../../../singletons/existenceChecker');
+const stateManager = require('../../../../singletons/stateManager');
 
 // Default value for empty loc
 // If not treated, it breaks babel, as there is no plugin that accepts empty loc.
@@ -33,40 +35,22 @@ function setDefaultLoc(ast) {
 function globalApiNewVue(ast) {
   const currentAst = { ...ast };
 
-  const VALIDATION = {
-    isThereImportVue: true,
-    isThereNewVue: false,
-    isThereRenderProp: false,
-  }
-  const STORE = {
-    /*
-      Real example: import Vue from 'vue';
-      AST store: { type: 'ImportDeclaration' }
-    */
-    importVue: null,
-    /*
-      Real example: const app = ...
-      AST store: { type: 'VariableDeclaration' }
-    */
-    appVariableDeclaration: null,
-    /*
-      Real example: { store, router ...}
-      AST store: [{ type: 'ExpressionStatement' }, ...]
-    */
-    newVueOtherProps: null,
-    /*
-      Real example: new Vue().$mount('#app');
-      AST store: { type: 'ExpressionStatement' }
-    */
-    newVueMount: null
-  }
-
   // Find validations
   traverse(currentAst, {
     ImportDeclaration(path) {
       if (t.isImportDeclaration(path.node)
         && t.isStringLiteral(path.node.source, { value: 'vue' })) {
-        VALIDATION.isThereImportVue = true;
+        existenceChecker.set('importVue', true);
+      }
+
+      if (t.isImportDeclaration(path.node)
+        && t.isStringLiteral(path.node.source, { value: 'vuex' })) {
+        existenceChecker.set('importVuex', true);
+      }
+
+      if (t.isImportDeclaration(path.node)
+        && t.isStringLiteral(path.node.source, { value: 'vue-router' })) {
+        existenceChecker.set('importVueRouter', true);
       }
     },
     NewExpression(path) {
@@ -77,7 +61,7 @@ function globalApiNewVue(ast) {
             (prop) => t.isObjectProperty(prop) && prop.key.name === 'render'
           );
           if (!!renderProp) {
-            VALIDATION.isThereRenderProp = true;
+            existenceChecker.set('renderProp', true);
           }
         }
       }
@@ -88,7 +72,7 @@ function globalApiNewVue(ast) {
         && t.isNewExpression(expression.callee.object)
         && t.isIdentifier(expression.callee.object.callee, { name: 'Vue' })
       ) {
-        VALIDATION.isThereNewVue = true;
+        existenceChecker.set('newVue', true);
       }
     }
   });
@@ -107,7 +91,8 @@ function globalApiNewVue(ast) {
           const args = [createApp];
           showLog(MIGRATION.SUCESSFULL.GLOBAL_API.CREATE_APP);
 
-          if (VALIDATION.isThereRenderProp) {
+          const isThereRenderProp = existenceChecker.get('renderProp');
+          if (isThereRenderProp) {
             const h = t.importSpecifier(
               t.identifier('h'), t.identifier('h')
             );
@@ -116,7 +101,7 @@ function globalApiNewVue(ast) {
             showLog(MIGRATION.SUCESSFULL.GLOBAL_API.H);
           }
 
-          STORE.importVue = t.importDeclaration(args, t.stringLiteral('vue'));
+          stateManager.set('importVue', t.importDeclaration(args, t.stringLiteral('vue')));
           path.remove();
         }
       }
@@ -125,7 +110,7 @@ function globalApiNewVue(ast) {
       const declarator = path.node.declarations[0];
       if (t.isNewExpression(declarator.init)
         && t.isIdentifier(declarator.init.callee, { name: 'Vue' })
-        && !VALIDATION.isThereNewVue
+        && !existenceChecker.get('newVue')
       ) {
         // Remove 'const' keyword
         path.node.kind = '';
@@ -211,28 +196,28 @@ function globalApiNewVue(ast) {
           renderProp.value = newFunctionForRenderProp;
           const otherProps = properties.filter((_, index) => index !== renderPropIndex);
 
-          STORE.appVariableDeclaration = t.variableDeclaration('const', [
+          stateManager.set('appVariableDeclaration', t.variableDeclaration('const', [
             t.variableDeclarator(
               t.identifier('app'),
               t.callExpression(t.identifier('createApp'), [
                 t.objectExpression(renderProp ? [renderProp] : []),
               ])
             ),
-          ]);
-          STORE.newVueOtherProps = otherProps.map((prop) =>
+          ]));
+          stateManager.set('newVueOtherProps', otherProps.map((prop) =>
             t.expressionStatement(
               t.callExpression(
                 t.memberExpression(t.identifier('app'), t.identifier('use')),
                 [prop.value]
               )
             )
-          );
-          STORE.newVueMount = t.expressionStatement(
+          ));
+          stateManager.set('newVueMount', t.expressionStatement(
             t.callExpression(
               t.memberExpression(t.identifier('app'), t.identifier('mount')),
               [t.stringLiteral('#app')]
             )
-          );
+          ));
 
           path.remove();
         }
@@ -243,8 +228,9 @@ function globalApiNewVue(ast) {
   // Insert nodes
   traverse(currentAst, {
     Program(path) {
-      Object.keys(STORE).forEach(item => {
-        if (item === 'appVariableDeclaration' && STORE[item]) {
+      const store = stateManager.getState();
+      Object.keys(store).forEach(item => {
+        if (item === 'appVariableDeclaration' && stateManager.get(item)) {
           const lastImportIndex = path.node.body.reduce((lastIndex, node, index) => {
             if (t.isImportDeclaration(node)) {
               return index;
@@ -255,14 +241,21 @@ function globalApiNewVue(ast) {
           path.node.body.splice(
             lastImportIndex + 1,
             0,
-            STORE.appVariableDeclaration,
+            stateManager.get('appVariableDeclaration'),
           );
-        } else if (item === 'newVueOtherProps' && STORE[item]) {
-          path.node.body.push(...STORE[item]);
-        } else if (item === 'importVue' && STORE[item]) {
-          path.node.body.unshift(STORE.importVue);
-        } else if (STORE[item]) {
-          path.node.body.push(STORE[item]);
+        }
+        else if (item === 'newVueOtherProps'
+          && stateManager.get(item)) {
+          path.node.body.push(...stateManager.get(item));
+        }
+        else if (item === 'importVue'
+          && stateManager.get(item)
+          && !existenceChecker.get('importVuex')
+          && !existenceChecker.get('importVueRouter')) {
+          path.node.body.unshift(stateManager.get('importVue'));
+        }
+        else if (item !== 'importVue' && stateManager.get(item)) {
+          path.node.body.push(stateManager.get(item));
         }
       });
     }
