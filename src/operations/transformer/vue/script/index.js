@@ -2,8 +2,8 @@
 
 const { MIGRATION } = require('../../constants');
 const { showLog } = require('../../../../utils/message');
-const traverse = require('@babel/traverse').default;
 const t = require('@babel/types');
+const traverse = require('@babel/traverse').default;
 const existenceChecker = require('../../../../singletons/existenceChecker');
 const stateManager = require('../../../../singletons/stateManager');
 
@@ -23,19 +23,10 @@ function setDefaultLoc(ast) {
   return currentAst;
 };
 
-// Global API
-
-// - [Global API] new Vue now is createApp, an app instance from new concept in Vue 3.
-
-/*TODO https://v3-migration.vuejs.org/breaking-changes/global-api.html#a-new-global-api-createapp
-  Add treatment for:
-    - Vue.config.ignoredElements
-    - Vue.prototype
-*/
-function globalApiNewVue(ast) {
+// Checks for the existence of variables for later use in node modification, editing and deletion rules.
+function existenceCheckerForRules(ast) {
   const currentAst = { ...ast };
 
-  // Find validations
   traverse(currentAst, {
     ImportDeclaration(path) {
       if (t.isImportDeclaration(path.node)
@@ -77,7 +68,21 @@ function globalApiNewVue(ast) {
     }
   });
 
-  // Modify, Remove nodes 
+  return currentAst;
+}
+
+// Global API
+
+// - [Global API] new Vue now is createApp, an app instance from new concept in Vue 3.
+
+/*TODO https://v3-migration.vuejs.org/breaking-changes/global-api.html#a-new-global-api-createapp
+  Add treatment for:
+    - Vue.config.ignoredElements
+    - Vue.prototype
+*/
+function globalApiNewVue(ast) {
+  const currentAst = { ...ast };
+
   traverse(currentAst, {
     ImportDeclaration(path) {
       if (t.isImportDeclaration(path.node)
@@ -222,7 +227,6 @@ function globalApiNewVue(ast) {
     },
   });
 
-  // Insert nodes
   traverse(currentAst, {
     Program(path) {
       const store = stateManager.getState();
@@ -391,8 +395,12 @@ function filters(ast) {
   return currentAst;
 }
 
-const VUE_SCRIPT_TRANSFORM_LIST = [
+const BEFORE_START_RULES = [
   setDefaultLoc,
+  existenceCheckerForRules,
+];
+
+const VUE_SCRIPT_TRANSFORM_LIST = [
   globalApiNewVue,
   destroyedToUnmouted,
   beforeDestroyToBeforeUnmount,
@@ -407,5 +415,6 @@ module.exports = {
   beforeDestroyToBeforeUnmount,
   dataOptions,
   filters,
+  BEFORE_START_RULES,
   VUE_SCRIPT_TRANSFORM_LIST,
 }
