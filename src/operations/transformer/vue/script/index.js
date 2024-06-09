@@ -89,7 +89,6 @@ function globalApiNewVue(ast) {
             t.identifier('createApp'), t.identifier('createApp')
           );
           const args = [createApp];
-          showLog(MIGRATION.VUE.GLOBAL_API.CREATE_APP);
 
           const isThereRenderProp = existenceChecker.get('renderProp');
           if (isThereRenderProp) {
@@ -97,8 +96,6 @@ function globalApiNewVue(ast) {
               t.identifier('h'), t.identifier('h')
             );
             args.push(h);
-
-            showLog(MIGRATION.VUE.GLOBAL_API.H);
           }
 
           stateManager.set('importVue', t.importDeclaration(args, t.stringLiteral('vue')));
@@ -253,6 +250,14 @@ function globalApiNewVue(ast) {
           && !existenceChecker.get('importVuex')
           && !existenceChecker.get('importVueRouter')) {
           path.node.body.unshift(stateManager.get('importVue'));
+
+          showLog(MIGRATION.VUE.GLOBAL_API.CREATE_APP);
+
+          const hasHImport = stateManager.get('importVue').specifiers
+            .find(key => key.local.name === 'h' && key.imported.name === 'h');
+          if (hasHImport) {
+            showLog(MIGRATION.VUE.GLOBAL_API.H);
+          }
         }
         else if (item !== 'importVue' && stateManager.get(item)) {
           path.node.body.push(stateManager.get(item));
