@@ -9,6 +9,7 @@ const VUE = {
   LISTENERS_REMOVED: ' - (VUE) $listeners has been removed / merged into $attrs.',
   DATA_OPTIONS: ' - (VUE) The data option should always be declared as a function.',
   FILTERS: ' - (VUE) Filters are removed from Vue 3.0 and no longer supported.',
+  REMOVE_VUE_USE: ' - (VUE) "Vue.use" has been removed from vue.',
   GLOBAL_API: {
     CREATE_APP: ' - (VUE) [Global API] "import Vue" now is "import { createApp }", an app instance from new concept in Vue 3.',
     NEW_VUE: ' - (VUE) [Global API] "new Vue" now is "createApp", an app instance from new concept in Vue 3.',
@@ -20,13 +21,18 @@ const VUE = {
 
 const VUEX = {
   CREATE_STORE: ' - (VUEX) Create a new store, users are now encouraged to use the newly introduced createStore function',
-  REMOVE_VUE_USE: ' - (VUEX) "Vue.use(Vuex)" has been removed from vue, now vuex is used in another way.',
-  VUEX_STORE: ' - (VUEX) "new Vuex.Store" has been change for createStore.'
+  VUEX_STORE: ' - (VUEX) "new Vuex.Store" has been change for createStore.',
+};
+
+const ROUTER = {
+  CREATE_ROUTER: ' - (VUE-ROUTER) "new Router" becomes "createRouter".',
+  VUE_ROUTER: ' - (VUE-ROUTER) Instead of writing new VueRouter(), you now have to call "createRouter".'
 };
 
 const MIGRATION = {
   VUE,
   VUEX,
+  ROUTER,
   ERROR: {
     KEY_CODE_IS_NOT_DEFINED: 'key code is not defined.',
     CREATE_DIRECTORY: 'Error creating directory',

@@ -48,11 +48,24 @@ function existenceCheckerForRules(ast) {
       if (t.isIdentifier(path.node.callee, { name: 'Vue' })) {
         const args = path.node.arguments;
         if (args.length === 1 && t.isObjectExpression(args[0])) {
-          const renderProp = args[0].properties.find(
+          const isThereRenderProp = args[0].properties.find(
             (prop) => t.isObjectProperty(prop) && prop.key.name === 'render'
           );
-          if (!!renderProp) {
-            existenceChecker.set('renderProp', true);
+          if (!!isThereRenderProp) {
+            existenceChecker.set('vuePropRender', true);
+          }
+        }
+      }
+
+      if (t.isIdentifier(path.node.callee, { name: 'VueRouter' })) {
+        const args = path.node.arguments;
+        if (args.length === 1 && t.isObjectExpression(args[0])) {
+          const isThereModeProp = args[0].properties.find(
+            (prop) => t.isObjectProperty(prop) && prop.key.name === 'mode'
+          );
+          if (!!isThereModeProp) {
+            const value = args[0].properties.filter(prop => prop.key.name === 'mode')[0].value;
+            stateManager.set('routerPropMode', value);
           }
         }
       }
@@ -95,7 +108,7 @@ function globalApiNewVue(ast) {
           );
           const args = [createApp];
 
-          const isThereRenderProp = existenceChecker.get('renderProp');
+          const isThereRenderProp = existenceChecker.get('vuePropRender');
           if (isThereRenderProp) {
             const h = t.importSpecifier(
               t.identifier('h'), t.identifier('h')
@@ -154,6 +167,7 @@ function globalApiNewVue(ast) {
       if (t.isMemberExpression(path.node.callee)
         && t.isIdentifier(path.node.callee.object, { name: 'Vue' })
         && !existenceChecker.get('importVuex')
+        && !existenceChecker.get('importVueRouter')
       ) {
         path.node.callee.object = t.identifier('app');
         showLog(MIGRATION.VUE.GLOBAL_API.CALL_EXPRESSION);
@@ -164,6 +178,16 @@ function globalApiNewVue(ast) {
             delete path.node.loc;
           }
         }
+      }
+
+      if (t.isMemberExpression(path.node.callee)
+        && t.isIdentifier(path.node.callee.object, { name: 'Vue' })
+        && t.isIdentifier(path.node.callee.property, { name: 'use' })
+        && (existenceChecker.get('importVuex')
+          || existenceChecker.get('importVueRouter'))
+      ) {
+        path.remove();
+        showLog(MIGRATION.VUE.REMOVE_VUE_USE);
       }
     },
     ExpressionStatement(path) {
@@ -263,7 +287,9 @@ function globalApiNewVue(ast) {
             showLog(MIGRATION.VUE.GLOBAL_API.H);
           }
         }
-        else if (item !== 'importVue' && stateManager.get(item)) {
+        else if (item !== 'importVue'
+          && item !== 'routerPropMode' // routerPropMode is just to store object, not to render component
+          && stateManager.get(item)) {
           path.node.body.push(stateManager.get(item));
         }
       });

@@ -8,7 +8,7 @@ class ExistenceChecker extends BaseSingleton {
         importVuex: false,
         importVueRouter: false,
         newVue: false,
-        renderProp: false,
+        vuePropRender: false,
       });
 
       ExistenceChecker.instance = this;

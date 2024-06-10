@@ -28,17 +28,6 @@ function createStore(ast) {
         }
       }
     },
-    CallExpression(path) {
-      if (t.isMemberExpression(path.node.callee)
-        && t.isIdentifier(path.node.callee.object, { name: 'Vue' })
-      ) {
-        path.node.callee.object = t.identifier('app');
-
-        showLog(MIGRATION.VUEX.REMOVE_VUE_USE);
-
-        path.remove();
-      }
-    },
     NewExpression(path) {
       if (t.isNewExpression(path.node)
         && t.isMemberExpression(path.node.callee)

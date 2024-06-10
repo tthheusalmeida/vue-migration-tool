@@ -15,6 +15,11 @@ class StateManager extends BaseSingleton {
         */
         importVuex: null,
         /*
+          Real example: import VueRouter from 'vue-router';
+          AST store: { type: 'ImportDeclaration' }
+        */
+        importVueRouter: null,
+        /*
           Real example: const app = ...
           AST store: { type: 'VariableDeclaration' }
         */
@@ -28,7 +33,12 @@ class StateManager extends BaseSingleton {
           Real example: new Vue().$mount('#app');
           AST store: { type: 'ExpressionStatement' }
         */
-        newVueMount: null
+        newVueMount: null,
+        /*
+          Real example: { mode: 'history' }
+          store: { value: String, ... }
+        */
+        routerPropMode: null,
       });
 
       StateManager.instance = this;
