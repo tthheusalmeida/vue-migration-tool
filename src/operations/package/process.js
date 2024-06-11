@@ -3,6 +3,10 @@
 const { spawn } = require('child_process');
 const { showLog } = require('../../utils/message');
 const packageInfo = require('../../singletons/packageInfo');
+const {
+  NEW_DEPENDENCIES,
+  NEW_DEPENDENCIES_LIST
+} = require('./constants');
 
 function runProcesses(fileDirectory) {
   npmRegeneratePackageLock(fileDirectory);
@@ -91,23 +95,11 @@ function npmInstallDependencies(fileDirectory) {
 
   const pkgDependencies = Object.keys(packageInfo.get('dependencies'));
 
-  const isThereVuex = pkgDependencies.includes('vuex');
-  const isThereVueRouter = pkgDependencies.includes('vue-router');
-  const isThereHighcharts = pkgDependencies.includes('highcharts');
-  const isThereHighchartsVue = pkgDependencies.includes('highcharts-vue');
-
-  if (isThereVuex) {
-    dependencies.push('vuex@4.1.0');
-  }
-  if (isThereVueRouter) {
-    dependencies.push('vue-router@4.3.3');
-  }
-  if (isThereHighcharts) {
-    dependencies.push('highcharts@10.0.0');
-  }
-  if (isThereHighchartsVue) {
-    dependencies.push('highcharts-vue@1.4.0');
-  }
+  pkgDependencies.forEach(dependencie => {
+    if (NEW_DEPENDENCIES_LIST.includes(dependencie)) {
+      dependencies.push(`${dependencie}@${NEW_DEPENDENCIES[dependencie]}`);
+    }
+  })
 
   const npmObject = {
     command: 'npm.cmd',
