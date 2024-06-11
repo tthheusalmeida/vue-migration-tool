@@ -23,13 +23,13 @@ function process(npmObject = {}, fileDirectory = '', nextCommand = null) {
 
   processInstance.stdout.on('data', (data) => {
     if (logStdout) {
-      showLog(`🟡 ${data}`);
+      showLog(`🔵 ${data}`);
     }
   });
 
   processInstance.stderr.on('data', (data) => {
     if (logStderr) {
-      showLog(`🔵 Debbug mode: \n${data}`);
+      showLog(`🟡 ${data}`);
     }
   });
 
@@ -58,7 +58,13 @@ function npmRegeneratePackageLock(fileDirectory) {
 }
 
 function npmUninstall(fileDirectory) {
-  const dependencies = ['vue-template-compiler'];
+  const dependencies = [
+    'vue-template-compiler',
+    '@vue/cli-plugin-router',
+    '@vue/cli-plugin-vuex',
+    'vue-cli-plugin-router',
+    'vue-cli-plugin-vuex',
+  ];
   const npmObject = {
     command: 'npm.cmd',
     args: ['uninstall', ...dependencies],
@@ -71,7 +77,13 @@ function npmUninstall(fileDirectory) {
 }
 
 function npmInstallDependencies(fileDirectory) {
-  const dependencies = ['vue@3.4.27', 'vuex@4.1.0', 'vue-router@4.3.3'];
+  const dependencies = [
+    'create-vite-app',
+    'vue@3.4.27',
+    'vuex@4.1.0',
+    'vue-router@4.3.3'
+  ];
+
   const npmObject = {
     command: 'npm.cmd',
     args: ['install', ...dependencies],
@@ -85,8 +97,12 @@ function npmInstallDependencies(fileDirectory) {
 
 function npmInstallSaveDev(fileDirectory) {
   const dependencies = [
+    'vite@5.2.13',
+    '@vitejs/plugin-vue@5.0.5',
+    '@vue/compiler-sfc@3.4.27',
     '@vue/test-utils@2.0.0',
   ];
+
   const npmObject = {
     command: 'npm.cmd',
     args: ['install', '--save-dev', ...dependencies],
