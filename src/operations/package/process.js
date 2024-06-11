@@ -99,7 +99,7 @@ function npmInstallDependencies(fileDirectory) {
     if (NEW_DEPENDENCIES_LIST.includes(dependencie)) {
       dependencies.push(`${dependencie}@${NEW_DEPENDENCIES[dependencie]}`);
     }
-  })
+  });
 
   const npmObject = {
     command: 'npm.cmd',
