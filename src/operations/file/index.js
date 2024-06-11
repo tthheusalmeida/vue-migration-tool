@@ -6,6 +6,7 @@ const fsExtra = require('fs-extra');
 const { runParser } = require('../parser/index');
 const { runTransformer } = require('../transformer/index');
 const { runRender } = require('../compiler/render');
+const { runMigratePackage } = require('../package/index');
 
 async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
   try {
@@ -22,19 +23,23 @@ async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
       if (fileStat.isFile()) {
         if (isConfigFile(file)
           || isDocFile(file)
-          || isNodeFile(file)
+          || isPackageLockFile(file)
           || isTestFile(file)
         ) {
           await fsExtra.copy(sourceFilePath, targetFilePath);
         }
-        else if (fileExtension !== '.vue' && fileExtension !== '.js') {
+        else if (fileExtension !== '.vue'
+          && fileExtension !== '.js'
+          && !isPackageFile(file)) {
           await fsExtra.copy(sourceFilePath, targetFilePath);
         }
         else {
           try {
-            // if (file === 'main.js') { // TODO remove if
-            migrateSingleFile(sourceFilePath, targetFilePath, fileExtension);
-            // }
+            if (isPackageFile(file)) {
+              runMigratePackage(sourceFilePath, targetFilePath, targetDirectory);
+            } else {
+              migrateSingleFile(sourceFilePath, targetFilePath, fileExtension);
+            }
           } catch (e) {
             console.error(e);
           }
@@ -55,7 +60,6 @@ async function migrateSingleFile(sourceFilePath, targetFilePath, fileExtension) 
 
   fs.writeFileSync(targetFilePath, renderedComponent);
 }
-
 
 function isConfigFile(file) {
   if (file.startsWith('.', 0)
@@ -79,13 +83,16 @@ function isDocFile(file) {
   return false;
 };
 
-function isNodeFile(file) {
-  const docFiles = [
-    'package-lock.json',
-    'package.json'
-  ]
+function isPackageLockFile(file) {
+  if ('package-lock.json' === file) {
+    return true;
+  }
 
-  if (docFiles.includes(file)) {
+  return false;
+};
+
+function isPackageFile(file) {
+  if ('package.json' === file) {
     return true;
   }
 
@@ -104,6 +111,7 @@ module.exports = {
   migrateSingleFile,
   isConfigFile,
   isDocFile,
-  isNodeFile,
+  isPackageLockFile,
+  isPackageFile,
   isTestFile,
 }

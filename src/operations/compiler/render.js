@@ -195,11 +195,13 @@ function renderScript(ast, fileExtension) {
     return `<script>\n${generator(ast).code}\n</script>\n`;
   }
 
-  return generator(ast, {
+  const options = {
     jsescOption: {
       quotes: 'single',
     },
-  }).code;
+  };
+
+  return generator(ast, options).code;
 }
 
 module.exports = {
