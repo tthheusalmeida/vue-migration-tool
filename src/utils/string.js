@@ -71,10 +71,28 @@ function getStyleContent(fileContent) {
   return scss || css || empty;
 }
 
+function splitfilePath(filePath, regex) {
+  const parts = filePath.split(regex);
+  if (parts.length > 1) {
+    return parts[2] || parts[1];
+  } else {
+    return filePath;
+  }
+}
+
+function insertTagScript(htmlContent) {
+  const scriptTag = '\t<script type="module" src="/src/main.js"></script>';
+  const bodyCloseTag = '</body>';
+  const newHtmlContent = htmlContent.replace(bodyCloseTag, `${scriptTag}\n${bodyCloseTag}`);
+  return newHtmlContent;
+}
+
 module.exports = {
   replaceExtensionVueToJson,
   getTagContent,
   getTemplateContent,
   getScriptContent,
   getStyleContent,
+  splitfilePath,
+  insertTagScript,
 }

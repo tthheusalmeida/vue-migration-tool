@@ -9,6 +9,8 @@ async function runMigratePackage(sourceFilePath, targetFilePath, fileDirectory) 
   let packageObj = JSON.parse(fileContent);
 
   packageObj = updateEngines(packageObj);
+  packageObj = updateType(packageObj);
+  packageObj = updateScripts(packageObj);
 
   const formattedJson = await format(JSON.stringify(packageObj), {
     parser: 'json',
@@ -27,6 +29,21 @@ async function runMigratePackage(sourceFilePath, targetFilePath, fileDirectory) 
 
 function updateEngines(packageObj) {
   packageObj['engines'] = { node: '20.11.1', npm: '10.2.4' };
+
+  return packageObj;
+}
+
+function updateType(packageObj) {
+  packageObj['type'] = 'module';
+
+  return packageObj;
+}
+
+function updateScripts(packageObj) {
+  if (packageObj.scripts) {
+    packageObj.scripts['start'] = 'vite';
+    packageObj.scripts['serve'] = 'vite';
+  }
 
   return packageObj;
 }

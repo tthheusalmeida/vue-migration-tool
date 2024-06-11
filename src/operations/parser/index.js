@@ -4,14 +4,17 @@ const fs = require('fs');
 const { parse } = require('@babel/parser');
 const { compile } = require('vue-template-compiler');
 const { showLog } = require('../../utils/message');
-const { getTemplateContent } = require('../../utils/string');
-const { getScriptContent } = require('../../utils/string');
-const { getStyleContent } = require('../../utils/string');
 const { stringifyCircularStructureToJson } = require('../../utils/object');
+const {
+  getTemplateContent,
+  getScriptContent,
+  getStyleContent,
+  splitfilePath
+} = require('../../utils/string');
 
 function runParser(filePath = '', fileExtension) {
   showLog(' ');
-  console.info(`=> Running parse for "${splitfilePath(filePath)}".`);
+  console.info(`=> Running parse for "${splitfilePath(filePath, 'src\\')}".`);
   const fileContent = fs.readFileSync(filePath, 'utf8');
 
   if (!fileContent) {
@@ -57,15 +60,6 @@ function getScriptAst(fileContent = '', fileExtension) {
     script,
     { sourceType: 'module' },
   );
-}
-
-const splitfilePath = (filePath) => {
-  const parts = filePath.split('src\\');
-  if (parts.length > 1) {
-    return parts[2] || parts[1];
-  } else {
-    return filePath;
-  }
 }
 
 module.exports = {
