@@ -32,18 +32,18 @@ async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
       if (fileStat.isFile()) {
         if (shouldCopyFile(file)) {
           if (!isVueConfigFile(file)) {
-            await copyFile(sourceFilePath, targetFilePath);
+            //await copyFile(sourceFilePath, targetFilePath);
           }
         }
         else if (isIndexHtmlFile(file)) {
-          await copyIndexHtmlFile(sourceFilePath, targetFilePath);
+          //await copyIndexHtmlFile(sourceFilePath, targetFilePath);
         }
         else {
           try {
             if (isPackageFile(file)) {
               runMigratePackage(sourceFilePath, targetFilePath, targetDirectory);
             } else {
-              await migrateSingleFile(sourceFilePath, targetFilePath, fileExtension);
+              //await migrateSingleFile(sourceFilePath, targetFilePath, fileExtension);
             }
           } catch (e) {
             console.error(e);

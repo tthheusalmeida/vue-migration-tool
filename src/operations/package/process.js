@@ -2,6 +2,7 @@
 
 const { spawn } = require('child_process');
 const { showLog } = require('../../utils/message');
+const packageInfo = require('../../singletons/packageInfo');
 
 function runProcesses(fileDirectory) {
   npmRegeneratePackageLock(fileDirectory);
@@ -60,10 +61,16 @@ function npmRegeneratePackageLock(fileDirectory) {
 function npmUninstall(fileDirectory) {
   const dependencies = [
     'vue-template-compiler',
-    '@vue/cli-plugin-router',
-    '@vue/cli-plugin-vuex',
     'vue-cli-plugin-router',
     'vue-cli-plugin-vuex',
+    // vue-cli-plugin,
+    '@vue/cli-plugin-router',
+    '@vue/cli-plugin-vuex',
+    '@vue/cli-plugin-babel',
+    '@vue/cli-plugin-eslint',
+    '@vue/cli-plugin-pwa',
+    '@vue/cli-plugin-unit-jest',
+    '@vue/cli-service',
   ];
   const npmObject = {
     command: 'npm.cmd',
@@ -80,9 +87,27 @@ function npmInstallDependencies(fileDirectory) {
   const dependencies = [
     'create-vite-app',
     'vue@3.4.27',
-    'vuex@4.1.0',
-    'vue-router@4.3.3'
   ];
+
+  const pkgDependencies = Object.keys(packageInfo.get('dependencies'));
+
+  const isThereVuex = pkgDependencies.includes('vuex');
+  const isThereVueRouter = pkgDependencies.includes('vue-router');
+  const isThereHighcharts = pkgDependencies.includes('highcharts');
+  const isThereHighchartsVue = pkgDependencies.includes('highcharts-vue');
+
+  if (isThereVuex) {
+    dependencies.push('vuex@4.1.0');
+  }
+  if (isThereVueRouter) {
+    dependencies.push('vue-router@4.3.3');
+  }
+  if (isThereHighcharts) {
+    dependencies.push('highcharts@10.0.0');
+  }
+  if (isThereHighchartsVue) {
+    dependencies.push('highcharts-vue@1.4.0');
+  }
 
   const npmObject = {
     command: 'npm.cmd',
@@ -136,6 +161,7 @@ function removePackageLock(fileDirectory) {
   };
 
   process(npmObject, fileDirectory);
+  packageInfo.reset();
 }
 
 module.exports = {

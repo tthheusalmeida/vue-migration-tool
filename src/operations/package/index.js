@@ -3,6 +3,7 @@
 const fs = require('fs');
 const { format } = require('prettier');
 const { runProcesses } = require('./process');
+const packageInfo = require('../../singletons/packageInfo');
 
 async function runMigratePackage(sourceFilePath, targetFilePath, fileDirectory) {
   const fileContent = fs.readFileSync(sourceFilePath, 'utf8');
@@ -11,6 +12,9 @@ async function runMigratePackage(sourceFilePath, targetFilePath, fileDirectory) 
   packageObj = updateEngines(packageObj);
   packageObj = updateType(packageObj);
   packageObj = updateScripts(packageObj);
+
+  packageInfo.set('dependencies', packageObj.dependencies);
+  packageInfo.set('devDependencies', packageObj.devDependencies);
 
   const formattedJson = await format(JSON.stringify(packageObj), {
     parser: 'json',
