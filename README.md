@@ -44,19 +44,30 @@ For run the project we have some environment variables:<br>
 `REPOSITORY`: HTTPS link from project. <strong style="color: red">(required)</strong><br>
 `BRANCH`: Branch name, if there is no name, <strong>main</strong> is used. <span>(optional)</span><br>
 
-Then run one of these commands:
+Then run one of these commands
 
-for a specific branch
+#### For main branch:
 ```
-cross-env REPOSITORY=<repository-link> BRANCH=<branch-name> npm run start
+cross-env REPOSITORY=<repository-link> npm start
 ```
-Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git BRANCH=migrate npm run start`
+Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git npm start`
 
-for main branch
+#### For a specific branch:
 ```
-cross-env REPOSITORY=<repository-link> npm run start
+cross-env REPOSITORY=<repository-link> BRANCH=<branch-name> npm start
 ```
-Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git npm run start`
+Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git BRANCH=migrate npm start`
+
+#### For main branch and log info:
+```
+cross-env REPOSITORY=<repository-link> npm run run start:log
+```
+
+also works with `BRANCH`:
+```
+cross-env REPOSITORY=<repository-link> BRANCH=migrate npm run run start:log
+```
+Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git BRANCH=migrate npm run start:log`
 
 At the end of the execution the code will be available in the `migrated` folder.
 
