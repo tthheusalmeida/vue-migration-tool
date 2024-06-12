@@ -14,7 +14,7 @@ const {
 
 async function migration(sourceDirectory, targetDirectory) {
   await copyOrMigrateFiles(sourceDirectory, targetDirectory);
-  createViteConfigFile(targetDirectory);
+  await createFiles(targetDirectory);
 }
 
 async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
@@ -148,6 +148,13 @@ function isJavascriptFile(file) {
 
 function isIndexHtmlFile(file) {
   return file === 'index.html';
+}
+
+async function createFiles(directory) {
+  const [projectFolder, _] = await fsExtra.readdir(directory);
+  const projectPath = path.join(directory, projectFolder);
+
+  createViteConfigFile(projectPath);
 }
 
 function createViteConfigFile(directory = '') {

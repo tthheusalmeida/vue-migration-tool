@@ -10,8 +10,8 @@ function renameHighchartsTag(ast) {
 
   traverseTemplate(currentAst, {
     action: (node) => {
-      if (node.tag.match(REGEX.TRANSFORMER.HIGHCHARTS)) {
-        node.tag = 'Highcharts';
+      if (node?.tag?.match(REGEX.TRANSFORMER.HIGHCHARTS)) {
+        node.tag = 'highcharts';
 
         showLog(MIGRATION.HIGHCHARTS.RENAME_HIGHCHARTS_TAG);
       }

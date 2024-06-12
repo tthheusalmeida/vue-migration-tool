@@ -11,44 +11,22 @@ function changeHighchartImport(ast) {
 
   traverse(currentAst, {
     Program(path) {
-      const highchartsImportIndex = path.node.body.findIndex(
+      const IsThereHighchartsImport = path.node.body.find(
+        item => t.isImportDeclaration(item)
+          && t.isStringLiteral(item.source, { value: 'highcharts' })
+      )
+      const IsThereHighchartsVueImport = path.node.body.find(
         item => t.isImportDeclaration(item)
           && t.isStringLiteral(item.source, { value: 'highcharts-vue' })
       )
-      if (highchartsImportIndex >= 0) {
+      if (IsThereHighchartsVueImport && !IsThereHighchartsImport) {
+        const highchartsImportIndex = path.node.body.findIndex(
+          item => t.isImportDeclaration(item)
+            && t.isStringLiteral(item.source, { value: 'highcharts-vue' })
+        )
         path.node.body.splice(highchartsImportIndex, 1);
 
-        const importHighcharts = t.importDeclaration(
-          [t.importDefaultSpecifier(t.identifier('Highcharts'))],
-          t.stringLiteral('highcharts'),
-        );
-        const importHighchartsExporting = t.importDeclaration(
-          [t.importDefaultSpecifier(t.identifier('exportingInit'))],
-          t.stringLiteral('highcharts/modules/exporting'),
-        );
-
-        path.node.body.unshift(
-          importHighcharts,
-          importHighchartsExporting,
-        );
-
-        const lastImportIndex = path.node.body.reduce((lastIndex, node, index) => {
-          if (t.isImportDeclaration(node)) {
-            return index;
-          }
-          return lastIndex;
-        }, -1);
-        const callExpressionExportingInit = t.callExpression(
-          t.identifier('exportingInit'),
-          [t.identifier('Highcharts')],
-        );
-
-        path.node.body.splice(
-          lastImportIndex + 1,
-          0,
-          callExpressionExportingInit,
-        );
-
+        showLog(MIGRATION.HIGHCHARTS.IMPORT_IN_COMPONENT);
       }
     },
     ExportDefaultDeclaration(path) {
@@ -59,6 +37,7 @@ function changeHighchartImport(ast) {
         properties.forEach((prop, index) => {
           if (t.isObjectProperty(prop) && prop.key.name === 'components') {
             const components = prop.value;
+
             if (t.isObjectExpression(components)) {
               const componentProperties = components.properties;
               componentProperties.forEach((item, compPropIndex) => {

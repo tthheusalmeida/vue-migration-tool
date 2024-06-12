@@ -31,7 +31,8 @@ const ROUTER = {
 
 const HIGHCHARTS = {
   RENAME_HIGHCHARTS_TAG: ' - (HIGHCHARTS) Rename render tag to "Highcharts".',
-  COMPONENT_DEFINITION: ' - (HIGHCHARTS) Remove component definition on export default.'
+  COMPONENT_DEFINITION: ' - (HIGHCHARTS) Remove component definition on export default.',
+  IMPORT_IN_COMPONENT: ' - (HIGHCHARTS) Removes component import.'
 }
 
 const MIGRATION = {
