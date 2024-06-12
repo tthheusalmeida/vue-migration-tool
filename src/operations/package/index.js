@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const { format } = require('prettier');
-const { runProcesses } = require('./process');
+const { runProcessUpdatePackage } = require('./process');
 const packageInfo = require('../../singletons/packageInfo');
 
 async function runMigratePackage(sourceFilePath, targetFilePath, fileDirectory) {
@@ -28,7 +28,7 @@ async function runMigratePackage(sourceFilePath, targetFilePath, fileDirectory) 
 
   fs.writeFileSync(targetFilePath, formattedJson, 'utf8');
 
-  runProcesses(fileDirectory);
+  runProcessUpdatePackage(fileDirectory);
 }
 
 function updateEngines(packageObj) {

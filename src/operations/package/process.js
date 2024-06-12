@@ -8,18 +8,33 @@ const {
   NEW_DEPENDENCIES_LIST
 } = require('./constants');
 
-function runProcesses(fileDirectory) {
-  npmRegeneratePackageLock(fileDirectory);
+function runProcessUpdatePackage(fileDirectory) {
+  const processList = [
+    npmRegeneratePackageLock,
+    npmUninstall,
+    npmInstallDependencies,
+    npmInstallSaveDev,
+    removePackageLock,
+  ];
+
+  process({}, fileDirectory, processList, 0);
 }
 
-function process(npmObject = {}, fileDirectory = '', nextCommand = null) {
+function process(processObject = {}, fileDirectory = '', processList = null, currentProcess = undefined) {
   const {
     command = '', // String
     args = [],  // [String]
     logStdout = false, // Boolean
     logStderr = false, // Boolean
     processName = 'Undefined', // String
-  } = npmObject;
+  } = processObject;
+
+  const isProcessObjectEmpty = !Object.keys(processObject).length;
+  if (isProcessObjectEmpty) {
+    processList[currentProcess](fileDirectory, processList, currentProcess);
+    return;
+  };
+
   const processInstance = spawn(command, args, { cwd: fileDirectory });
 
   processInstance.on('spawn', () => {
@@ -43,14 +58,14 @@ function process(npmObject = {}, fileDirectory = '', nextCommand = null) {
       console.error(`🔴 "${processName}" process error: ${code}`);
     } else {
       console.info(`🟢 "${processName}" process successfully!`);
-      if (!!nextCommand) {
-        nextCommand(fileDirectory);
+      if (!!processList[currentProcess]) {
+        processList[currentProcess](fileDirectory, processList, currentProcess);
       }
     }
   });
 }
 
-function npmRegeneratePackageLock(fileDirectory) {
+function npmRegeneratePackageLock(fileDirectory, processList, currentProcess) {
   const npmObject = {
     command: 'npm.cmd',
     args: ['install', '--package-lock-only'],
@@ -59,10 +74,10 @@ function npmRegeneratePackageLock(fileDirectory) {
     processName: 'npm install --package-lock-only',
   };
 
-  process(npmObject, fileDirectory, npmUninstall);
+  process(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
-function npmUninstall(fileDirectory) {
+function npmUninstall(fileDirectory, processList, currentProcess) {
   const dependencies = [
     'vue-template-compiler',
     'vue-cli-plugin-router',
@@ -84,10 +99,10 @@ function npmUninstall(fileDirectory) {
     processName: 'npm uninstall',
   };
 
-  process(npmObject, fileDirectory, npmInstallDependencies);
+  process(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
-function npmInstallDependencies(fileDirectory) {
+function npmInstallDependencies(fileDirectory, processList, currentProcess) {
   const dependencies = [
     'create-vite-app',
     'vue@3.4.27',
@@ -109,10 +124,10 @@ function npmInstallDependencies(fileDirectory) {
     processName: 'npm install',
   };
 
-  process(npmObject, fileDirectory, npmInstallSaveDev);
+  process(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
-function npmInstallSaveDev(fileDirectory) {
+function npmInstallSaveDev(fileDirectory, processList, currentProcess) {
   const dependencies = [
     'vite@5.2.13',
     '@vitejs/plugin-vue@5.0.5',
@@ -128,22 +143,22 @@ function npmInstallSaveDev(fileDirectory) {
     processName: 'npm install devDependencies',
   };
 
-  process(npmObject, fileDirectory, removePackageLock);
+  process(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
-// function npmAuditFix(fileDirectory) {
-//   const npmObject = {
-//     command: 'npm.cmd',
-//     args: ['audit', 'fix'],
-//     logStdout: true,
-//     logStderr: true,
-//     processName: 'npm audit fix',
-//   };
+function npmAuditFix(fileDirectory, processList, currentProcess) {
+  const npmObject = {
+    command: 'npm.cmd',
+    args: ['audit', 'fix'],
+    logStdout: true,
+    logStderr: true,
+    processName: 'npm audit fix',
+  };
 
-//   process(npmObject, fileDirectory, removePackageLock);
-// }
+  process(npmObject, fileDirectory, processList, currentProcess + 1);
+}
 
-function removePackageLock(fileDirectory) {
+function removePackageLock(fileDirectory, processList, currentProcess) {
   const npmObject = {
     command: 'powershell.exe',
     args: ['-Command', 'Remove-Item -Recurse -Force -ErrorAction Stop node_modules'],
@@ -152,17 +167,17 @@ function removePackageLock(fileDirectory) {
     processName: 'Remove node_modules',
   };
 
-  process(npmObject, fileDirectory);
+  process(npmObject, fileDirectory, processList, currentProcess + 1);
   packageInfo.reset();
 }
 
 module.exports = {
-  runProcesses,
+  runProcessUpdatePackage,
   process,
   npmRegeneratePackageLock,
   npmUninstall,
   npmInstallDependencies,
   npmInstallSaveDev,
-  // npmAuditFix,
+  npmAuditFix,
   removePackageLock,
 }
