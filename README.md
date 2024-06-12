@@ -17,10 +17,13 @@
 
 ## 📂 Table of Contents
 
-- [How to use](#how-to-use)
-- [Breaking changes](#breaking-changes)
+- [⚙️ How to use](#how-to-use)
+- [🔨 Breaking changes](#breaking-changes)
   - [Vue](#breaking-changes-vue)
-- [License](#license)
+- [😃 How to contribute](#how-to-contribute)
+- [📝 License](#license)
+
+😃 How to contribute
 
 <a id="how-to-use"></a>
 
@@ -61,7 +64,7 @@ Enjoy! 😎
 
 <a id="breaking-changes"></a>
 
-## Breaking Changes
+## 🔨 Breaking Changes
 
 Below is a list of breaking changes that were implemented in the project.
 
@@ -125,6 +128,17 @@ Documentation with breaking changes can be found [here](https://v3-migration.vue
 - [ ] propsData option
 - [ ] $destroy instance method. Users should no longer manually manage the lifecycle of individual Vue components.
 - [ ] Global functions set and delete, and the instance methods $set and $delete. They are no longer required with proxy-based change detection.
+
+<a id="how-to-contribute"></a>
+
+## 😃 How to contribute
+- First, I leave ⭐ if you liked it!
+- Fork this repository.
+- Create a branch with the features: `git checkout -b my-feature`
+- Commit: `git commit -m 'feat: my new feature'`
+- Submit your branch: `git push origin my-feature`
+
+<a id="license"></a>
 
 ## 📝 License
 
