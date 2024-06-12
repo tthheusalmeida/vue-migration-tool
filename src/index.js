@@ -14,6 +14,13 @@ function runVueMigrationTool() {
 
   runProcessMigration(DIRECTORY_PATH_CODE, DIRECTORY_PATH_MIGRATED);
 
+  eventEmitter.on('gitCloneProject', async () => {
+    if (!process.env.BRANCH) {
+      await runMigrationFile(DIRECTORY_PATH_CODE, DIRECTORY_PATH_MIGRATED);
+      runMigratePackage(DIRECTORY_PATH_CODE, DIRECTORY_PATH_MIGRATED);
+    }
+  });
+
   eventEmitter.on('gitCheckoutBranch', async () => {
     await runMigrationFile(DIRECTORY_PATH_CODE, DIRECTORY_PATH_MIGRATED);
     runMigratePackage(DIRECTORY_PATH_CODE, DIRECTORY_PATH_MIGRATED);
