@@ -1,12 +1,28 @@
 'use strict';
 
 const { spawn } = require('child_process');
-const { showLog } = require('../../utils/message');
-const packageInfo = require('../../singletons/packageInfo');
+const path = require('path');
+const packageInfo = require('../singletons/packageInfo');
+const EventEmitter = require('events');
 const {
   NEW_DEPENDENCIES,
   NEW_DEPENDENCIES_LIST
-} = require('./constants');
+} = require('../operations/package/constants');
+
+const eventEmitter = new EventEmitter();
+
+function runProcessMigration(fileDirectory) {
+  const processList = [
+    gitCloneProject,
+  ];
+
+  if (process.env.BRANCH) {
+    processList.push(gitFetchAll);
+    processList.push(gitCheckoutBranch);
+  }
+
+  processAction({}, fileDirectory, processList, 0);
+}
 
 function runProcessUpdatePackage(fileDirectory) {
   const processList = [
@@ -15,18 +31,18 @@ function runProcessUpdatePackage(fileDirectory) {
     npmInstallDependencies,
     npmInstallSaveDev,
     removePackageLock,
+    removeSourceProject,
   ];
 
-  process({}, fileDirectory, processList, 0);
+  processAction({}, fileDirectory, processList, 0);
 }
 
-function process(processObject = {}, fileDirectory = '', processList = null, currentProcess = undefined) {
+function processAction(processObject = {}, fileDirectory = '', processList = null, currentProcess = undefined) {
   const {
     command = '', // String
     args = [],  // [String]
-    logStdout = false, // Boolean
-    logStderr = false, // Boolean
     processName = 'Undefined', // String
+    functionName = '', // String
   } = processObject;
 
   const isProcessObjectEmpty = !Object.keys(processObject).length;
@@ -42,14 +58,14 @@ function process(processObject = {}, fileDirectory = '', processList = null, cur
   })
 
   processInstance.stdout.on('data', (data) => {
-    if (logStdout) {
-      showLog(`🔵 ${data}`);
+    if (process.env.SHOW_LOG === 'true') {
+      console.info(`🔵 ${data}`);
     }
   });
 
   processInstance.stderr.on('data', (data) => {
-    if (logStderr) {
-      showLog(`🟡 ${data}`);
+    if (process.env.SHOW_LOG === 'true') {
+      console.info(`🟡 ${data}`);
     }
   });
 
@@ -58,6 +74,9 @@ function process(processObject = {}, fileDirectory = '', processList = null, cur
       console.error(`🔴 "${processName}" process error: ${code}`);
     } else {
       console.info(`🟢 "${processName}" process successfully!`);
+
+      eventEmitter.emit(functionName);
+
       if (!!processList[currentProcess]) {
         processList[currentProcess](fileDirectory, processList, currentProcess);
       }
@@ -65,16 +84,58 @@ function process(processObject = {}, fileDirectory = '', processList = null, cur
   });
 }
 
+function gitCloneProject(fileDirectory, processList, currentProcess) {
+  if (!process.env.REPOSITORY) {
+    console.info('=> process.env.REPOSITORY is not defined.')
+    process.exit(1);
+  }
+
+  const npmObject = {
+    command: 'git',
+    args: ['clone', process.env.REPOSITORY],
+    processName: `git clone ${process.env.REPOSITORY}`,
+    functionName: 'gitCloneProject',
+  };
+
+  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
+}
+
+function gitFetchAll(fileDirectory, processList, currentProcess) {
+  const npmObject = {
+    command: 'git',
+    args: ['fetch', '--all'],
+    processName: 'git featch --all',
+    functionName: 'gitFetchAll',
+  };
+
+  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
+}
+
+function gitCheckoutBranch(fileDirectory, processList, currentProcess) {
+  if (!process.env.BRANCH) {
+    console.info('=> process.env.BRANCH is not defined.')
+    process.exit(1);
+  }
+
+  const npmObject = {
+    command: 'git',
+    args: ['checkout', process.env.BRANCH],
+    processName: `git checkout ${process.env.BRANCH}`,
+    functionName: 'gitCheckoutBranch',
+  };
+
+  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
+}
+
 function npmRegeneratePackageLock(fileDirectory, processList, currentProcess) {
   const npmObject = {
     command: 'npm.cmd',
     args: ['install', '--package-lock-only'],
-    logStdout: true,
-    logStderr: false,
     processName: 'npm install --package-lock-only',
+    functionName: 'npmRegeneratePackageLock',
   };
 
-  process(npmObject, fileDirectory, processList, currentProcess + 1);
+  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
 function npmUninstall(fileDirectory, processList, currentProcess) {
@@ -94,12 +155,11 @@ function npmUninstall(fileDirectory, processList, currentProcess) {
   const npmObject = {
     command: 'npm.cmd',
     args: ['uninstall', ...dependencies],
-    logStdout: true,
-    logStderr: false,
     processName: 'npm uninstall',
+    functionName: 'npmUninstall',
   };
 
-  process(npmObject, fileDirectory, processList, currentProcess + 1);
+  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
 function npmInstallDependencies(fileDirectory, processList, currentProcess) {
@@ -112,19 +172,18 @@ function npmInstallDependencies(fileDirectory, processList, currentProcess) {
 
   pkgDependencies.forEach(dependencie => {
     if (NEW_DEPENDENCIES_LIST.includes(dependencie)) {
-      dependencies.push(`${dependencie}@${NEW_DEPENDENCIES[dependencie]}`);
+      dependencies.push(`${dependencie}@${NEW_DEPENDENCIES[dependencie]} `);
     }
   });
 
   const npmObject = {
     command: 'npm.cmd',
     args: ['install', ...dependencies],
-    logStdout: true,
-    logStderr: false,
     processName: 'npm install',
+    functionName: 'npmInstallDependencies',
   };
 
-  process(npmObject, fileDirectory, processList, currentProcess + 1);
+  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
 function npmInstallSaveDev(fileDirectory, processList, currentProcess) {
@@ -138,46 +197,62 @@ function npmInstallSaveDev(fileDirectory, processList, currentProcess) {
   const npmObject = {
     command: 'npm.cmd',
     args: ['install', '--save-dev', ...dependencies],
-    logStdout: true,
-    logStderr: false,
     processName: 'npm install devDependencies',
+    functionName: 'npmInstallSaveDev',
   };
 
-  process(npmObject, fileDirectory, processList, currentProcess + 1);
+  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
 function npmAuditFix(fileDirectory, processList, currentProcess) {
   const npmObject = {
     command: 'npm.cmd',
     args: ['audit', 'fix'],
-    logStdout: true,
-    logStderr: true,
     processName: 'npm audit fix',
+    functionName: 'npmAuditFix',
   };
 
-  process(npmObject, fileDirectory, processList, currentProcess + 1);
+  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
 function removePackageLock(fileDirectory, processList, currentProcess) {
   const npmObject = {
     command: 'powershell.exe',
     args: ['-Command', 'Remove-Item -Recurse -Force -ErrorAction Stop node_modules'],
-    logStdout: true,
-    logStderr: false,
     processName: 'Remove node_modules',
+    functionName: 'removePackageLock',
   };
 
-  process(npmObject, fileDirectory, processList, currentProcess + 1);
+  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
+}
+
+function removeSourceProject(fileDirectory, processList, currentProcess) {
+  const splitPath = fileDirectory.split(path.sep);
+  const migratedIndex = splitPath.indexOf("migrated");
+  splitPath[migratedIndex] = 'code';
+  const projectFolder = splitPath.join(path.sep);
+
+  const npmObject = {
+    command: 'powershell.exe',
+    args: ['-Command', `Remove-Item -Recurse -Force -ErrorAction Stop ${projectFolder}`],
+    processName: 'Remove source project folder',
+    functionName: 'removePackageLock',
+  };
+
+  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
+
   packageInfo.reset();
 }
 
 module.exports = {
+  runProcessMigration,
   runProcessUpdatePackage,
-  process,
+  processAction,
   npmRegeneratePackageLock,
   npmUninstall,
   npmInstallDependencies,
   npmInstallSaveDev,
   npmAuditFix,
   removePackageLock,
+  eventEmitter,
 }
