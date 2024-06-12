@@ -2,6 +2,7 @@
 
 const { spawn } = require('child_process');
 const path = require('path');
+const fsExtra = require('fs-extra');
 const packageInfo = require('../singletons/packageInfo');
 const EventEmitter = require('events');
 const {
@@ -69,16 +70,21 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
     }
   });
 
-  processInstance.on('close', (code) => {
+  processInstance.on('close', async (code) => {
     if (code !== 0) {
       console.error(`🔴 "${processName}" process error: ${code}`);
     } else {
       console.info(`🟢 "${processName}" process successfully!`);
-
       eventEmitter.emit(functionName);
 
+      let currentDirectory = fileDirectory;
+      if (functionName === 'gitCloneProject') {
+        const [projectFolder, _] = await fsExtra.readdir(fileDirectory);
+        currentDirectory = path.join(currentDirectory, projectFolder);
+      }
+
       if (!!processList[currentProcess]) {
-        processList[currentProcess](fileDirectory, processList, currentProcess);
+        processList[currentProcess](currentDirectory, processList, currentProcess);
       }
     }
   });
@@ -112,15 +118,16 @@ function gitFetchAll(fileDirectory, processList, currentProcess) {
 }
 
 function gitCheckoutBranch(fileDirectory, processList, currentProcess) {
-  if (!process.env.BRANCH) {
+  const branch = process.env.BRANCH;
+  if (!branch) {
     console.info('=> process.env.BRANCH is not defined.')
     process.exit(1);
   }
 
   const npmObject = {
     command: 'git',
-    args: ['checkout', process.env.BRANCH],
-    processName: `git checkout ${process.env.BRANCH}`,
+    args: ['checkout', branch],
+    processName: `git checkout ${branch}`,
     functionName: 'gitCheckoutBranch',
   };
 
@@ -248,11 +255,15 @@ module.exports = {
   runProcessMigration,
   runProcessUpdatePackage,
   processAction,
+  gitCloneProject,
+  gitFetchAll,
+  gitCheckoutBranch,
   npmRegeneratePackageLock,
   npmUninstall,
   npmInstallDependencies,
   npmInstallSaveDev,
   npmAuditFix,
   removePackageLock,
+  removeSourceProject,
   eventEmitter,
 }
