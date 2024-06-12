@@ -60,12 +60,13 @@ Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git BRA
 
 #### For main branch and log info:
 ```
-cross-env REPOSITORY=<repository-link> npm run run start:log
+cross-env REPOSITORY=<repository-link> npm run start:log
 ```
+Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git npm run start:log`
 
 also works with `BRANCH`:
 ```
-cross-env REPOSITORY=<repository-link> BRANCH=migrate npm run run start:log
+cross-env REPOSITORY=<repository-link> BRANCH=migrate npm run start:log
 ```
 Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git BRANCH=migrate npm run start:log`
 
