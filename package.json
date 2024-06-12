@@ -8,7 +8,7 @@
     "npm": "10.2.4"
   },
   "scripts": {
-    "start": "node src/index.js",
+    "start": "cross-env node src/index.js",
     "start:log": "cross-env SHOW_LOG=true node src/index.js",
     "test": "jest test",
     "test:unit": "jest --coverage --verbose --silent",

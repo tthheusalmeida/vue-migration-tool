@@ -1,12 +1,21 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
+const fsExtra = require('fs-extra');
 const { format } = require('prettier');
-const { runProcessUpdatePackage } = require('./process');
+const { runProcessUpdatePackage } = require('../../utils/process');
 const packageInfo = require('../../singletons/packageInfo');
 
-async function runMigratePackage(sourceFilePath, targetFilePath, fileDirectory) {
-  const fileContent = fs.readFileSync(sourceFilePath, 'utf8');
+async function runMigratePackage(sourceDirectory, targetDirectory) {
+  const [projectFolder, _] = await fsExtra.readdir(sourceDirectory);
+
+  const packageSourceDirectory = path.join(sourceDirectory, projectFolder);
+  const packageTargetDirectory = path.join(targetDirectory, projectFolder);
+  const packageSourceFilePath = path.join(packageSourceDirectory, 'package.json');
+  const packageTargetFilePath = path.join(packageTargetDirectory, 'package.json');
+
+  const fileContent = fs.readFileSync(packageSourceFilePath, 'utf8');
   let packageObj = JSON.parse(fileContent);
 
   packageObj = updateEngines(packageObj);
@@ -26,9 +35,9 @@ async function runMigratePackage(sourceFilePath, targetFilePath, fileDirectory) 
     bracketSpacing: true,
   });
 
-  fs.writeFileSync(targetFilePath, formattedJson, 'utf8');
+  fs.writeFileSync(packageTargetFilePath, formattedJson, 'utf8');
 
-  runProcessUpdatePackage(fileDirectory);
+  runProcessUpdatePackage(packageTargetDirectory);
 }
 
 function updateEngines(packageObj) {

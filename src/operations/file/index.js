@@ -6,13 +6,12 @@ const fsExtra = require('fs-extra');
 const { runParser } = require('../parser/index');
 const { runTransformer } = require('../transformer/index');
 const { runRender } = require('../compiler/render');
-const { runMigratePackage } = require('../package/index');
 const {
   splitfilePath,
   insertTagScript,
 } = require('../../utils/string');
 
-async function migration(sourceDirectory, targetDirectory) {
+async function runMigrationFile(sourceDirectory, targetDirectory) {
   await copyOrMigrateFiles(sourceDirectory, targetDirectory);
   await createFiles(targetDirectory);
 }
@@ -40,9 +39,7 @@ async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
         }
         else {
           try {
-            if (isPackageFile(file)) {
-              runMigratePackage(sourceFilePath, targetFilePath, targetDirectory);
-            } else {
+            if (!isPackageFile(file)) {
               await migrateSingleFile(sourceFilePath, targetFilePath, fileExtension);
             }
           } catch (e) {
@@ -187,7 +184,7 @@ function createViteConfigFile(directory = '') {
 }
 
 module.exports = {
-  migration,
+  runMigrationFile,
   copyOrMigrateFiles,
   migrateSingleFile,
   isConfigFile,
