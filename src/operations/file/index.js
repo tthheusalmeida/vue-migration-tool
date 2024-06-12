@@ -41,9 +41,11 @@ async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
         else {
           try {
             if (isPackageFile(file)) {
-              runMigratePackage(sourceFilePath, targetFilePath, targetDirectory);
+              // runMigratePackage(sourceFilePath, targetFilePath, targetDirectory);
             } else {
-              //await migrateSingleFile(sourceFilePath, targetFilePath, fileExtension);
+              if (file === 'PolarChart.vue') { // TODO remove if line
+                await migrateSingleFile(sourceFilePath, targetFilePath, fileExtension);
+              }
             }
           } catch (e) {
             console.error(e);

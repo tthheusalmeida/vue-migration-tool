@@ -7,6 +7,7 @@ const REGEX = {
     HOOK: /@hook/g,
     V_ON: /v-on/g,
     DIGIT: /\d+/g,
+    HIGHCHARTS: /highcharts/i,
   },
   COMPILER: {
     RENDER: {

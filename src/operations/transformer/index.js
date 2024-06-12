@@ -3,6 +3,8 @@ const existenceChecker = require('../../singletons/existenceChecker');
 const stateManager = require('../../singletons/stateManager');
 
 const { VUE_TEMPLATE_TRANSFORM_LIST } = require('./vue/template');
+const { HIGHCHARTS_TEMPLATE_TRANSFORM_LIST } = require('./highcharts/template');
+
 const { BEFORE_START_RULES, VUE_SCRIPT_TRANSFORM_LIST } = require('./vue/script');
 const { VUEX_SCRIPT_TRANSFORM_LIST } = require('./vuex/script');
 const { ROUTER_SCRIPT_TRANSFORM_LIST } = require('./router/script');
@@ -16,6 +18,7 @@ function runTransformer(ast) {
 
   const templateRules = [
     ...VUE_TEMPLATE_TRANSFORM_LIST,
+    ...HIGHCHARTS_TEMPLATE_TRANSFORM_LIST,
   ];
   const scriptRules = [
     ...BEFORE_START_RULES,

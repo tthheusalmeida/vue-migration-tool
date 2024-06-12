@@ -29,10 +29,15 @@ const ROUTER = {
   VUE_ROUTER: ' - (VUE-ROUTER) Instead of writing new VueRouter(), you now have to call "createRouter".'
 };
 
+const HIGHCHARTS = {
+  RENAME_HIGHCHARTS_TAG: ' - (HIGHCHARTS) Rename render tag to "Highcharts".',
+}
+
 const MIGRATION = {
   VUE,
   VUEX,
   ROUTER,
+  HIGHCHARTS,
   ERROR: {
     KEY_CODE_IS_NOT_DEFINED: 'key code is not defined.',
     CREATE_DIRECTORY: 'Error creating directory',
