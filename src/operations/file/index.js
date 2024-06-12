@@ -32,20 +32,18 @@ async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
       if (fileStat.isFile()) {
         if (shouldCopyFile(file)) {
           if (!isVueConfigFile(file)) {
-            //await copyFile(sourceFilePath, targetFilePath);
+            await copyFile(sourceFilePath, targetFilePath);
           }
         }
         else if (isIndexHtmlFile(file)) {
-          //await copyIndexHtmlFile(sourceFilePath, targetFilePath);
+          await copyIndexHtmlFile(sourceFilePath, targetFilePath);
         }
         else {
           try {
             if (isPackageFile(file)) {
-              // runMigratePackage(sourceFilePath, targetFilePath, targetDirectory);
+              runMigratePackage(sourceFilePath, targetFilePath, targetDirectory);
             } else {
-              if (file === 'PolarChart.vue') { // TODO remove if line
-                await migrateSingleFile(sourceFilePath, targetFilePath, fileExtension);
-              }
+              await migrateSingleFile(sourceFilePath, targetFilePath, fileExtension);
             }
           } catch (e) {
             console.error(e);
