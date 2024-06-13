@@ -5,6 +5,7 @@ const path = require('path');
 const fsExtra = require('fs-extra');
 const { format } = require('prettier');
 const { runProcessUpdatePackage } = require('../../utils/process');
+const { removeEmptyObjects } = require('../../utils/object');
 const packageInfo = require('../../singletons/packageInfo');
 
 async function runMigratePackage(sourceDirectory, targetDirectory) {
@@ -17,6 +18,8 @@ async function runMigratePackage(sourceDirectory, targetDirectory) {
 
   const fileContent = fs.readFileSync(packageSourceFilePath, 'utf8');
   let packageObj = JSON.parse(fileContent);
+
+  removeEmptyObjects(packageObj);
 
   packageObj = updateEngines(packageObj);
   packageObj = updateType(packageObj);

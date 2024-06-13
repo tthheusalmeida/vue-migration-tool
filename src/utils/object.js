@@ -17,6 +17,21 @@ function stringifyCircularStructureToJson(obj) {
   return str;
 }
 
+function removeEmptyObjects(obj) {
+  if (obj && typeof obj === 'object') {
+    for (let key in obj) {
+      if (typeof obj[key] === 'object') {
+        removeEmptyObjects(obj[key]);
+      }
+
+      if (typeof obj[key] === 'object' && Object.keys(obj[key]).length === 0) {
+        delete obj[key];
+      }
+    }
+  }
+}
+
 module.exports = {
   stringifyCircularStructureToJson,
+  removeEmptyObjects,
 }
