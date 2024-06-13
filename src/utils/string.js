@@ -87,6 +87,21 @@ function insertTagScript(htmlContent) {
   return newHtmlContent;
 }
 
+function importToVariableName(importPath) {
+  let filename = importPath.split('/').pop().split('.')[0];
+  filename = filename.replace(/-/g, ' ');
+
+  let result = filename.split(' ').map((word, index) => {
+    if (index === 0) {
+      return word;
+    } else {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+  }).join('');
+
+  return result;
+}
+
 module.exports = {
   replaceExtensionVueToJson,
   getTagContent,
@@ -95,4 +110,5 @@ module.exports = {
   getStyleContent,
   splitfilePath,
   insertTagScript,
+  importToVariableName
 }

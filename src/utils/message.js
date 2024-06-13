@@ -19,6 +19,10 @@ const VUE = {
   }
 };
 
+const VITE = {
+  REQUIRE_IS_NOT_SUPPORTED: ' - (VITE) Vite do not support "require", changed to "import"',
+}
+
 const VUEX = {
   CREATE_STORE: ' - (VUEX) Create a new store, users are now encouraged to use the newly introduced createStore function',
   VUEX_STORE: ' - (VUEX) "new Vuex.Store" has been change for createStore.',
@@ -26,17 +30,18 @@ const VUEX = {
 
 const ROUTER = {
   CREATE_ROUTER: ' - (VUE-ROUTER) "new Router" becomes "createRouter".',
-  VUE_ROUTER: ' - (VUE-ROUTER) Instead of writing new VueRouter(), you now have to call "createRouter".'
+  VUE_ROUTER: ' - (VUE-ROUTER) Instead of writing new VueRouter(), you now have to call "createRouter".',
 };
 
 const HIGHCHARTS = {
   RENAME_HIGHCHARTS_TAG: ' - (HIGHCHARTS) Rename render tag to "Highcharts".',
   COMPONENT_DEFINITION: ' - (HIGHCHARTS) Remove component definition on export default.',
-  IMPORT_IN_COMPONENT: ' - (HIGHCHARTS) Removes component import.'
+  IMPORT_IN_COMPONENT: ' - (HIGHCHARTS) Removes component import.',
 }
 
 const MIGRATION = {
   VUE,
+  VITE,
   VUEX,
   ROUTER,
   HIGHCHARTS,
@@ -58,5 +63,5 @@ function showLog(log) {
 
 module.exports = {
   MIGRATION,
-  showLog
+  showLog,
 }

@@ -6,6 +6,7 @@ const { VUE_TEMPLATE_TRANSFORM_LIST } = require('./vue/template');
 const { HIGHCHARTS_TEMPLATE_TRANSFORM_LIST } = require('./highcharts/template');
 
 const { BEFORE_START_RULES, VUE_SCRIPT_TRANSFORM_LIST } = require('./vue/script');
+const { VITE_SCRIPT_TRANSFORM_LIST } = require('./vite/script');
 const { VUEX_SCRIPT_TRANSFORM_LIST } = require('./vuex/script');
 const { ROUTER_SCRIPT_TRANSFORM_LIST } = require('./router/script');
 const { HIGHCHARTS_SCRIPT_TRANSFORM_LIST } = require('./highcharts/script');
@@ -24,6 +25,7 @@ function runTransformer(ast) {
   const scriptRules = [
     ...BEFORE_START_RULES,
     ...VUE_SCRIPT_TRANSFORM_LIST,
+    ...VITE_SCRIPT_TRANSFORM_LIST,
     ...VUEX_SCRIPT_TRANSFORM_LIST,
     ...ROUTER_SCRIPT_TRANSFORM_LIST,
     ...HIGHCHARTS_SCRIPT_TRANSFORM_LIST,
