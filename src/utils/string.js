@@ -102,6 +102,10 @@ function importToVariableName(importPath) {
   return result;
 }
 
+function changeUnescapedInterpolation(texto) {
+  return texto.replace(/<%= ([^%]+) %>/g, '%$1%');
+}
+
 module.exports = {
   replaceExtensionVueToJson,
   getTagContent,
@@ -110,5 +114,6 @@ module.exports = {
   getStyleContent,
   splitfilePath,
   insertTagScript,
-  importToVariableName
+  importToVariableName,
+  changeUnescapedInterpolation,
 }

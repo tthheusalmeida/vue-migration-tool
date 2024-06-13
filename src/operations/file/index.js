@@ -9,6 +9,7 @@ const { runRender } = require('../compiler/render');
 const {
   splitfilePath,
   insertTagScript,
+  changeUnescapedInterpolation,
 } = require('../../utils/string');
 
 async function runMigrationFile(sourceDirectory, targetDirectory) {
@@ -74,9 +75,12 @@ async function copyIndexHtmlFile(sourceFilePath, targetFilePath) {
     file.name
   );
 
-  const htmlContent = fs.readFileSync(sourceFilePath, 'utf8');
-  const newHtmlContent = insertTagScript(htmlContent);
-  fs.writeFileSync(newTargetFilePath, newHtmlContent, 'utf8');
+  let htmlContent = fs.readFileSync(sourceFilePath, 'utf8');
+
+  htmlContent = changeUnescapedInterpolation(htmlContent);
+  htmlContent = insertTagScript(htmlContent);
+
+  fs.writeFileSync(newTargetFilePath, htmlContent, 'utf8');
 }
 
 async function migrateSingleFile(sourceFilePath, targetFilePath, fileExtension) {
