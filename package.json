@@ -1,7 +1,23 @@
 {
-  "name": "migration",
+  "name": "vue-migration-tool",
   "version": "1.0.0",
-  "description": "",
+  "author": "Matheus Henrique dos Santos Almeida <dev.almeida.matheus@gmail.com>",
+  "license": "MIT",
+  "description": "Better than doing it manually.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tthheusalmeida/vue-migration-tool.git"
+  },
+  "keywords": [
+    "vue",
+    "vue2",
+    "vue3",
+    "tool",
+    "vite",
+    "frontend",
+    "migration",
+    "vue-migration-tool"
+  ],
   "main": "index.js",
   "engines": {
     "node": "20.11.1",
@@ -27,8 +43,6 @@
       "src/migrated"
     ]
   },
-  "author": "Matheus Henrique dos Santos Almeida",
-  "license": "MIT",
   "dependencies": {
     "@babel/core": "^7.24.5",
     "@babel/generator": "^7.24.5",

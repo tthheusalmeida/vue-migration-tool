@@ -19,15 +19,18 @@
 
 - [⚙️ How to use](#how-to-use)
 - [🔨 Breaking changes](#breaking-changes)
-  - [Vue](#breaking-changes-vue)
 - [😃 How to contribute](#how-to-contribute)
 - [📝 License](#license)
-
-😃 How to contribute
 
 <a id="how-to-use"></a>
 
 ## ⚙️ How to use
+
+To use [Vue Migration Tool](https://github.com/tthheusalmeida/vue-migration-tool), your code must follow the standards in this <strong>[Vue Guide](https://v2.vuejs.org/v2/guide/)</strong>.<br>
+> ⚠️ If your code has a different implementation than the guide, there may be inconsistencies after migration.<br>
+
+Here we go!
+___
 
 Clone the project: 
 ```
@@ -41,8 +44,8 @@ npm install
 
 For run the project we have some environment variables:<br>
 
-`REPOSITORY`: HTTPS link from project. <strong style="color: red">(required)</strong><br>
-`BRANCH`: Branch name, if there is no name, <strong>main</strong> is used. <span>(optional)</span><br>
+`REPOSITORY`: HTTPS link from project. <strong>(required)</strong><br>
+`BRANCH`: Branch name, if there is no name, <strong>main</strong> is used. <em>(optional)</em><br>
 
 Then run one of these commands
 
@@ -78,80 +81,43 @@ Enjoy! 😎
 
 ## 🔨 Breaking Changes
 
-Below is a list of breaking changes that were implemented in the project.
+Each dependency has its own list with checkboxes. When a checkbox is ✔️, it means the change has been implemented.<br>
 
-The idea is that over time, the project can receive more and more migrations of other plugins, libs, etc., that break during this process.
+Here is a list of breaking changes from each dependency that were implemented in the project:
 
-<a id="breaking-changes-vue"></a>
+- [Vue](https://github.com/tthheusalmeida/vue-migration-tool/tree/main/src/operations/transformer/vue/README.md)
+- [Vuex](https://github.com/tthheusalmeida/vue-migration-tool/tree/main/src/operations/transformer/vuex/README.md)
+- [Vue-Router](https://github.com/tthheusalmeida/vue-migration-tool/tree/main/src/operations/transformer/router/README.md)
+- [Vite](https://github.com/tthheusalmeida/vue-migration-tool/tree/main/src/operations/transformer/vite/README.md)
+- [Highcharts](https://github.com/tthheusalmeida/vue-migration-tool/tree/main/src/operations/transformer/highcharts/README.md)
 
-### Vue
-
-Documentation with breaking changes can be found [here](https://v3-migration.vuejs.org/breaking-changes/).
-
-#### Global API
-- [X] Global Vue API is changed to use an application instance
-  - TODO: Vue.config.ignoredElements and Vue.prototype
-- [ ] Global and internal APIs have been restructured to be tree-shakable
-
-#### Template Directives
-- [ ] v-model usage on components has been reworked, replacing v-bind.sync
-- [ ] key usage on &lt;template v-for&gt; and non-v-for nodes has changed
-- [ ] v-if and v-for precedence when used on the same element has changed
-- [ ] v-bind="object" is now order-sensitive
-- [ ] v-on:event.native modifier has been removed
-
-#### Components
-- [ ] Functional components can only be created using a plain function
-- [ ] functional attribute on single-file component (SFC) &lt;template&gt; and functional component - option are deprecated
-- [ ] Async components now require defineAsyncComponent method to be created
-- [ ] Component events should now be declared with the emits option
-
-#### Render Function
-- [ ] Render function API changed
-- [ ] $scopedSlots property is removed and all slots are exposed via $slots as functions
-- [ ] $listeners has been removed / merged into $attrs
-- [ ] $attrs now includes class and style attributes
-
-#### Custom Elements
-- [ ] Custom element checks are now performed during template compilation
-- [ ] Special is attribute usage is restricted to the reserved &lt;component&gt; tag only
-
-#### Other Minor Changes
-- [x] The destroyed lifecycle option has been renamed to unmounted
-- [x] The beforeDestroy lifecycle option has been renamed to beforeUnmount
-- [ ] Props default factory function no longer has access to this context
-- [ ] Custom directive API changed to align with component lifecycle and binding.expression removed
-- [x] The data option should always be declared as a function
-- [ ] The data option from mixins is now merged shallowly
-- [ ] Attributes coercion strategy changed
-- [ ] Some transition classes got a rename
-- [ ] &lt;TransitionGroup&gt; now renders no wrapper element by default
-- [ ] When watching an array, the callback will only trigger when the array is replaced. If you need to - trigger on mutation, the deep option must be specified.
-- [ ] &lt;template&gt; tags with no special directives (v-if/else-if/else, v-for, or v-slot) are now treated as plain elements and will result in a native &lt;template&gt; element instead of rendering its inner content.
-- [ ] Mounted application does not replace the element it's mounted to
-- [x] Lifecycle hook: events prefix changed to vnode-
-
-#### Removed APIs
-- [x] keyCode support as v-on modifiers
-- [ ] $on, $off and $once instance methods
-- [x] Filters
-- [ ] Inline templates attributes
-- [ ] $children instance property
-- [ ] propsData option
-- [ ] $destroy instance method. Users should no longer manually manage the lifecycle of individual Vue components.
-- [ ] Global functions set and delete, and the instance methods $set and $delete. They are no longer required with proxy-based change detection.
+Over time, the project may receive more migrations of other plugins, libraries, etc., which can cause breaking changes.
 
 <a id="how-to-contribute"></a>
 
 ## 😃 How to contribute
-- First, I leave ⭐ if you liked it!
+- First, leave ⭐ if you liked it!
 - Fork this repository.
-- Create a branch with the features: `git checkout -b my-feature`
+- Create a branch for your feature: `git checkout -b my-feature`
+- If you are adding a new dependency breaking change:
+  1. Create a folder with the dependency's name in `src/operation/tranformer`.
+  2. Inside this folder, create a folder for scripts and/or templates.
+  3. Create a constant containing all functions from this dependency as `{dependency}_TEMPLATE_TRANSFORM_LIST` or `{dependency}_SCRIPT_TRANSFORM_LIST`.
+  4. In `src/operation/tranformer/index.js`, import your constant to `templateRules` or `scriptRules`.
+  5. Create a `README.md` file to list breaking changes, whether they have been migrated or not.
+  5. Follow the steps below..
+- If you are updating an existing dependency breaking change:
+  1. Add a breaking change message in `src/utils/message.js`.
+  2. Create a function in `src/operation/tranformer/{dependency}/template/index.js` or `src/operation/tranformer/{dependency}/script/index.js`.
+  3. Include `showLog` with a new breaking change message in the created function.
+  4. Add the created function to `{dependency}_TEMPLATE_TRANSFORM_LIST` or `{dependency}_SCRIPT_TRANSFORM_LIST`.
 - Commit: `git commit -m 'feat: my new feature'`
-- Submit your branch: `git push origin my-feature`
+- Push your branch: `git push origin my-feature`
 
 <a id="license"></a>
 
 ## 📝 License
 
-This project is under the MIT license. see the [license page](https://opensource.org/licenses/MIT) for more details.
+This project is under the MIT license. see the [license page](https://opensource.org/licenses/MIT) for more details.<br>
+
+<p align="left">Made by <strong><a href="https://www.linkedin.com/in/matheus-almeida-602139182/">Matheus Almeida</a></strong></p>
