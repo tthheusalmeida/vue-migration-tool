@@ -7,11 +7,13 @@ const packageInfo = require('../singletons/packageInfo');
 const EventEmitter = require('events');
 const {
   NEW_DEPENDENCIES,
-  OLD_DEV_DEPENDENCIES,
   NEW_DEV_DEPENDENCIES,
+  OLD_DEPENDENCIES,
+  OLD_DEV_DEPENDENCIES,
   NEW_DEPENDENCIES_LIST,
-  OLD_DEV_DEPENDENCIES_LIST,
   NEW_DEV_DEPENDENCIES_LIST,
+  OLD_DEPENDENCIES_LIST,
+  OLD_DEV_DEPENDENCIES_LIST,
 } = require('../operations/package/constants');
 
 const eventEmitter = new EventEmitter();
@@ -166,9 +168,18 @@ function npmUninstall(fileDirectory, processList, currentProcess) {
 
   const pkgDevDependencies = Object.keys(packageInfo.get('devDependencies'));
 
+  const oldDependencieList = [
+    ...OLD_DEPENDENCIES_LIST,
+    ...OLD_DEV_DEPENDENCIES_LIST,
+  ];
+
   pkgDevDependencies.forEach(dependency => {
-    if (OLD_DEV_DEPENDENCIES_LIST.includes(dependency)) {
-      dependencies.push(...OLD_DEV_DEPENDENCIES[dependency]);
+    if (oldDependencieList.includes(dependency)) {
+      const list = OLD_DEPENDENCIES[dependency] || OLD_DEV_DEPENDENCIES[dependency];
+
+      if (list.length) {
+        dependencies.push(...list);
+      }
     }
   });
 
