@@ -1,5 +1,5 @@
 <p align="right">
-  <a href="https://github.com/tthheusalmeida/vue-migration-tool/tree/main?tab=readme-ov-file#breaking-changes">
+  <a href="https://github.com/tthheusalmeida/vue-migration-tool#breaking-changes">
     Back to 🔨 Breaking Changes ⬅️
   </a>
 </p>
