@@ -7,7 +7,11 @@ const packageInfo = require('../singletons/packageInfo');
 const EventEmitter = require('events');
 const {
   NEW_DEPENDENCIES,
-  NEW_DEPENDENCIES_LIST
+  OLD_DEV_DEPENDENCIES,
+  NEW_DEV_DEPENDENCIES,
+  NEW_DEPENDENCIES_LIST,
+  OLD_DEV_DEPENDENCIES_LIST,
+  NEW_DEV_DEPENDENCIES_LIST,
 } = require('../operations/package/constants');
 
 const eventEmitter = new EventEmitter();
@@ -159,6 +163,15 @@ function npmUninstall(fileDirectory, processList, currentProcess) {
     '@vue/cli-plugin-unit-jest',
     '@vue/cli-service',
   ];
+
+  const pkgDevDependencies = Object.keys(packageInfo.get('devDependencies'));
+
+  pkgDevDependencies.forEach(dependency => {
+    if (OLD_DEV_DEPENDENCIES_LIST.includes(dependency)) {
+      dependencies.push(...OLD_DEV_DEPENDENCIES[dependency]);
+    }
+  });
+
   const npmObject = {
     command: 'npm.cmd',
     args: ['uninstall', ...dependencies],
@@ -200,6 +213,14 @@ function npmInstallSaveDev(fileDirectory, processList, currentProcess) {
     '@vue/compiler-sfc@3.4.27',
     '@vue/test-utils@2.0.0',
   ];
+
+  const pkgDevDependencies = Object.keys(packageInfo.get('devDependencies'));
+
+  pkgDevDependencies.forEach(dependency => {
+    if (NEW_DEV_DEPENDENCIES_LIST.includes(dependency)) {
+      dependencies.push(`${dependency}@${NEW_DEV_DEPENDENCIES[dependency]} `);
+    }
+  });
 
   const npmObject = {
     command: 'npm.cmd',
