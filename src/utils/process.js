@@ -177,9 +177,9 @@ function npmInstallDependencies(fileDirectory, processList, currentProcess) {
 
   const pkgDependencies = Object.keys(packageInfo.get('dependencies'));
 
-  pkgDependencies.forEach(dependencie => {
-    if (NEW_DEPENDENCIES_LIST.includes(dependencie)) {
-      dependencies.push(`${dependencie}@${NEW_DEPENDENCIES[dependencie]} `);
+  pkgDependencies.forEach(dependency => {
+    if (NEW_DEPENDENCIES_LIST.includes(dependency)) {
+      dependencies.push(`${dependency}@${NEW_DEPENDENCIES[dependency]} `);
     }
   });
 
