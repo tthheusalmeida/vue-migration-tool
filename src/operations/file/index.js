@@ -93,8 +93,7 @@ async function migrateSingleFile(sourceFilePath, targetFilePath, fileExtension) 
 
 function shouldCopyFile(file) {
   return (
-    isConfigFile(file)
-    || isDocFile(file)
+    isDocFile(file)
     || isPackageLockFile(file)
     || isTestFile(file)
     ||
@@ -171,9 +170,6 @@ function createViteConfigFile(directory = '') {
       + "    alias: {\n"
       + "      '@': '/src',\n"
       + "    },\n"
-      + "  },\n"
-      + "  define: {\n"
-      + "    'process.env': {},\n"
       + "  },\n"
       + "});\n",
   };

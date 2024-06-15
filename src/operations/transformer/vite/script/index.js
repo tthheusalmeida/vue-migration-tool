@@ -34,6 +34,18 @@ function requireIsNotSupported(ast) {
         })
       }
     },
+    MemberExpression(path) {
+      if (t.isIdentifier(path.node.object, { name: 'process' })
+        && t.isIdentifier(path.node.property, { name: 'env' })
+      ) {
+        path.replaceWith(t.memberExpression(
+          t.memberExpression(t.identifier('import'), t.identifier('meta')),
+          t.identifier('env')
+        ));
+
+        showLog(MIGRATION.VITE.PROCESS_ENV_NOT_SUPPORTED);
+      }
+    },
   });
 
   traverse(currentAst, {

@@ -21,6 +21,7 @@ const VUE = {
 
 const VITE = {
   REQUIRE_IS_NOT_SUPPORTED: ' - (VITE) Vite do not support "require", changed to "import"',
+  PROCESS_ENV_NOT_SUPPORTED: ' - (VITE) Vite do not support "process.env", changed to "import.meta.env"',
 }
 
 const VUEX = {
