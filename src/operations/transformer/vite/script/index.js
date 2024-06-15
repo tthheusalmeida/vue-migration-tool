@@ -18,16 +18,18 @@ function requireIsNotSupported(ast) {
         args.forEach((arg) => {
           if (t.isStringLiteral(arg)) {
             const importData = {
-              name: importToVariableName(path.node.arguments[0].value),
-              path: path.node.arguments[0].value,
+              name: importToVariableName(path.node.arguments[0]?.value) || '',
+              path: path.node.arguments[0]?.value || '',
             };
 
-            path.replaceWith(t.identifier(importData.name));
+            if (importData.name && importData.path) {
+              path.replaceWith(t.identifier(importData.name));
 
-            importFile.push(t.importDeclaration(
-              [t.importDefaultSpecifier(t.identifier(importData.name))],
-              t.stringLiteral(importData.path),
-            ));
+              importFile.push(t.importDeclaration(
+                [t.importDefaultSpecifier(t.identifier(importData.name))],
+                t.stringLiteral(importData.path),
+              ));
+            }
           }
         })
       }

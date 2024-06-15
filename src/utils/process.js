@@ -7,13 +7,9 @@ const packageInfo = require('../singletons/packageInfo');
 const EventEmitter = require('events');
 const {
   NEW_DEPENDENCIES,
-  NEW_DEV_DEPENDENCIES,
   OLD_DEPENDENCIES,
-  OLD_DEV_DEPENDENCIES,
   NEW_DEPENDENCIES_LIST,
-  NEW_DEV_DEPENDENCIES_LIST,
   OLD_DEPENDENCIES_LIST,
-  OLD_DEV_DEPENDENCIES_LIST,
 } = require('../operations/package/constants');
 
 const eventEmitter = new EventEmitter();
@@ -152,40 +148,26 @@ function npmRegeneratePackageLock(fileDirectory, processList, currentProcess) {
 }
 
 function npmUninstall(fileDirectory, processList, currentProcess) {
-  const dependencies = [
-    'vue-template-compiler',
-    'vue-cli-plugin-router',
-    'vue-cli-plugin-vuex',
-    // vue-cli-plugin,
-    '@vue/cli-plugin-router',
-    '@vue/cli-plugin-vuex',
-    '@vue/cli-plugin-babel',
-    '@vue/cli-plugin-eslint',
-    '@vue/cli-plugin-pwa',
-    '@vue/cli-plugin-unit-jest',
-    '@vue/cli-service',
+  const dependenciesUninstallList = [];
+
+  const pkgDependencies = [
+    ...Object.keys(packageInfo.get('dependencies')),
+    ...Object.keys(packageInfo.get('devDependencies')),
   ];
 
-  const pkgDevDependencies = Object.keys(packageInfo.get('devDependencies'));
-
-  const oldDependencieList = [
-    ...OLD_DEPENDENCIES_LIST,
-    ...OLD_DEV_DEPENDENCIES_LIST,
-  ];
-
-  pkgDevDependencies.forEach(dependency => {
-    if (oldDependencieList.includes(dependency)) {
-      const list = OLD_DEPENDENCIES[dependency] || OLD_DEV_DEPENDENCIES[dependency];
+  pkgDependencies.forEach(dependency => {
+    if (OLD_DEPENDENCIES_LIST.includes(dependency)) {
+      const list = OLD_DEPENDENCIES[dependency];
 
       if (list.length) {
-        dependencies.push(...list);
+        dependenciesUninstallList.push(...list);
       }
     }
   });
 
   const npmObject = {
     command: 'npm.cmd',
-    args: ['uninstall', ...dependencies],
+    args: ['uninstall', ...dependenciesUninstallList],
     processName: 'npm uninstall',
     functionName: 'npmUninstall',
   };
@@ -228,8 +210,8 @@ function npmInstallSaveDev(fileDirectory, processList, currentProcess) {
   const pkgDevDependencies = Object.keys(packageInfo.get('devDependencies'));
 
   pkgDevDependencies.forEach(dependency => {
-    if (NEW_DEV_DEPENDENCIES_LIST.includes(dependency)) {
-      dependencies.push(`${dependency}@${NEW_DEV_DEPENDENCIES[dependency]} `);
+    if (NEW_DEPENDENCIES_LIST.includes(dependency)) {
+      dependencies.push(`${dependency}@${NEW_DEPENDENCIES[dependency]}`);
     }
   });
 

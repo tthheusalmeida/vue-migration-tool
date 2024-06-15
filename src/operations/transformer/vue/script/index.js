@@ -121,48 +121,6 @@ function globalApiNewVue(ast) {
         }
       }
     },
-    VariableDeclaration(path) {
-      const declarator = path.node.declarations[0];
-      if (t.isNewExpression(declarator.init)
-        && t.isIdentifier(declarator.init.callee, { name: 'Vue' })
-        && !existenceChecker.get('newVue')
-      ) {
-        // Remove 'const' keyword
-        path.node.kind = '';
-
-        // Replace 'new Vue' with 'createApp'
-        declarator.init.callee = t.identifier('createApp');
-
-        // Remove 'el' property
-        const elPropertyIndex = declarator.init.arguments[0].properties.findIndex(prop => prop.key.name === 'el');
-        declarator.init.arguments[0].properties.splice(elPropertyIndex, 1);
-
-        // Add .mount('#app')
-        const mountCallExpression = t.callExpression(
-          t.memberExpression(declarator.init, t.identifier('mount')),
-          [t.stringLiteral('#app')]
-        );
-        path.insertAfter(mountCallExpression);
-
-        // Remove original declaration
-        path.remove();
-
-        // Add import declaration if not added yet
-        const importDeclaration = t.importDeclaration(
-          [t.importSpecifier(t.identifier('createApp'), t.identifier('createApp'))], t.stringLiteral('vue')
-        );
-        ast.program.body.unshift(importDeclaration);
-
-        showLog(MIGRATION.VUE.GLOBAL_API.NEW_VUE);
-
-        // Handle loc property
-        if (path.node?.loc) {
-          if (!path.node.loc.start || !path.node.loc.start.line) {
-            delete path.node.loc;
-          }
-        }
-      }
-    },
     CallExpression(path) {
       if (t.isMemberExpression(path.node.callee)
         && t.isIdentifier(path.node.callee.object, { name: 'Vue' })
@@ -171,13 +129,6 @@ function globalApiNewVue(ast) {
       ) {
         path.node.callee.object = t.identifier('app');
         showLog(MIGRATION.VUE.GLOBAL_API.CALL_EXPRESSION);
-
-        // Handle loc property
-        if (path.node?.loc) {
-          if (!path.node.loc.start || !path.node.loc.start.line) {
-            delete path.node.loc;
-          }
-        }
       }
 
       if (t.isMemberExpression(path.node.callee)
@@ -363,13 +314,6 @@ function dataOptions(ast) {
         path.replaceWith(newDataMethod);
 
         showLog(MIGRATION.VUE.DATA_OPTIONS);
-      }
-
-      // Handle loc property
-      if (path.node?.loc) {
-        if (!path.node.loc.start || !path.node.loc.start.line) {
-          delete path.node.loc;
-        }
       }
     }
   });
