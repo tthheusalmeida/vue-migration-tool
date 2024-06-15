@@ -14,3 +14,5 @@ Here are some of them:
 
 - [X] Remove `vue.config.js` and add `vite.config.js`.
 - [X] `required` is no longer supported in Vite. It's ESM only.
+- [X] `process.env` is no longer supported in Vite. Changed to `import.meta.env`.
+- [X] Rename environment variables starting with `VUE_` in the `.env` file to `VITE_`.

@@ -35,15 +35,30 @@ function requireIsNotSupported(ast) {
       }
     },
     MemberExpression(path) {
-      if (t.isIdentifier(path.node.object, { name: 'process' })
-        && t.isIdentifier(path.node.property, { name: 'env' })
+      if (t.isMemberExpression(path.node.object)
+        && t.isIdentifier(path.node.object.object, { name: 'process' })
+        && t.isIdentifier(path.node.object.property, { name: 'env' })
       ) {
-        path.replaceWith(t.memberExpression(
-          t.memberExpression(t.identifier('import'), t.identifier('meta')),
-          t.identifier('env')
-        ));
+        const propertyName = path.node.property.name;
+        const isVueEnvVar = propertyName.startsWith('VUE_');
+        const newPropertyName = isVueEnvVar
+          ? `VITE_${propertyName.slice(4)}`
+          : propertyName;
+
+        const newMemberExpression = t.memberExpression(
+          t.memberExpression(
+            t.memberExpression(t.identifier('import'), t.identifier('meta')),
+            t.identifier('env')
+          ),
+          t.identifier(newPropertyName)
+        );
+
+        path.replaceWith(newMemberExpression);
 
         showLog(MIGRATION.VITE.PROCESS_ENV_NOT_SUPPORTED);
+        if (isVueEnvVar) {
+          showLog(MIGRATION.VITE.CHANGE_VUE_ENV_VAR);
+        }
       }
     },
   });

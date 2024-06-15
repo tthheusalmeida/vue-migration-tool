@@ -38,6 +38,9 @@ async function copyOrMigrateFiles(sourceDirectory, targetDirectory) {
         else if (isIndexHtmlFile(file)) {
           await copyIndexHtmlFile(sourceFilePath, targetFilePath);
         }
+        else if (isEnvFile(file)) {
+          await copyEnvFile(sourceFilePath, targetFilePath);
+        }
         else {
           try {
             if (!isPackageFile(file)) {
@@ -83,6 +86,17 @@ async function copyIndexHtmlFile(sourceFilePath, targetFilePath) {
   fs.writeFileSync(newTargetFilePath, htmlContent, 'utf8');
 }
 
+async function copyEnvFile(sourceFilePath, targetFilePath) {
+  console.info(`=> Running parse for "${path.basename(targetFilePath)}".`);
+
+  let htmlContent = fs.readFileSync(sourceFilePath, 'utf8');
+
+  htmlContent = htmlContent.replace(/VUE_/g, 'VITE_');
+  showLog(MIGRATION.VITE.CHANGE_VUE_ENV_VAR);
+
+  fs.writeFileSync(targetFilePath, htmlContent, 'utf8');
+}
+
 async function migrateSingleFile(sourceFilePath, targetFilePath, fileExtension) {
   const ast = runParser(sourceFilePath, fileExtension);
   const tranformedAst = runTransformer(ast);
@@ -101,12 +115,17 @@ function shouldCopyFile(file) {
       && !isJavascriptFile(file)
       && !isPackageFile(file)
       && !isIndexHtmlFile(file)
+      && !isEnvFile(file)
     )
   );
 }
 
 function isConfigFile(file) {
   return file.startsWith('.', 0) || file.match('.config.');
+}
+
+function isEnvFile(file) {
+  return file && file.startsWith('.env', 0);
 }
 
 function isVueConfigFile(file) {
