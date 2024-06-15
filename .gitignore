@@ -134,4 +134,3 @@ src/migrated
 
 # code folder
 src/code
-!src/code/*.vue
