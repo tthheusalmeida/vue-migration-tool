@@ -7,6 +7,10 @@ const { runParser } = require('../parser/index');
 const { runTransformer } = require('../transformer/index');
 const { runRender } = require('../compiler/render');
 const {
+  MIGRATION,
+  showLog,
+} = require('../../utils/message.js');
+const {
   splitfilePath,
   insertTagScript,
   changeUnescapedInterpolation,
