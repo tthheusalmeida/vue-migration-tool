@@ -47,28 +47,14 @@ function getScriptContent(fileContent, fileExtension) {
 }
 
 function getStyleContent(fileContent) {
-  const scss = getTagContent(
-    fileContent,
-    '<style lang="scss">',
-    '</style>',
-    true,
-  );
+  let styleContent = '';
+  const styleRegex = /(<style[^>]*>)([\s\S]*?)(<\/style>)/i;
 
-  const css = getTagContent(
-    fileContent,
-    '<style lang="css">',
-    '</style>',
-    true,
-  );
+  fileContent.replace(styleRegex, (_, startTag, content, endTag) => {
+    styleContent = `${startTag}${content}${endTag}`;
+  });
 
-  const empty = getTagContent(
-    fileContent,
-    '<style>',
-    '</style>',
-    true,
-  );
-
-  return scss || css || empty;
+  return styleContent;
 }
 
 function splitfilePath(filePath, regex) {
