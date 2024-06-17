@@ -6,6 +6,12 @@ const fsExtra = require('fs-extra');
 const { format } = require('prettier');
 const { runProcessUpdatePackage } = require('../../utils/process');
 const { removeEmptyObjects } = require('../../utils/object');
+const {
+  NEW_DEPENDENCIES,
+  OLD_DEPENDENCIES,
+  OLD_DEPENDENCIES_LIST,
+  SWAP_DEPENDENCIES,
+} = require('./constants');
 const packageInfo = require('../../singletons/packageInfo');
 
 async function runMigratePackage(sourceDirectory, targetDirectory) {
@@ -24,6 +30,7 @@ async function runMigratePackage(sourceDirectory, targetDirectory) {
   packageObj = updateEngines(packageObj);
   packageObj = updateType(packageObj);
   packageObj = updateScripts(packageObj);
+  packageObj = updateAllDependencies(packageObj);
 
   packageInfo.set('dependencies', packageObj.dependencies);
   packageInfo.set('devDependencies', packageObj.devDependencies);
@@ -62,6 +69,71 @@ function updateScripts(packageObj) {
   }
 
   return packageObj;
+}
+
+function updateAllDependencies(packageObj) {
+  packageObj = updateDependencies(packageObj);
+  packageObj = updateDependencies(packageObj, true);
+
+  return packageObj;
+}
+
+function updateDependencies(packageObj, areDevDependencies = false) {
+  let packageData = { ...packageObj };
+  let packageDependencies = areDevDependencies
+    ? 'devDependencies'
+    : 'dependencies';
+
+  const packageDependenciesList = Object.keys(packageData[packageDependencies]);
+
+  packageDependenciesList.forEach(dependency => {
+    if (OLD_DEPENDENCIES_LIST.includes(dependency)) {
+      OLD_DEPENDENCIES[dependency].forEach(item => {
+        const newItem = SWAP_DEPENDENCIES[item];
+        if (newItem) {
+          packageData[packageDependencies][newItem] = NEW_DEPENDENCIES[newItem];
+        }
+        delete packageData[packageDependencies][item];
+      })
+    }
+  });
+
+  Object.keys(packageData[packageDependencies]).forEach(dependency => {
+    if (NEW_DEPENDENCIES[dependency]) {
+      packageData[packageDependencies][dependency] = `^${NEW_DEPENDENCIES[dependency]}`;
+    }
+  });
+
+  if (packageDependencies === 'dependencies') {
+    const newDependencies = [
+      { 'create-vite': '5.2.3' },
+      { 'vue': '3.4.27' },
+    ];
+
+    packageData = addDependency(packageData, packageDependencies, newDependencies);
+  } else {
+    const newDependencies = [
+      { 'vite': '5.2.13' },
+      { '@vitejs/plugin-vue': '5.0.5' },
+      { '@vue/compiler-sfc': '3.4.27' },
+      { '@vue/test-utils': '2.0.0' },
+    ];
+
+    packageData = addDependency(packageData, packageDependencies, newDependencies);
+  }
+
+  return packageData;
+}
+
+function addDependency(_packageData, dependency, newDependencies) {
+  let packageData = { ..._packageData };
+
+  newDependencies.forEach((currentDependency) => {
+    const name = Object.keys(currentDependency)[0];
+    packageData[dependency][name] = `^${currentDependency[name]}`;
+  });
+
+  return packageData;
 }
 
 module.exports = {

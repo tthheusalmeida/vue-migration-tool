@@ -23,8 +23,17 @@ const OLD_DEPENDENCIES = {
     '@vue/cli-plugin-unit-jest',
     '@vue/cli-service',
   ],
+  // sass
   sass: ['node-sass', 'sass-loader'],
+  'node-sass': ['node-sass', 'sass-loader'],
+  'sass-loader': ['node-sass', 'sass-loader'],
 }
+
+const SWAP_DEPENDENCIES = {
+  // sass
+  'node-sass': 'sass',
+  'sass-loader': 'sass',
+};
 
 const NEW_DEPENDENCIES_LIST = Object.keys(NEW_DEPENDENCIES);
 const OLD_DEPENDENCIES_LIST = Object.keys(OLD_DEPENDENCIES);
@@ -34,4 +43,5 @@ module.exports = {
   OLD_DEPENDENCIES,
   NEW_DEPENDENCIES_LIST,
   OLD_DEPENDENCIES_LIST,
+  SWAP_DEPENDENCIES,
 }

@@ -2,15 +2,10 @@
 
 const { spawn } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 const fsExtra = require('fs-extra');
 const packageInfo = require('../singletons/packageInfo');
 const EventEmitter = require('events');
-const {
-  NEW_DEPENDENCIES,
-  OLD_DEPENDENCIES,
-  NEW_DEPENDENCIES_LIST,
-  OLD_DEPENDENCIES_LIST,
-} = require('../operations/package/constants');
 
 const eventEmitter = new EventEmitter();
 
@@ -29,10 +24,8 @@ function runProcessMigration(fileDirectory) {
 
 function runProcessUpdatePackage(fileDirectory) {
   const processList = [
-    npmRegeneratePackageLock,
-    npmUninstall,
-    npmInstallDependencies,
-    npmInstallSaveDev,
+    npmRemovePackageLock,
+    npmInstall,
     removeNodeModules,
     removeSourceProject,
   ];
@@ -45,7 +38,8 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
     command = '', // String
     args = [],  // [String]
     processName = 'Undefined', // String
-    functionName = '', // String
+    functionName = '', // String,
+    jumpProcess = false,
   } = processObject;
 
   const isProcessObjectEmpty = !Object.keys(processObject).length;
@@ -86,7 +80,8 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
       }
 
       if (!!processList[currentProcess]) {
-        processList[currentProcess](currentDirectory, processList, currentProcess);
+        const processIndex = jumpProcess ? currentProcess + 1 : currentProcess;
+        processList[currentProcess](currentDirectory, processList, processIndex);
       }
     }
   });
@@ -136,101 +131,28 @@ function gitCheckoutBranch(fileDirectory, processList, currentProcess) {
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
-function npmRegeneratePackageLock(fileDirectory, processList, currentProcess) {
+function npmRemovePackageLock(fileDirectory, processList, currentProcess) {
   const npmObject = {
-    command: 'npm.cmd',
-    args: ['install', '--package-lock-only'],
-    processName: 'npm install --package-lock-only',
-    functionName: 'npmRegeneratePackageLock',
+    command: 'powershell.exe',
+    args: ['-Command', 'Remove-Item', '-Force', '-ErrorAction', 'Stop', 'package-lock.json'],
+    processName: 'remove package-lock.json',
+    functionName: 'npmRemovePackageLock',
   };
+
+  const isTherePackageLockFile = fs.existsSync(path.join(fileDirectory, 'package-lock.json'));
+  if (!isTherePackageLockFile) {
+    npmObject['jumpProcess'] = true;
+  }
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
-function npmUninstall(fileDirectory, processList, currentProcess) {
-  const dependenciesUninstallList = [];
-
-  const pkgDependencies = [
-    ...Object.keys(packageInfo.get('dependencies')),
-    ...Object.keys(packageInfo.get('devDependencies')),
-  ];
-
-  pkgDependencies.forEach(dependency => {
-    if (OLD_DEPENDENCIES_LIST.includes(dependency)) {
-      const list = OLD_DEPENDENCIES[dependency];
-
-      if (list.length) {
-        dependenciesUninstallList.push(...list);
-      }
-    }
-  });
-
+function npmInstall(fileDirectory, processList, currentProcess) {
   const npmObject = {
     command: 'npm.cmd',
-    args: ['uninstall', ...dependenciesUninstallList],
-    processName: 'npm uninstall',
-    functionName: 'npmUninstall',
-  };
-
-  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
-}
-
-function npmInstallDependencies(fileDirectory, processList, currentProcess) {
-  const dependencies = [
-    'create-vite-app',
-    'vue@3.4.27',
-  ];
-
-  const pkgDependencies = Object.keys(packageInfo.get('dependencies'));
-
-  pkgDependencies.forEach(dependency => {
-    if (NEW_DEPENDENCIES_LIST.includes(dependency)) {
-      dependencies.push(`${dependency}@${NEW_DEPENDENCIES[dependency]} `);
-    }
-  });
-
-  const npmObject = {
-    command: 'npm.cmd',
-    args: ['install', ...dependencies],
+    args: ['install'],
     processName: 'npm install',
-    functionName: 'npmInstallDependencies',
-  };
-
-  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
-}
-
-function npmInstallSaveDev(fileDirectory, processList, currentProcess) {
-  const dependencies = [
-    'vite@5.2.13',
-    '@vitejs/plugin-vue@5.0.5',
-    '@vue/compiler-sfc@3.4.27',
-    '@vue/test-utils@2.0.0',
-  ];
-
-  const pkgDevDependencies = Object.keys(packageInfo.get('devDependencies'));
-
-  pkgDevDependencies.forEach(dependency => {
-    if (NEW_DEPENDENCIES_LIST.includes(dependency)) {
-      dependencies.push(`${dependency}@${NEW_DEPENDENCIES[dependency]}`);
-    }
-  });
-
-  const npmObject = {
-    command: 'npm.cmd',
-    args: ['install', '--save-dev', ...dependencies],
-    processName: 'npm install devDependencies',
-    functionName: 'npmInstallSaveDev',
-  };
-
-  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
-}
-
-function npmAuditFix(fileDirectory, processList, currentProcess) {
-  const npmObject = {
-    command: 'npm.cmd',
-    args: ['audit', 'fix'],
-    processName: 'npm audit fix',
-    functionName: 'npmAuditFix',
+    functionName: 'npmInstall',
   };
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
@@ -272,11 +194,8 @@ module.exports = {
   gitCloneProject,
   gitFetchAll,
   gitCheckoutBranch,
-  npmRegeneratePackageLock,
-  npmUninstall,
-  npmInstallDependencies,
-  npmInstallSaveDev,
-  npmAuditFix,
+  npmRemovePackageLock,
+  npmInstall,
   removeNodeModules,
   removeSourceProject,
   eventEmitter,
