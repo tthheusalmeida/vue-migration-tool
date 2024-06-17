@@ -1,9 +1,10 @@
 'use strict';
 
+const t = require('@babel/types');
+const traverse = require('@babel/traverse').default;
+const path = require('path');
 const { MIGRATION } = require('../../constants');
 const { showLog } = require('../../../../utils/message');
-const traverse = require('@babel/traverse').default;
-const t = require('@babel/types');
 const { importToVariableName } = require('../../../../utils/string');
 
 function requireIsNotSupported(ast) {
@@ -87,8 +88,60 @@ function requireIsNotSupported(ast) {
   return currentAst;
 }
 
+function componentMustHaveExtensionName(ast) {
+  const currentAst = { ...ast };
+
+  const componentsName = [];
+
+  traverse(currentAst, {
+    ObjectExpression(path) {
+      const properties = path.node.properties;
+      properties.forEach(item => {
+        if (t.isObjectProperty(item)
+          && t.isIdentifier(item.key, { name: 'components' })
+        ) {
+          const objectProperties = item.value.properties;
+          objectProperties.forEach(prop => {
+            if (t.isObjectProperty(prop)
+              && t.isIdentifier(prop.value)) {
+              componentsName.push(prop.value.name);
+            }
+          });
+        }
+      });
+    }
+  });
+
+  traverse(currentAst, {
+    ImportDeclaration(path) {
+      const { isVueFile } = require('../../../file/index');
+      const [varDefinition, _] = path.node.specifiers;
+      if (Object.keys(varDefinition).length
+        && t.isImportDefaultSpecifier(varDefinition)
+        && componentsName.includes(varDefinition.local.name)
+      ) {
+        const importPath = path.node.source.value;
+
+        if (importPath && !isVueFile(importPath)) {
+          path.replaceWith(
+            t.importDeclaration(
+              [t.importDefaultSpecifier(t.identifier(varDefinition.local.name))],
+              t.stringLiteral(`${importPath}.vue`)
+            )
+          );
+
+          showLog(MIGRATION.VITE.COMPONENT_IMPORT);
+        }
+      }
+    }
+  });
+
+  return currentAst;
+}
+
 const VITE_SCRIPT_TRANSFORM_LIST = [
   requireIsNotSupported,
+  componentMustHaveExtensionName,
 ]
 
 module.exports = {

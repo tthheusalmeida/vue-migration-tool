@@ -23,6 +23,7 @@ const VITE = {
   REQUIRE_IS_NOT_SUPPORTED: ' - (VITE) Vite do not support "require", changed to "import"',
   PROCESS_ENV_NOT_SUPPORTED: ' - (VITE) Vite do not support "process.env", changed to "import.meta.env"',
   CHANGE_VUE_ENV_VAR: ' - (VITE) Change environment variables that start with "VUE_" to "VITE_" to maintain the same behavior as in Vue 2.',
+  COMPONENT_IMPORT: ' - (VITE) The component import must end with ".vue" in the file name.',
 }
 
 const VUEX = {
