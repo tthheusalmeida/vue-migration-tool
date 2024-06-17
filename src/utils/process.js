@@ -33,7 +33,7 @@ function runProcessUpdatePackage(fileDirectory) {
     npmUninstall,
     npmInstallDependencies,
     npmInstallSaveDev,
-    removePackageLock,
+    removeNodeModules,
     removeSourceProject,
   ];
 
@@ -236,12 +236,12 @@ function npmAuditFix(fileDirectory, processList, currentProcess) {
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
 }
 
-function removePackageLock(fileDirectory, processList, currentProcess) {
+function removeNodeModules(fileDirectory, processList, currentProcess) {
   const npmObject = {
     command: 'powershell.exe',
     args: ['-Command', 'Remove-Item -Recurse -Force -ErrorAction Stop node_modules'],
     processName: 'Remove node_modules',
-    functionName: 'removePackageLock',
+    functionName: 'removeNodeModules',
   };
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
@@ -257,7 +257,7 @@ function removeSourceProject(fileDirectory, processList, currentProcess) {
     command: 'powershell.exe',
     args: ['-Command', `Remove-Item -Recurse -Force -ErrorAction Stop ${projectFolder}`],
     processName: 'Remove source project folder',
-    functionName: 'removePackageLock',
+    functionName: 'removeSourceProject',
   };
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
@@ -277,7 +277,7 @@ module.exports = {
   npmInstallDependencies,
   npmInstallSaveDev,
   npmAuditFix,
-  removePackageLock,
+  removeNodeModules,
   removeSourceProject,
   eventEmitter,
 }
