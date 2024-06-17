@@ -209,8 +209,14 @@ function createViteConfigFile(directory = '') {
 module.exports = {
   runMigrationFile,
   copyOrMigrateFiles,
+  copyFile,
+  copyIndexHtmlFile,
+  copyEnvFile,
   migrateSingleFile,
+  shouldCopyFile,
+  isVueConfigFile,
   isConfigFile,
+  isEnvFile,
   isDocFile,
   isPackageLockFile,
   isPackageFile,
@@ -218,5 +224,6 @@ module.exports = {
   isVueFile,
   isJavascriptFile,
   isIndexHtmlFile,
+  createFiles,
   createViteConfigFile,
 }
