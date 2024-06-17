@@ -38,8 +38,8 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
     command = '', // String
     args = [],  // [String]
     processName = 'Undefined', // String
-    functionName = '', // String,
-    jumpProcess = false,
+    functionName = '', // String
+    jumpProcess = false, // Boolean
   } = processObject;
 
   const isProcessObjectEmpty = !Object.keys(processObject).length;
@@ -47,6 +47,11 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
     processList[currentProcess](fileDirectory, processList, currentProcess);
     return;
   };
+
+  if (jumpProcess) {
+    processList[currentProcess](fileDirectory, processList, currentProcess + 1);
+    return;
+  }
 
   const processInstance = spawn(command, args, { cwd: fileDirectory });
 
@@ -80,8 +85,7 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
       }
 
       if (!!processList[currentProcess]) {
-        const processIndex = jumpProcess ? currentProcess + 1 : currentProcess;
-        processList[currentProcess](currentDirectory, processList, processIndex);
+        processList[currentProcess](currentDirectory, processList, currentProcess);
       }
     }
   });
