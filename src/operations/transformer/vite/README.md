@@ -16,3 +16,4 @@ Here are some of them:
 - [X] `required` is no longer supported in Vite. It's ESM only.
 - [X] `process.env` is no longer supported in Vite. Changed to `import.meta.env`.
 - [X] Rename environment variables starting with `VUE_` in the `.env` file to `VITE_`.
+- [X] The component import must end with `.vue` in the file name.
