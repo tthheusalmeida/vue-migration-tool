@@ -15,6 +15,7 @@ const {
   insertTagScript,
   changeUnescapedInterpolation,
 } = require('../../utils/string');
+const projectInfo = require('../../singletons/projectInfo.js');
 
 async function runMigrationFile(sourceDirectory, targetDirectory) {
   await copyOrMigrateFiles(sourceDirectory, targetDirectory);
@@ -174,7 +175,7 @@ function isIndexHtmlFile(file) {
 }
 
 async function createFiles(directory) {
-  const [projectFolder, _] = await fsExtra.readdir(directory);
+  const projectFolder = projectInfo.get('folderName');
   const projectPath = path.join(directory, projectFolder);
 
   createViteConfigFile(projectPath);

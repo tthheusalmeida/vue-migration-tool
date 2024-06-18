@@ -13,10 +13,10 @@ const {
   SWAP_DEPENDENCIES,
 } = require('./constants');
 const packageInfo = require('../../singletons/packageInfo');
+const projectInfo = require('../../singletons/projectInfo');
 
 async function runMigratePackage(sourceDirectory, targetDirectory) {
-  const [projectFolder, _] = await fsExtra.readdir(sourceDirectory);
-
+  const projectFolder = projectInfo.get('folderName');
   const packageSourceDirectory = path.join(sourceDirectory, projectFolder);
   const packageTargetDirectory = path.join(targetDirectory, projectFolder);
   const packageSourceFilePath = path.join(packageSourceDirectory, 'package.json');
@@ -48,6 +48,8 @@ async function runMigratePackage(sourceDirectory, targetDirectory) {
   fs.writeFileSync(packageTargetFilePath, formattedJson, 'utf8');
 
   runProcessUpdatePackage(packageTargetDirectory);
+
+  projectInfo.reset();
 }
 
 function updateEngines(packageObj) {

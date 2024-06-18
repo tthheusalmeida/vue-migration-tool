@@ -6,10 +6,13 @@ const traverse = require('@babel/traverse').default;
 const t = require('@babel/types');
 const stateManager = require('../../../../singletons/stateManager');
 
-const MODE_TYPE = {
-  history: 'createWebHistory',
-  hash: 'createWebHashHistory',
-  abstract: 'createMemoryHistory'
+const getModeType = (mode) => {
+  const MODE_TYPE = {
+    history: 'createWebHistory',
+    hash: 'createWebHashHistory',
+    abstract: 'createMemoryHistory'
+  }
+  return MODE_TYPE[mode];
 }
 
 // https://router.vuejs.org/guide/migration/
@@ -22,20 +25,29 @@ function createRouter(ast) {
       if (t.isImportDeclaration(path.node)
         && t.isStringLiteral(path.node.source, { value: 'vue-router' })
       ) {
-        const isThereImportVueRouter = path.node.specifiers.find(spec => spec.local.name === 'VueRouter');
+        const isThereImportVueRouter = path.node?.specifiers.find(spec =>
+          spec.local.name === 'VueRouter'
+          || spec.local.name === 'Router'
+        );
         if (isThereImportVueRouter) {
           const createRouter = t.importSpecifier(
             t.identifier('createRouter'), t.identifier('createRouter')
           );
           const args = [createRouter];
 
-          const modeProp = stateManager.get('routerPropMode').value;
-          if (!!modeProp) {
-            const prop = t.importSpecifier(
-              t.identifier(MODE_TYPE[modeProp]), t.identifier(MODE_TYPE[modeProp])
-            );
-            args.push(prop);
+          const isThereModeProp = !!stateManager.get('routerPropMode')?.value;
+          let modeProp = '';
+          if (isThereModeProp) {
+            modeProp = stateManager.get('routerPropMode').value;
+          } else {
+            modeProp = 'history';
+            stateManager.set('routerPropMode', modeProp);
           }
+
+          const prop = t.importSpecifier(
+            t.identifier(getModeType(modeProp)), t.identifier(getModeType(modeProp))
+          );
+          args.push(prop);
 
           stateManager.set('importVueRouter', t.importDeclaration(args, t.stringLiteral('vue-router')));
           path.remove();
@@ -43,8 +55,9 @@ function createRouter(ast) {
       }
     },
     NewExpression(path) {
-      if (t.isNewExpression(path.node)
-        && t.isIdentifier(path.node.callee, { name: 'VueRouter' })
+      if (path.node?.callee
+        && (t.isIdentifier(path.node.callee, { name: 'VueRouter' })
+          || t.isIdentifier(path.node.callee, { name: 'Router' }))
       ) {
         const args = path.node.arguments;
         const modeIndex = args[0].properties.findIndex(prop => prop.key.name === 'mode');
@@ -57,13 +70,25 @@ function createRouter(ast) {
             t.objectProperty(
               t.identifier(identifier),
               t.callExpression(
-                t.identifier(MODE_TYPE[identifier]),
+                t.identifier(getModeType(identifier)),
                 isThereBaseProp ? [baseValue] : []
               ));
 
           if (isThereBaseProp) {
             args[0].properties.splice(baseIndex, 1);
           }
+        } else {
+          const args = path.node.arguments;
+          const properties = args[0].properties;
+          const defaultMode = 'history';
+          properties.push(
+            t.objectProperty(
+              t.identifier(defaultMode),
+              t.callExpression(
+                t.identifier(getModeType(defaultMode)),
+                []
+              ))
+          );
         }
 
         path.replaceWith(

@@ -116,8 +116,9 @@ function componentMustHaveExtensionName(ast) {
     ImportDeclaration(path) {
       const { isVueFile } = require('../../../file/index');
       const { extname } = require('path');
-      const [varDefinition, _] = path.node.specifiers;
-      if (Object.keys(varDefinition).length
+      const [varDefinition, _] = path.node?.specifiers;
+      if (varDefinition
+        && Object.keys(varDefinition).length
         && t.isImportDefaultSpecifier(varDefinition)
         && componentsName.includes(varDefinition.local.name)
       ) {

@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const fsExtra = require('fs-extra');
 const packageInfo = require('../singletons/packageInfo');
+const projectInfo = require('../singletons/projectInfo');
 const EventEmitter = require('events');
 
 const eventEmitter = new EventEmitter();
@@ -81,6 +82,7 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
       let currentDirectory = fileDirectory;
       if (functionName === 'gitCloneProject') {
         const [projectFolder, _] = await fsExtra.readdir(fileDirectory);
+        projectInfo.set('folderName', projectFolder);
         currentDirectory = path.join(currentDirectory, projectFolder);
       }
 
