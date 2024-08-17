@@ -61,10 +61,16 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
     return;
   }
 
-  const processInstance = spawn(command, args, { cwd: fileDirectory });
+  const options = {
+    cwd: fileDirectory,
+    env: {
+      PATH: process.env.PATH,
+    },
+  };
+  const processInstance = spawn(command, args, options);
 
   processInstance.on('spawn', () => {
-    console.info(`⚪️"${processName}" process start...`);
+    console.info(`⚪️ "${processName}" process start...`);
   })
 
   processInstance.stdout.on('data', (data) => {
@@ -104,6 +110,10 @@ function gitCloneProject(fileDirectory, processList, currentProcess) {
   if (!process.env.REPOSITORY) {
     console.info('=> process.env.REPOSITORY is not defined.')
     process.exit(1);
+  }
+
+  if (!fs.existsSync(fileDirectory)) {
+    fs.mkdirSync(fileDirectory, { recursive: true });
   }
 
   const npmObject = {
