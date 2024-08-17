@@ -7,8 +7,15 @@ const fsExtra = require('fs-extra');
 const packageInfo = require('../singletons/packageInfo');
 const projectInfo = require('../singletons/projectInfo');
 const EventEmitter = require('events');
+const os = require('os');
 
 const eventEmitter = new EventEmitter();
+
+const OPERATION_SYSTEM = {
+  Linux: 'linux',
+  Windows_NT: 'windows',
+  // Darwin: 'macOS', There's no config for macOS yet
+}
 
 function runProcessMigration(fileDirectory) {
   const processList = [
@@ -138,9 +145,25 @@ function gitCheckoutBranch(fileDirectory, processList, currentProcess) {
 }
 
 function npmRemovePackageLock(fileDirectory, processList, currentProcess) {
+  const _os = getOperationalSystem();
+
+  let command = '';
+  let args = [];
+
+  if (_os === 'windows') {
+    command = 'powershell.exe';
+    args = ['-Command', 'Remove-Item', '-Force', '-ErrorAction', 'Stop', 'package-lock.json'];
+  } else if (_os === 'linux') {
+    command = 'rm';
+    args = ['-f', 'package-lock.json'];
+  } else {
+    console.error('=> process not defined to this operational system.')
+    process.exit(1);
+  }
+
   const npmObject = {
-    command: 'powershell.exe',
-    args: ['-Command', 'Remove-Item', '-Force', '-ErrorAction', 'Stop', 'package-lock.json'],
+    command,
+    args,
     processName: 'remove package-lock.json',
     functionName: 'npmRemovePackageLock',
   };
@@ -154,9 +177,25 @@ function npmRemovePackageLock(fileDirectory, processList, currentProcess) {
 }
 
 function npmInstall(fileDirectory, processList, currentProcess) {
+  const _os = getOperationalSystem();
+
+  let command = '';
+  let args = [];
+
+  if (_os === 'windows') {
+    command = 'npm.cmd';
+    args = ['install'];
+  } else if (_os === 'linux') {
+    command = 'npm';
+    args = ['install'];
+  } else {
+    console.error('=> process not defined to this operational system.')
+    process.exit(1);
+  }
+
   const npmObject = {
-    command: 'npm.cmd',
-    args: ['install'],
+    command,
+    args,
     processName: 'npm install',
     functionName: 'npmInstall',
   };
@@ -165,9 +204,25 @@ function npmInstall(fileDirectory, processList, currentProcess) {
 }
 
 function removeNodeModules(fileDirectory, processList, currentProcess) {
+  const _os = getOperationalSystem();
+
+  let command = '';
+  let args = [];
+
+  if (_os === 'windows') {
+    command = 'powershell.exe';
+    args = ['-Command', 'Remove-Item -Recurse -Force -ErrorAction Stop node_modules'];
+  } else if (_os === 'linux') {
+    command = 'rm';
+    args = ['-rf', 'node_modules'];
+  } else {
+    console.error('=> process not defined to this operational system.')
+    process.exit(1);
+  }
+
   const npmObject = {
-    command: 'powershell.exe',
-    args: ['-Command', 'Remove-Item -Recurse -Force -ErrorAction Stop node_modules'],
+    command,
+    args,
     processName: 'Remove node_modules',
     functionName: 'removeNodeModules',
   };
@@ -181,9 +236,25 @@ function removeSourceProject(fileDirectory, processList, currentProcess) {
   splitPath[migratedIndex] = 'code';
   const projectFolder = splitPath.join(path.sep);
 
+  const _os = getOperationalSystem();
+
+  let command = '';
+  let args = [];
+
+  if (_os === 'windows') {
+    command = 'powershell.exe';
+    args = ['-Command', `Remove-Item -Recurse -Force -ErrorAction Stop ${projectFolder}`];
+  } else if (_os === 'linux') {
+    command = 'rm';
+    args = ['-rf', projectFolder];
+  } else {
+    console.error('=> process not defined to this operational system.')
+    process.exit(1);
+  }
+
   const npmObject = {
-    command: 'powershell.exe',
-    args: ['-Command', `Remove-Item -Recurse -Force -ErrorAction Stop ${projectFolder}`],
+    command,
+    args,
     processName: 'Remove source project folder',
     functionName: 'removeSourceProject',
   };
@@ -191,6 +262,12 @@ function removeSourceProject(fileDirectory, processList, currentProcess) {
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
 
   packageInfo.reset();
+}
+
+function getOperationalSystem() {
+  const type = os.type();
+
+  return OPERATION_SYSTEM[type];
 }
 
 module.exports = {
