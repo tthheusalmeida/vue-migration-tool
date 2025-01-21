@@ -5,6 +5,9 @@ const {
   getScriptContent,
   getStyleContent,
   splitfilePath,
+  insertTagScript,
+  importToVariableName,
+  changeUnescapedInterpolation,
 } = require("../../src/utils/string");
 
 describe("=> utils/string", () => {
@@ -31,6 +34,62 @@ describe("=> utils/string", () => {
   });
 
   describe("getTagContent()", () => {
+    test("When startTag and endTag are not passed, should return empty string", () => {
+      const fileContent = `<div>Some content</div>`;
+      expect(getTagContent(fileContent)).toBe("");
+    });
+
+    test("When startTag is missing, should return empty string", () => {
+      const fileContent = `<div>Some content</div>`;
+      expect(getTagContent(fileContent, "", "</div>")).toBe("");
+    });
+
+    test("When endTag is missing, should return empty string", () => {
+      const fileContent = `<div>Some content</div>`;
+      expect(getTagContent(fileContent, "<div>", "")).toBe("");
+    });
+
+    test("When both startTag and endTag are missing, should return empty string", () => {
+      const fileContent = `<div>Some content</div>`;
+      expect(getTagContent(fileContent, "", "")).toBe("");
+    });
+
+    test("When includeTag is not passed, should default to false", () => {
+      const fileContent = `<div>Some content</div>`;
+      const expected = "Some content";
+
+      expect(getTagContent(fileContent, "<div>", "</div>")).toBe(expected);
+    });
+
+    test("When fileContent does not contain the startTag, should return empty string", () => {
+      const fileContent = `<div>Some content</div>`;
+      expect(getTagContent(fileContent, "<span>", "</div>")).toBe("");
+    });
+
+    test("When fileContent does not contain the endTag, should return empty string", () => {
+      const fileContent = `<div>Some content</div>`;
+      expect(getTagContent(fileContent, "<div>", "</span>")).toBe("");
+    });
+
+    test("When startTag and endTag are the same, should return empty string", () => {
+      const fileContent = `<div>Some content</div>`;
+      expect(getTagContent(fileContent, "<div>", "<div>")).toBe("");
+    });
+
+    test("When includeTag is true, should include startTag and endTag", () => {
+      const fileContent = `<div>Some content</div>`;
+      const expected = `<div>Some content</div>`;
+
+      expect(getTagContent(fileContent, "<div>", "</div>", true)).toBe(
+        expected
+      );
+    });
+
+    test("When fileContent is empty, should return empty string", () => {
+      const fileContent = "";
+      expect(getTagContent(fileContent, "<div>", "</div>")).toBe("");
+    });
+
     test("When passes any Vue tag and includeTag as false, should return the content between them.", () => {
       const fileContent = `
       <template>
@@ -204,6 +263,89 @@ describe("=> utils/string", () => {
       const regex = /[\\/]/;
       const result = splitfilePath(filePath, regex);
       expect(result).toBe("");
+    });
+  });
+
+  describe("insertTagScript()", () => {
+    test("Should insert the script tag before </body>", () => {
+      const htmlContent = "<html>" + "\n\t<body>" + "\n\t</body>" + "\n</html>";
+      const expected =
+        "<html>" +
+        "\n\t<body>" +
+        '\n\t\t<script type="module" src="/src/main.js"></script>' +
+        "\n</body>" +
+        "\n</html>";
+
+      expect(insertTagScript(htmlContent)).toBe(expected);
+    });
+
+    test("Should not alter the content if </body> is missing", () => {
+      const htmlContent = `
+        <html>
+          <head></head>
+          <div></div>
+        </html>`;
+
+      expect(insertTagScript(htmlContent)).toBe(htmlContent);
+    });
+  });
+
+  describe("importToVariableName()", () => {
+    test("Should convert file name with hyphens to camelCase", () => {
+      const importPath = "/path/to/my-component.js";
+      const expected = "myComponent";
+
+      expect(importToVariableName(importPath)).toBe(expected);
+    });
+
+    test("Should handle file names without hyphens", () => {
+      const importPath = "/path/to/component.js";
+      const expected = "component";
+
+      expect(importToVariableName(importPath)).toBe(expected);
+    });
+
+    test("Should handle nested paths and ignore directories", () => {
+      const importPath = "/nested/path/to/another-component.js";
+      const expected = "anotherComponent";
+
+      expect(importToVariableName(importPath)).toBe(expected);
+    });
+
+    test("Should return empty string if the path does not contain a file name", () => {
+      const importPath = "/path/to/";
+      const expected = "";
+
+      expect(importToVariableName(importPath)).toBe(expected);
+    });
+  });
+
+  describe("changeUnescapedInterpolation()", () => {
+    test("Should replace unescaped interpolation tags with %...%", () => {
+      const texto = "Hello <%= name %>, welcome!";
+      const expected = "Hello %name%, welcome!";
+
+      expect(changeUnescapedInterpolation(texto)).toBe(expected);
+    });
+
+    test("Should not alter text without <%= %> tags", () => {
+      const texto = "Hello, welcome!";
+
+      expect(changeUnescapedInterpolation(texto)).toBe(texto);
+    });
+
+    test("Should handle multiple unescaped interpolation tags", () => {
+      const texto = "Hello <%= name %>, your age is <%= age %>.";
+      const expected = "Hello %name%, your age is %age%.";
+
+      expect(changeUnescapedInterpolation(texto)).toBe(expected);
+    });
+
+    test("Should handle edge cases with invalid formatting", () => {
+      const texto = "Hello <%name%>, welcome!";
+      const expected = "Hello <%name%>, welcome!";
+
+      expect(changeUnescapedInterpolation(texto)).toBe(expected);
     });
   });
 });

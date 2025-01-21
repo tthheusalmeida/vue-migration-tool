@@ -1,53 +1,51 @@
-'use strict';
+"use strict";
 
 function replaceExtensionVueToJson(string) {
   return string.replace(/\.vue$/, ".json");
 }
 
-function getTagContent(fileContent, startTag = '', endTag = '', includeTag = false) {
+function getTagContent(
+  fileContent,
+  startTag = "",
+  endTag = "",
+  includeTag = false
+) {
+  if (!startTag || !endTag) {
+    return "";
+  }
+
+  if (startTag === endTag) {
+    return "";
+  }
+
   const indexStart = fileContent.indexOf(startTag);
   const indexEnd = fileContent.indexOf(endTag);
 
   if (indexStart < 0 || indexEnd < 0) {
-    return '';
+    return "";
   }
 
   if (includeTag) {
-    return fileContent.substring(
-      indexStart,
-      indexEnd + endTag.length,
-    ).trim();
+    return fileContent.substring(indexStart, indexEnd + endTag.length).trim();
   }
 
-  return fileContent.substring(
-    indexStart + startTag.length,
-    indexEnd,
-  ).trim();
+  return fileContent.substring(indexStart + startTag.length, indexEnd).trim();
 }
 
 function getTemplateContent(fileContent) {
-  return getTagContent(
-    fileContent,
-    '<template>',
-    '</template>',
-    true,
-  );
+  return getTagContent(fileContent, "<template>", "</template>", true);
 }
 
 function getScriptContent(fileContent, fileExtension) {
-  if (fileExtension?.endsWith('.vue')) {
-    return getTagContent(
-      fileContent,
-      '<script>',
-      '</script>',
-    );
+  if (fileExtension?.endsWith(".vue")) {
+    return getTagContent(fileContent, "<script>", "</script>");
   }
 
   return fileContent;
 }
 
 function getStyleContent(fileContent) {
-  let styleContent = '';
+  let styleContent = "";
   const styleRegex = /(<style[^>]*>)([\s\S]*?)(<\/style>)/i;
 
   fileContent.replace(styleRegex, (_, startTag, content, endTag) => {
@@ -68,28 +66,34 @@ function splitfilePath(filePath, regex) {
 
 function insertTagScript(htmlContent) {
   const scriptTag = '\t<script type="module" src="/src/main.js"></script>';
-  const bodyCloseTag = '</body>';
-  const newHtmlContent = htmlContent.replace(bodyCloseTag, `${scriptTag}\n${bodyCloseTag}`);
+  const bodyCloseTag = "</body>";
+  const newHtmlContent = htmlContent.replace(
+    bodyCloseTag,
+    `${scriptTag}\n${bodyCloseTag}`
+  );
   return newHtmlContent;
 }
 
 function importToVariableName(importPath) {
-  let filename = importPath.split('/').pop().split('.')[0];
-  filename = filename.replace(/-/g, ' ');
+  let filename = importPath.split("/").pop().split(".")[0];
+  filename = filename.replace(/-/g, " ");
 
-  let result = filename.split(' ').map((word, index) => {
-    if (index === 0) {
-      return word;
-    } else {
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    }
-  }).join('');
+  let result = filename
+    .split(" ")
+    .map((word, index) => {
+      if (index === 0) {
+        return word;
+      } else {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+    })
+    .join("");
 
   return result;
 }
 
 function changeUnescapedInterpolation(texto) {
-  return texto.replace(/<%= ([^%]+) %>/g, '%$1%');
+  return texto.replace(/<%= ([^%]+) %>/g, "%$1%");
 }
 
 module.exports = {
@@ -102,4 +106,4 @@ module.exports = {
   insertTagScript,
   importToVariableName,
   changeUnescapedInterpolation,
-}
+};
