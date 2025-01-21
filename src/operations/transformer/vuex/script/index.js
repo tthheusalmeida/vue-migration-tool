@@ -1,10 +1,11 @@
-'use strict';
+"use strict";
 
-const { MIGRATION } = require('../../constants');
-const { showLog } = require('../../../../utils/message');
-const traverse = require('@babel/traverse').default;
-const t = require('@babel/types');
-const stateManager = require('../../../../singletons/stateManager');
+const { MIGRATION } = require("../../constants");
+const { showLog } = require("../../../../utils/message");
+const traverse = require("@babel/traverse").default;
+const t = require("@babel/types");
+const stateManager = require("../../../../singletons/stateManager");
+const breakingChanges = require("../../../../singletons/breakingChanges");
 
 // https://vuex.vuejs.org/guide/migrating-to-4-0-from-3-x.html#breaking-changes
 
@@ -13,31 +14,40 @@ function createStore(ast) {
 
   traverse(currentAst, {
     ImportDeclaration(path) {
-      if (t.isImportDeclaration(path.node)
-        && t.isStringLiteral(path.node.source, { value: 'vuex' })
+      if (
+        t.isImportDeclaration(path.node) &&
+        t.isStringLiteral(path.node.source, { value: "vuex" })
       ) {
-        const isThereImportVuex = path.node.specifiers.find(spec => spec.local.name === 'Vuex');
+        const isThereImportVuex = path.node.specifiers.find(
+          (spec) => spec.local.name === "Vuex"
+        );
         if (isThereImportVuex) {
           const createStore = t.importSpecifier(
-            t.identifier('createStore'), t.identifier('createStore')
+            t.identifier("createStore"),
+            t.identifier("createStore")
           );
+          breakingChanges.increaseCount();
           showLog(MIGRATION.VUEX.CREATE_STORE);
 
-          stateManager.set('importVuex', t.importDeclaration([createStore], t.stringLiteral('vuex')));
+          stateManager.set(
+            "importVuex",
+            t.importDeclaration([createStore], t.stringLiteral("vuex"))
+          );
           path.remove();
         }
       }
     },
     NewExpression(path) {
-      if (t.isNewExpression(path.node)
-        && t.isMemberExpression(path.node.callee)
-        && t.isIdentifier(path.node.callee.object, { name: 'Vuex' })
-        && t.isIdentifier(path.node.callee.property, { name: 'Store' })
+      if (
+        t.isNewExpression(path.node) &&
+        t.isMemberExpression(path.node.callee) &&
+        t.isIdentifier(path.node.callee.object, { name: "Vuex" }) &&
+        t.isIdentifier(path.node.callee.property, { name: "Store" })
       ) {
         path.replaceWith(
-          t.callExpression(t.identifier('createStore'), path.node.arguments)
+          t.callExpression(t.identifier("createStore"), path.node.arguments)
         );
-
+        breakingChanges.increaseCount();
         showLog(MIGRATION.VUEX.VUEX_STORE);
       }
     },
@@ -46,23 +56,20 @@ function createStore(ast) {
   traverse(currentAst, {
     Program(path) {
       const store = stateManager.getState();
-      Object.keys(store).forEach(item => {
-        if (item === 'importVuex'
-          && stateManager.get(item)) {
-          path.node.body.unshift(stateManager.get('importVuex'));
+      Object.keys(store).forEach((item) => {
+        if (item === "importVuex" && stateManager.get(item)) {
+          path.node.body.unshift(stateManager.get("importVuex"));
         }
       });
-    }
+    },
   });
 
   return currentAst;
 }
 
-const VUEX_SCRIPT_TRANSFORM_LIST = [
-  createStore,
-]
+const VUEX_SCRIPT_TRANSFORM_LIST = [createStore];
 
 module.exports = {
   createStore,
   VUEX_SCRIPT_TRANSFORM_LIST,
-}
+};

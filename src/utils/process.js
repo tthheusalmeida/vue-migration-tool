@@ -1,26 +1,25 @@
-'use strict';
+"use strict";
 
-const { spawn } = require('child_process');
-const path = require('path');
-const fs = require('fs');
-const fsExtra = require('fs-extra');
-const packageInfo = require('../singletons/packageInfo');
-const projectInfo = require('../singletons/projectInfo');
-const EventEmitter = require('events');
-const os = require('os');
+const { spawn } = require("child_process");
+const path = require("path");
+const fs = require("fs");
+const fsExtra = require("fs-extra");
+const packageInfo = require("../singletons/packageInfo");
+const projectInfo = require("../singletons/projectInfo");
+const breakingChanges = require("../singletons/breakingChanges.js");
+const EventEmitter = require("events");
+const os = require("os");
 
 const eventEmitter = new EventEmitter();
 
 const OPERATION_SYSTEM = {
-  Linux: 'linux',
-  Windows_NT: 'windows',
+  Linux: "linux",
+  Windows_NT: "windows",
   // Darwin: 'macOS', There's no config for macOS yet
-}
+};
 
 function runProcessMigration(fileDirectory) {
-  const processList = [
-    gitCloneProject,
-  ];
+  const processList = [gitCloneProject];
 
   if (process.env.BRANCH) {
     processList.push(gitFetchAll);
@@ -36,17 +35,23 @@ function runProcessUpdatePackage(fileDirectory) {
     npmInstall,
     removeNodeModules,
     removeSourceProject,
+    showMetrics,
   ];
 
   processAction({}, fileDirectory, processList, 0);
 }
 
-function processAction(processObject = {}, fileDirectory = '', processList = null, currentProcess = undefined) {
+function processAction(
+  processObject = {},
+  fileDirectory = "",
+  processList = null,
+  currentProcess = undefined
+) {
   const {
-    command = '', // String
-    args = [],  // [String]
-    processName = 'Undefined', // String
-    functionName = '', // String
+    command = "", // String
+    args = [], // [String]
+    processName = "Undefined", // String
+    functionName = "", // String
     jumpProcess = false, // Boolean
   } = processObject;
 
@@ -54,7 +59,7 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
   if (isProcessObjectEmpty) {
     processList[currentProcess](fileDirectory, processList, currentProcess);
     return;
-  };
+  }
 
   if (jumpProcess) {
     processList[currentProcess](fileDirectory, processList, currentProcess + 1);
@@ -69,23 +74,23 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
   };
   const processInstance = spawn(command, args, options);
 
-  processInstance.on('spawn', () => {
+  processInstance.on("spawn", () => {
     console.info(`⚪️ "${processName}" process start...`);
-  })
+  });
 
-  processInstance.stdout.on('data', (data) => {
-    if (process.env.SHOW_LOG === 'true') {
+  processInstance.stdout.on("data", (data) => {
+    if (process.env.SHOW_LOG === "true") {
       console.info(`🔵 ${data}`);
     }
   });
 
-  processInstance.stderr.on('data', (data) => {
-    if (process.env.SHOW_LOG === 'true') {
+  processInstance.stderr.on("data", (data) => {
+    if (process.env.SHOW_LOG === "true") {
       console.info(`🟡 ${data}`);
     }
   });
 
-  processInstance.on('close', async (code) => {
+  processInstance.on("close", async (code) => {
     if (code !== 0) {
       console.error(`🔴 "${processName}" process error: ${code}`);
     } else {
@@ -93,14 +98,18 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
       eventEmitter.emit(functionName);
 
       let currentDirectory = fileDirectory;
-      if (functionName === 'gitCloneProject') {
+      if (functionName === "gitCloneProject") {
         const [projectFolder, _] = await fsExtra.readdir(fileDirectory);
-        projectInfo.set('folderName', projectFolder);
+        projectInfo.set("folderName", projectFolder);
         currentDirectory = path.join(currentDirectory, projectFolder);
       }
 
       if (!!processList[currentProcess]) {
-        processList[currentProcess](currentDirectory, processList, currentProcess);
+        processList[currentProcess](
+          currentDirectory,
+          processList,
+          currentProcess
+        );
       }
     }
   });
@@ -108,7 +117,7 @@ function processAction(processObject = {}, fileDirectory = '', processList = nul
 
 function gitCloneProject(fileDirectory, processList, currentProcess) {
   if (!process.env.REPOSITORY) {
-    console.info('=> process.env.REPOSITORY is not defined.')
+    console.info("=> process.env.REPOSITORY is not defined.");
     process.exit(1);
   }
 
@@ -117,10 +126,10 @@ function gitCloneProject(fileDirectory, processList, currentProcess) {
   }
 
   const npmObject = {
-    command: 'git',
-    args: ['clone', process.env.REPOSITORY],
+    command: "git",
+    args: ["clone", process.env.REPOSITORY],
     processName: `git clone ${process.env.REPOSITORY}`,
-    functionName: 'gitCloneProject',
+    functionName: "gitCloneProject",
   };
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
@@ -128,10 +137,10 @@ function gitCloneProject(fileDirectory, processList, currentProcess) {
 
 function gitFetchAll(fileDirectory, processList, currentProcess) {
   const npmObject = {
-    command: 'git',
-    args: ['fetch', '--all'],
-    processName: 'git featch --all',
-    functionName: 'gitFetchAll',
+    command: "git",
+    args: ["fetch", "--all"],
+    processName: "git featch --all",
+    functionName: "gitFetchAll",
   };
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
@@ -140,15 +149,15 @@ function gitFetchAll(fileDirectory, processList, currentProcess) {
 function gitCheckoutBranch(fileDirectory, processList, currentProcess) {
   const branch = process.env.BRANCH;
   if (!branch) {
-    console.info('=> process.env.BRANCH is not defined.')
+    console.info("=> process.env.BRANCH is not defined.");
     process.exit(1);
   }
 
   const npmObject = {
-    command: 'git',
-    args: ['checkout', branch],
+    command: "git",
+    args: ["checkout", branch],
     processName: `git checkout ${branch}`,
-    functionName: 'gitCheckoutBranch',
+    functionName: "gitCheckoutBranch",
   };
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
@@ -157,30 +166,39 @@ function gitCheckoutBranch(fileDirectory, processList, currentProcess) {
 function npmRemovePackageLock(fileDirectory, processList, currentProcess) {
   const _os = getOperationalSystem();
 
-  let command = '';
+  let command = "";
   let args = [];
 
-  if (_os === 'windows') {
-    command = 'powershell.exe';
-    args = ['-Command', 'Remove-Item', '-Force', '-ErrorAction', 'Stop', 'package-lock.json'];
-  } else if (_os === 'linux') {
-    command = 'rm';
-    args = ['-f', 'package-lock.json'];
+  if (_os === "windows") {
+    command = "powershell.exe";
+    args = [
+      "-Command",
+      "Remove-Item",
+      "-Force",
+      "-ErrorAction",
+      "Stop",
+      "package-lock.json",
+    ];
+  } else if (_os === "linux") {
+    command = "rm";
+    args = ["-f", "package-lock.json"];
   } else {
-    console.error('=> process not defined to this operational system.')
+    console.error("=> process not defined to this operational system.");
     process.exit(1);
   }
 
   const npmObject = {
     command,
     args,
-    processName: 'remove package-lock.json',
-    functionName: 'npmRemovePackageLock',
+    processName: "remove package-lock.json",
+    functionName: "npmRemovePackageLock",
   };
 
-  const isTherePackageLockFile = fs.existsSync(path.join(fileDirectory, 'package-lock.json'));
+  const isTherePackageLockFile = fs.existsSync(
+    path.join(fileDirectory, "package-lock.json")
+  );
   if (!isTherePackageLockFile) {
-    npmObject['jumpProcess'] = true;
+    npmObject["jumpProcess"] = true;
   }
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
@@ -189,25 +207,25 @@ function npmRemovePackageLock(fileDirectory, processList, currentProcess) {
 function npmInstall(fileDirectory, processList, currentProcess) {
   const _os = getOperationalSystem();
 
-  let command = '';
+  let command = "";
   let args = [];
 
-  if (_os === 'windows') {
-    command = 'npm.cmd';
-    args = ['install'];
-  } else if (_os === 'linux') {
-    command = 'npm';
-    args = ['install'];
+  if (_os === "windows") {
+    command = "npm.cmd";
+    args = ["install"];
+  } else if (_os === "linux") {
+    command = "npm";
+    args = ["install"];
   } else {
-    console.error('=> process not defined to this operational system.')
+    console.error("=> process not defined to this operational system.");
     process.exit(1);
   }
 
   const npmObject = {
     command,
     args,
-    processName: 'npm install',
-    functionName: 'npmInstall',
+    processName: "npm install",
+    functionName: "npmInstall",
   };
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
@@ -216,25 +234,28 @@ function npmInstall(fileDirectory, processList, currentProcess) {
 function removeNodeModules(fileDirectory, processList, currentProcess) {
   const _os = getOperationalSystem();
 
-  let command = '';
+  let command = "";
   let args = [];
 
-  if (_os === 'windows') {
-    command = 'powershell.exe';
-    args = ['-Command', 'Remove-Item -Recurse -Force -ErrorAction Stop node_modules'];
-  } else if (_os === 'linux') {
-    command = 'rm';
-    args = ['-rf', 'node_modules'];
+  if (_os === "windows") {
+    command = "powershell.exe";
+    args = [
+      "-Command",
+      "Remove-Item -Recurse -Force -ErrorAction Stop node_modules",
+    ];
+  } else if (_os === "linux") {
+    command = "rm";
+    args = ["-rf", "node_modules"];
   } else {
-    console.error('=> process not defined to this operational system.')
+    console.error("=> process not defined to this operational system.");
     process.exit(1);
   }
 
   const npmObject = {
     command,
     args,
-    processName: 'Remove node_modules',
-    functionName: 'removeNodeModules',
+    processName: "Remove node_modules",
+    functionName: "removeNodeModules",
   };
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
@@ -243,35 +264,44 @@ function removeNodeModules(fileDirectory, processList, currentProcess) {
 function removeSourceProject(fileDirectory, processList, currentProcess) {
   const splitPath = fileDirectory.split(path.sep);
   const migratedIndex = splitPath.indexOf("migrated");
-  splitPath[migratedIndex] = 'code';
+  splitPath[migratedIndex] = "code";
   const projectFolder = splitPath.join(path.sep);
 
   const _os = getOperationalSystem();
 
-  let command = '';
+  let command = "";
   let args = [];
 
-  if (_os === 'windows') {
-    command = 'powershell.exe';
-    args = ['-Command', `Remove-Item -Recurse -Force -ErrorAction Stop ${projectFolder}`];
-  } else if (_os === 'linux') {
-    command = 'rm';
-    args = ['-rf', projectFolder];
+  if (_os === "windows") {
+    command = "powershell.exe";
+    args = [
+      "-Command",
+      `Remove-Item -Recurse -Force -ErrorAction Stop ${projectFolder}`,
+    ];
+  } else if (_os === "linux") {
+    command = "rm";
+    args = ["-rf", projectFolder];
   } else {
-    console.error('=> process not defined to this operational system.')
+    console.error("=> process not defined to this operational system.");
     process.exit(1);
   }
 
   const npmObject = {
     command,
     args,
-    processName: 'Remove source project folder',
-    functionName: 'removeSourceProject',
+    processName: "Remove source project folder",
+    functionName: "removeSourceProject",
   };
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
 
   packageInfo.reset();
+}
+
+function showMetrics(fileDirectory, processList, currentProcess) {
+  console.log("\nBreaking changes fixed: ", breakingChanges.get("count"));
+
+  breakingChanges.reset();
 }
 
 function getOperationalSystem() {
@@ -292,4 +322,4 @@ module.exports = {
   removeNodeModules,
   removeSourceProject,
   eventEmitter,
-}
+};
