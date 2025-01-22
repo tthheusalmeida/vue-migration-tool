@@ -85,7 +85,7 @@ function requireIsNotSupported(ast) {
 
         path.node.body.splice(lastImportIndex + 1, 0, ...importFile);
 
-        breakingChanges.increaseCount();
+        breakingChanges.increaseCount(importFile.length);
         showLog(MIGRATION.VITE.REQUIRE_IS_NOT_SUPPORTED);
       }
     },

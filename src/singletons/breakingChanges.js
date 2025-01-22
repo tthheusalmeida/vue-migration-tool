@@ -19,8 +19,8 @@ class BreakingChanges extends BaseSingleton {
     });
   }
 
-  increaseCount() {
-    this.set("count", this.state.count + 1);
+  increaseCount(value) {
+    this.set("count", this.state.count + (value || 1));
   }
 }
 
