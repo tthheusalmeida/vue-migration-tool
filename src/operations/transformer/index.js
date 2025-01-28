@@ -1,20 +1,25 @@
-'use strict';
-const existenceChecker = require('../../singletons/existenceChecker');
-const stateManager = require('../../singletons/stateManager');
+"use strict";
+const existenceChecker = require("../../singletons/existenceChecker");
+const stateManager = require("../../singletons/stateManager");
 
-const { VUE_TEMPLATE_TRANSFORM_LIST } = require('./vue/template');
-const { HIGHCHARTS_TEMPLATE_TRANSFORM_LIST } = require('./highcharts/template');
+const { VUE_TEMPLATE_TRANSFORM_LIST } = require("./vue/template");
+const { HIGHCHARTS_TEMPLATE_TRANSFORM_LIST } = require("./highcharts/template");
 
-const { BEFORE_START_RULES, VUE_SCRIPT_TRANSFORM_LIST } = require('./vue/script');
-const { VITE_SCRIPT_TRANSFORM_LIST } = require('./vite/script');
-const { VUEX_SCRIPT_TRANSFORM_LIST } = require('./vuex/script');
-const { ROUTER_SCRIPT_TRANSFORM_LIST } = require('./router/script');
-const { HIGHCHARTS_SCRIPT_TRANSFORM_LIST } = require('./highcharts/script');
+const {
+  BEFORE_START_RULES,
+  VUE_SCRIPT_TRANSFORM_LIST,
+} = require("./vue/script");
+const { VITE_SCRIPT_TRANSFORM_LIST } = require("./vite/script");
+const { VUEX_SCRIPT_TRANSFORM_LIST } = require("./vuex/script");
+const { ROUTER_SCRIPT_TRANSFORM_LIST } = require("./router/script");
+const { HIGHCHARTS_SCRIPT_TRANSFORM_LIST } = require("./highcharts/script");
 
 function runTransformer(ast) {
-  if (Object.keys(ast.template).length === 0
-    && Object.keys(ast.script).length === 0
-    && ast.styleString === '') {
+  if (
+    Object.keys(ast.template).length === 0 &&
+    Object.keys(ast.script).length === 0 &&
+    ast.styleString === ""
+  ) {
     return ast;
   }
 
@@ -31,7 +36,9 @@ function runTransformer(ast) {
     ...HIGHCHARTS_SCRIPT_TRANSFORM_LIST,
   ];
 
-  const template = { ast: applyTransformerRules(ast.template.ast, templateRules) };
+  const template = {
+    ast: applyTransformerRules(ast.template.ast, templateRules),
+  };
   const script = applyTransformerRules(ast.script, scriptRules);
 
   resetStoredData();
@@ -40,13 +47,13 @@ function runTransformer(ast) {
     template,
     script,
     styleString: ast.styleString,
-  }
+  };
 }
 
-function applyTransformerRules(ast, rulesList) {
+function applyTransformerRules(ast = {}, rulesList) {
   let newAst = { ...ast };
 
-  rulesList.forEach(currentFunction => {
+  rulesList.forEach((currentFunction) => {
     newAst = currentFunction(newAst);
   });
 
@@ -61,4 +68,4 @@ function resetStoredData() {
 module.exports = {
   runTransformer,
   applyTransformerRules,
-}
+};
