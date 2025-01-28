@@ -18,9 +18,7 @@ describe("=> operations/transformer/index.js", () => {
 
       expect(applyTransformerRules(ast, rulesList)).toStrictEqual(expected);
     });
-  });
 
-  describe("applyTransformerRules()", () => {
     test("When passes an empty ast and rulesList, should not apply transformer rules on ast.", () => {
       const ast = {};
       const rulesList = [
