@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function traverseTemplate(ast, options) {
   walk(ast, options?.action);
@@ -12,7 +12,7 @@ function walk(node, action = undefined) {
     action(node);
   }
 
-  node.children?.forEach(child => {
+  node.children?.forEach((child) => {
     walk(child, action);
   });
 }
@@ -20,4 +20,4 @@ function walk(node, action = undefined) {
 module.exports = {
   traverseTemplate,
   walk,
-}
+};
