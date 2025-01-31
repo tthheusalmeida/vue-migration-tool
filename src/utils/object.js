@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function stringifyCircularStructureToJson(obj) {
   let cache = [];
@@ -18,13 +18,13 @@ function stringifyCircularStructureToJson(obj) {
 }
 
 function removeEmptyObjects(obj) {
-  if (obj && typeof obj === 'object') {
+  if (obj && typeof obj === "object") {
     for (let key in obj) {
-      if (typeof obj[key] === 'object') {
+      if (typeof obj[key] === "object") {
         removeEmptyObjects(obj[key]);
       }
 
-      if (typeof obj[key] === 'object' && Object.keys(obj[key]).length === 0) {
+      if (typeof obj[key] === "object" && Object.keys(obj[key]).length === 0) {
         delete obj[key];
       }
     }
@@ -34,4 +34,4 @@ function removeEmptyObjects(obj) {
 module.exports = {
   stringifyCircularStructureToJson,
   removeEmptyObjects,
-}
+};
