@@ -40,8 +40,8 @@ describe("StateManager Singleton", () => {
   });
 
   test("should maintain singleton instance", () => {
-    const instance1 = require("../stateManager");
-    const instance2 = require("../stateManager");
+    const instance1 = require("./../../src/singletons/stateManager");
+    const instance2 = require("./../../src/singletons/stateManager");
     expect(instance1).toBe(instance2);
   });
 });
