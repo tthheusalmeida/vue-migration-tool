@@ -36,6 +36,7 @@
       "src/operations/compiler/**/*.js",
       "src/operations/parser/**/*.js",
       "src/operations/transformer/**/*.js",
+      "src/singletons/**/*.js",
       "src/utils/**/*.js"
     ],
     "modulePathIgnorePatterns": [
