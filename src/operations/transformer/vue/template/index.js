@@ -104,8 +104,8 @@ function keyCodeModifiers(ast) {
 
               breakingChanges.increaseCount();
               showLog(MIGRATION.VUE.KEY_CODE_MODIFIERS);
-            } catch (e) {
-              console.error(e);
+            } catch (error) {
+              throw new Error(error);
             }
           }
         });
