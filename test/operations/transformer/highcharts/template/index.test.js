@@ -4,7 +4,7 @@ const {
 
 describe("=> operations/transformer/highcharts/template/index.js", () => {
   describe("renameHighchartsTag()", () => {
-    test("When passes an ast with import of Chart, should remove highchart import on ast.", async () => {
+    test("When passes an ast with import of Chart, should remove highchart import on ast.", () => {
       const ast = {
         type: 1,
         tag: "template",
@@ -91,7 +91,7 @@ describe("=> operations/transformer/highcharts/template/index.js", () => {
         staticRoot: false,
       };
 
-      expect(await renameHighchartsTag(ast)).toStrictEqual(expected);
+      expect(renameHighchartsTag(ast)).toStrictEqual(expected);
     });
   });
 });
