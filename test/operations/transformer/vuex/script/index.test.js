@@ -13,7 +13,7 @@ beforeEach(() => {
 
 describe("=> operations/transformer/vuex/script/index.js", () => {
   describe("createStore()", () => {
-    test("When passes an ast wuth new Vuex.Store, should apply transformer for createStore.", async () => {
+    test("When passes an ast with new Vuex.Store, should apply transformer for createStore.", async () => {
       const spyGet = jest.spyOn(stateManager, "get");
       const spySet = jest.spyOn(stateManager, "set");
 
