@@ -2,7 +2,6 @@
 
 const t = require("@babel/types");
 const traverse = require("@babel/traverse").default;
-const path = require("path");
 const { MIGRATION } = require("../../constants");
 const { showLog } = require("../../../../utils/message");
 const { importToVariableName } = require("../../../../utils/string");
@@ -160,5 +159,6 @@ const VITE_SCRIPT_TRANSFORM_LIST = [
 
 module.exports = {
   requireIsNotSupported,
+  componentMustHaveExtensionName,
   VITE_SCRIPT_TRANSFORM_LIST,
 };
