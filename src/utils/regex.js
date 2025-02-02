@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const REGEX = {
   TRANSFORMER: {
@@ -21,12 +21,14 @@ const REGEX = {
       VUE_COMPONENT_NAME_PASCAL_CASE: /^[A-Z][a-z]+(?:[A-Z][a-z]+)*$/,
       VUE_COMPONENT_NAME_KEBAB_CASE: /^[a-z]+(-[a-z]+)+$/,
       VUE_ITEM_IN_ARRAY: /\(?([\w\s,]+)\)?\s*in\s*([\w\s]+)/,
-    }
-  }
+    },
+  },
+  PACKAGE: {
+    VUETIFY: /vuetify/g,
+    VUE_CLI: /vue-cli/g,
+  },
 };
 
-
-
 module.exports = {
-  REGEX
-}
+  REGEX,
+};

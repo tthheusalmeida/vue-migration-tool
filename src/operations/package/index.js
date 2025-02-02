@@ -5,6 +5,7 @@ const path = require("path");
 const { format } = require("prettier");
 const { runProcessUpdatePackage } = require("../../utils/process");
 const { removeEmptyObjects } = require("../../utils/object");
+const { REGEX } = require("../../utils/regex");
 const {
   NEW_DEPENDENCIES,
   OLD_DEPENDENCIES,
@@ -105,14 +106,10 @@ function updateDependencies(packageObj, areDevDependencies = false) {
     }
   });
 
-  Object.keys(packageData[packageDependencies]).forEach((dependency) => {
-    if (NEW_DEPENDENCIES[dependency]) {
-      packageData[packageDependencies][dependency] =
-        `^${NEW_DEPENDENCIES[dependency]}`;
-    }
-  });
+  packageData = updateOldDependencies(packageData, packageDependencies);
+  packageData = removeOldDependencies(packageData, packageDependencies);
 
-  if (packageDependencies === "dependencies") {
+  if (!areDevDependencies) {
     const newDependencies = [{ "create-vite": "5.2.3" }, { vue: "3.4.27" }];
 
     packageData = addDependency(
@@ -144,6 +141,34 @@ function addDependency(_packageData, dependency, newDependencies) {
   newDependencies.forEach((currentDependency) => {
     const name = Object.keys(currentDependency)[0];
     packageData[dependency][name] = `^${currentDependency[name]}`;
+  });
+
+  return packageData;
+}
+
+function removeOldDependencies(_packageData, dependencies) {
+  const packageData = { ..._packageData };
+
+  Object.keys(packageData[dependencies]).forEach((dependency) => {
+    if (
+      dependency.match(REGEX.PACKAGE.VUETIFY) ||
+      dependency.match(REGEX.PACKAGE.VUE_CLI)
+    ) {
+      delete packageData[dependencies][dependency];
+    }
+  });
+
+  return packageData;
+}
+
+function updateOldDependencies(_packageData, dependencies) {
+  const packageData = { ..._packageData };
+
+  Object.keys(packageData[dependencies]).forEach((dependency) => {
+    if (NEW_DEPENDENCIES[dependency]) {
+      packageData[dependencies][dependency] =
+        `^${NEW_DEPENDENCIES[dependency]}`;
+    }
   });
 
   return packageData;
