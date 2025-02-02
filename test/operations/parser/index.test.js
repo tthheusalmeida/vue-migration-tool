@@ -29,6 +29,11 @@ jest.mock("../../../src/utils/object", () => ({
   stringifyCircularStructureToJson: jest.fn(),
 }));
 
+beforeEach(() => {
+  // Remove log for "=> Running parse for 'file/path'."
+  jest.spyOn(console, "info").mockImplementation(() => {});
+});
+
 describe("=> operations/parser", () => {
   describe("runParser()", () => {
     test("When passes file without content, should return AST with template, script and styleString empty.", () => {

@@ -430,6 +430,7 @@ const VUE_SCRIPT_TRANSFORM_LIST = [
 
 module.exports = {
   setDefaultLoc,
+  existenceCheckerForRules,
   globalApiNewVue,
   destroyedToUnmouted,
   beforeDestroyToBeforeUnmount,
