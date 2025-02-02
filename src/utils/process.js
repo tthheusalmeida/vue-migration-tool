@@ -33,7 +33,6 @@ function runProcessUpdatePackage(fileDirectory) {
   const processList = [
     npmRemovePackageLock,
     npmInstall,
-    removeNodeModules,
     removeSourceProject,
     showMetrics,
   ];
@@ -212,10 +211,10 @@ function npmInstall(fileDirectory, processList, currentProcess) {
 
   if (_os === "windows") {
     command = "npm.cmd";
-    args = ["install"];
+    args = ["install", "--package-lock-only"];
   } else if (_os === "linux") {
     command = "npm";
-    args = ["install"];
+    args = ["install", "--package-lock-only"];
   } else {
     console.error("=> process not defined to this operational system.");
     process.exit(1);
@@ -226,36 +225,6 @@ function npmInstall(fileDirectory, processList, currentProcess) {
     args,
     processName: "npm install",
     functionName: "npmInstall",
-  };
-
-  processAction(npmObject, fileDirectory, processList, currentProcess + 1);
-}
-
-function removeNodeModules(fileDirectory, processList, currentProcess) {
-  const _os = getOperationalSystem();
-
-  let command = "";
-  let args = [];
-
-  if (_os === "windows") {
-    command = "powershell.exe";
-    args = [
-      "-Command",
-      "Remove-Item -Recurse -Force -ErrorAction Stop node_modules",
-    ];
-  } else if (_os === "linux") {
-    command = "rm";
-    args = ["-rf", "node_modules"];
-  } else {
-    console.error("=> process not defined to this operational system.");
-    process.exit(1);
-  }
-
-  const npmObject = {
-    command,
-    args,
-    processName: "Remove node_modules",
-    functionName: "removeNodeModules",
   };
 
   processAction(npmObject, fileDirectory, processList, currentProcess + 1);
@@ -319,7 +288,6 @@ module.exports = {
   gitCheckoutBranch,
   npmRemovePackageLock,
   npmInstall,
-  removeNodeModules,
   removeSourceProject,
   eventEmitter,
 };
