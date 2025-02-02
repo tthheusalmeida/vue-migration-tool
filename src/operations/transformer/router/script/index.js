@@ -13,7 +13,7 @@ const getModeType = (mode) => {
     hash: "createWebHashHistory",
     abstract: "createMemoryHistory",
   };
-  return MODE_TYPE[mode];
+  return MODE_TYPE[mode] || MODE_TYPE.history;
 };
 
 // https://router.vuejs.org/guide/migration/
@@ -131,6 +131,7 @@ function createRouter(ast) {
 const ROUTER_SCRIPT_TRANSFORM_LIST = [createRouter];
 
 module.exports = {
+  getModeType,
   createRouter,
   ROUTER_SCRIPT_TRANSFORM_LIST,
 };
