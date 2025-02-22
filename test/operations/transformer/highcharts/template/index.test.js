@@ -66,7 +66,7 @@ describe("=> operations/transformer/highcharts/template/index.js", () => {
             children: [
               {
                 type: 1,
-                tag: "Highcharts",
+                tag: "highcharts",
                 attrsList: [{ name: ":options", value: "chartOptions" }],
                 attrsMap: { ":options": "chartOptions" },
                 rawAttrsMap: {},
