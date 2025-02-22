@@ -2,6 +2,7 @@ const {
   setDefaultLoc,
   existenceCheckerForRules,
   globalApiNewVue,
+  destroyedToUnmouted,
 } = require("../../../../../src/operations/transformer/vue/script/index");
 
 const existenceChecker = require("../../../../../src/singletons/existenceChecker");
@@ -275,4 +276,128 @@ describe("=> operations/transformer/vuex/script/index.js", () => {
   //     });
   //   });
   // });
+
+  describe("destroyedToUnmouted()", () => {
+    test("Should replace 'destroyed' with 'unmounted' in AST identifiers", () => {
+      const ast = {
+        type: "File",
+        start: 0,
+        end: 14,
+        loc: {
+          start: { line: 1, column: 0, index: 0 },
+          end: { line: 2, column: 0, index: 14 },
+        },
+        errors: [],
+        program: {
+          type: "Program",
+          start: 0,
+          end: 14,
+          loc: {},
+          sourceType: "module",
+          interpreter: null,
+          body: [
+            {
+              type: "ExpressionStatement",
+              start: 0,
+              end: 12,
+              loc: {
+                start: { line: 1, column: 0, index: 0 },
+                end: { line: 1, column: 12, index: 12 },
+              },
+              expression: {
+                type: "CallExpression",
+                start: 0,
+                end: 11,
+                loc: { end: { line: 1, column: 11, index: 11 } },
+                callee: {
+                  type: "Identifier",
+                  start: 0,
+                  end: 9,
+                  loc: {
+                    end: { line: 1, column: 9, index: 9 },
+                    identifierName: "destroyed",
+                  },
+                  name: "destroyed",
+                },
+                arguments: [],
+              },
+            },
+          ],
+          directives: [],
+        },
+        comments: [],
+      };
+
+      const expected = {
+        type: "File",
+        start: 0,
+        end: 14,
+        loc: {
+          start: { line: 1, column: 0, index: 0 },
+          end: { line: 2, column: 0, index: 14 },
+        },
+        errors: [],
+        program: {
+          type: "Program",
+          start: 0,
+          end: 14,
+          sourceType: "module",
+          interpreter: null,
+          body: [
+            {
+              type: "ExpressionStatement",
+              start: 0,
+              end: 12,
+              loc: {
+                start: { line: 1, column: 0, index: 0 },
+                end: { line: 1, column: 12, index: 12 },
+              },
+              expression: {
+                type: "CallExpression",
+                start: 0,
+                end: 11,
+                callee: {
+                  type: "Identifier",
+                  start: 0,
+                  end: 9,
+                  name: "unmounted",
+                },
+                arguments: [],
+              },
+            },
+          ],
+          directives: [],
+        },
+        comments: [],
+      };
+
+      expect(destroyedToUnmouted(ast)).toStrictEqual(expected);
+    });
+
+    test("Should remove incorrect loc values from nodes", () => {
+      const ast = {
+        type: "Program",
+        body: [
+          {
+            type: "ExpressionStatement",
+            loc: {
+              start: {},
+              end: { line: 10, column: 5 },
+            },
+          },
+        ],
+      };
+
+      const expected = {
+        type: "Program",
+        body: [
+          {
+            type: "ExpressionStatement",
+          },
+        ],
+      };
+
+      expect(destroyedToUnmouted(ast)).toStrictEqual(expected);
+    });
+  });
 });
