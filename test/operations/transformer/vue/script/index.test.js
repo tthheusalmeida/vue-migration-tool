@@ -130,7 +130,7 @@ describe("=> operations/transformer/vuex/script/index.js", () => {
               callee: { type: "Identifier", name: "Vue" },
               arguments: [
                 {
-                  type: "xpression",
+                  type: "ObjectExpression",
                   properties: [
                     {
                       type: "ObjectProperty",
