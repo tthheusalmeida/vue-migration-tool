@@ -5,6 +5,7 @@ const {
   destroyedToUnmouted,
   beforeDestroyToBeforeUnmount,
   dataOptions,
+  filters,
 } = require("../../../../../src/operations/transformer/vue/script/index");
 
 const existenceChecker = require("../../../../../src/singletons/existenceChecker");
@@ -916,6 +917,632 @@ describe("=> operations/transformer/vuex/script/index.js", () => {
       };
 
       expect(dataOptions(ast)).toStrictEqual(expected);
+    });
+  });
+
+  describe("filters()", () => {
+    test("Should move filters properties into methods if methods exist", () => {
+      const ast = {
+        type: "File",
+        start: 0,
+        end: 101,
+        loc: {
+          start: { line: 1, column: 0, index: 0 },
+          end: { line: 7, column: 2, index: 101 },
+        },
+        errors: [],
+        program: {
+          type: "Program",
+          start: 0,
+          end: 101,
+          loc: {},
+          sourceType: "module",
+          interpreter: null,
+          body: [
+            {
+              type: "ExportDefaultDeclaration",
+              start: 0,
+              end: 101,
+              loc: {
+                start: { line: 1, column: 0, index: 0 },
+                end: { line: 7, column: 2, index: 101 },
+              },
+              declaration: {
+                type: "ObjectExpression",
+                start: 15,
+                end: 100,
+                loc: {
+                  start: { line: 1, column: 15, index: 15 },
+                  end: { line: 7, column: 1, index: 100 },
+                },
+                properties: [
+                  {
+                    type: "ObjectProperty",
+                    start: 20,
+                    end: 96,
+                    loc: {
+                      start: { line: 2, column: 2, index: 20 },
+                      end: { line: 6, column: 3, index: 96 },
+                    },
+                    method: false,
+                    key: {
+                      type: "Identifier",
+                      start: 20,
+                      end: 27,
+                      loc: {
+                        end: { line: 2, column: 9, index: 27 },
+                        identifierName: "filters",
+                      },
+                      name: "filters",
+                    },
+                    computed: false,
+                    shorthand: false,
+                    value: {
+                      type: "ObjectExpression",
+                      start: 29,
+                      end: 96,
+                      loc: { start: { line: 2, column: 11, index: 29 } },
+                      properties: [
+                        {
+                          type: "ObjectMethod",
+                          start: 36,
+                          end: 90,
+                          loc: {
+                            start: { line: 3, column: 4, index: 36 },
+                            end: { line: 5, column: 5, index: 90 },
+                          },
+                          method: true,
+                          key: {
+                            type: "Identifier",
+                            start: 36,
+                            end: 47,
+                            loc: {
+                              end: { line: 3, column: 15, index: 47 },
+                              identifierName: "currencyUSD",
+                            },
+                            name: "currencyUSD",
+                          },
+                          computed: false,
+                          kind: "method",
+                          id: null,
+                          generator: false,
+                          async: false,
+                          params: [
+                            {
+                              type: "Identifier",
+                              start: 48,
+                              end: 53,
+                              loc: {
+                                start: { line: 3, column: 16, index: 48 },
+                                end: { line: 3, column: 21, index: 53 },
+                                identifierName: "value",
+                              },
+                              name: "value",
+                            },
+                          ],
+                          body: {
+                            type: "BlockStatement",
+                            start: 55,
+                            end: 90,
+                            loc: {
+                              start: { line: 3, column: 23, index: 55 },
+                            },
+                            body: [
+                              {
+                                type: "ReturnStatement",
+                                start: 64,
+                                end: 83,
+                                loc: {
+                                  start: { line: 4, column: 6, index: 64 },
+                                  end: { line: 4, column: 25, index: 83 },
+                                },
+                                argument: {
+                                  type: "BinaryExpression",
+                                  start: 71,
+                                  end: 82,
+                                  loc: {
+                                    start: { line: 4, column: 13, index: 71 },
+                                    end: { line: 4, column: 24, index: 82 },
+                                  },
+                                  left: {
+                                    type: "StringLiteral",
+                                    start: 71,
+                                    end: 74,
+                                    loc: {
+                                      end: { line: 4, column: 16, index: 74 },
+                                    },
+                                    extra: { rawValue: "$", raw: '"$"' },
+                                    value: "$",
+                                  },
+                                  operator: "+",
+                                  right: {
+                                    type: "Identifier",
+                                    start: 77,
+                                    end: 82,
+                                    loc: {
+                                      start: {
+                                        line: 4,
+                                        column: 19,
+                                        index: 77,
+                                      },
+                                      identifierName: "value",
+                                    },
+                                    name: "value",
+                                  },
+                                },
+                              },
+                            ],
+                            directives: [],
+                          },
+                        },
+                      ],
+                      extra: { trailingComma: 90 },
+                    },
+                  },
+                ],
+                extra: { trailingComma: 96 },
+              },
+            },
+          ],
+          directives: [],
+        },
+        comments: [],
+      };
+
+      const expected = {
+        comments: [],
+        end: 101,
+        errors: [],
+        loc: {
+          end: {
+            column: 2,
+            index: 101,
+            line: 7,
+          },
+          start: {
+            column: 0,
+            index: 0,
+            line: 1,
+          },
+        },
+        program: {
+          body: [
+            {
+              declaration: {
+                end: 100,
+                extra: {
+                  trailingComma: 96,
+                },
+                loc: {
+                  end: {
+                    column: 1,
+                    index: 100,
+                    line: 7,
+                  },
+                  start: {
+                    column: 15,
+                    index: 15,
+                    line: 1,
+                  },
+                },
+                properties: [
+                  {
+                    computed: false,
+                    end: 96,
+                    key: {
+                      end: 27,
+                      loc: {
+                        end: {
+                          column: 9,
+                          index: 27,
+                          line: 2,
+                        },
+                        identifierName: "filters",
+                      },
+                      name: "methods",
+                      start: 20,
+                      type: "Identifier",
+                    },
+                    loc: {
+                      end: {
+                        column: 3,
+                        index: 96,
+                        line: 6,
+                      },
+                      start: {
+                        column: 2,
+                        index: 20,
+                        line: 2,
+                      },
+                    },
+                    method: false,
+                    shorthand: false,
+                    start: 20,
+                    type: "ObjectProperty",
+                    value: {
+                      end: 96,
+                      extra: {
+                        trailingComma: 90,
+                      },
+                      loc: {
+                        start: {
+                          column: 11,
+                          index: 29,
+                          line: 2,
+                        },
+                      },
+                      properties: [
+                        {
+                          async: false,
+                          body: {
+                            body: [
+                              {
+                                argument: {
+                                  end: 82,
+                                  left: {
+                                    end: 74,
+                                    extra: {
+                                      raw: '"$"',
+                                      rawValue: "$",
+                                    },
+                                    loc: {
+                                      end: {
+                                        column: 16,
+                                        index: 74,
+                                        line: 4,
+                                      },
+                                    },
+                                    start: 71,
+                                    type: "StringLiteral",
+                                    value: "$",
+                                  },
+                                  loc: {
+                                    end: {
+                                      column: 24,
+                                      index: 82,
+                                      line: 4,
+                                    },
+                                    start: {
+                                      column: 13,
+                                      index: 71,
+                                      line: 4,
+                                    },
+                                  },
+                                  operator: "+",
+                                  right: {
+                                    end: 82,
+                                    loc: {
+                                      identifierName: "value",
+                                      start: {
+                                        column: 19,
+                                        index: 77,
+                                        line: 4,
+                                      },
+                                    },
+                                    name: "value",
+                                    start: 77,
+                                    type: "Identifier",
+                                  },
+                                  start: 71,
+                                  type: "BinaryExpression",
+                                },
+                                end: 83,
+                                loc: {
+                                  end: {
+                                    column: 25,
+                                    index: 83,
+                                    line: 4,
+                                  },
+                                  start: {
+                                    column: 6,
+                                    index: 64,
+                                    line: 4,
+                                  },
+                                },
+                                start: 64,
+                                type: "ReturnStatement",
+                              },
+                            ],
+                            directives: [],
+                            end: 90,
+                            loc: {
+                              start: {
+                                column: 23,
+                                index: 55,
+                                line: 3,
+                              },
+                            },
+                            start: 55,
+                            type: "BlockStatement",
+                          },
+                          computed: false,
+                          end: 90,
+                          generator: false,
+                          id: null,
+                          key: {
+                            end: 47,
+                            loc: {
+                              end: {
+                                column: 15,
+                                index: 47,
+                                line: 3,
+                              },
+                              identifierName: "currencyUSD",
+                            },
+                            name: "currencyUSD",
+                            start: 36,
+                            type: "Identifier",
+                          },
+                          kind: "method",
+                          loc: {
+                            end: {
+                              column: 5,
+                              index: 90,
+                              line: 5,
+                            },
+                            start: {
+                              column: 4,
+                              index: 36,
+                              line: 3,
+                            },
+                          },
+                          method: true,
+                          params: [
+                            {
+                              end: 53,
+                              loc: {
+                                end: {
+                                  column: 21,
+                                  index: 53,
+                                  line: 3,
+                                },
+                                identifierName: "value",
+                                start: {
+                                  column: 16,
+                                  index: 48,
+                                  line: 3,
+                                },
+                              },
+                              name: "value",
+                              start: 48,
+                              type: "Identifier",
+                            },
+                          ],
+                          start: 36,
+                          type: "ObjectMethod",
+                        },
+                      ],
+                      start: 29,
+                      type: "ObjectExpression",
+                    },
+                  },
+                ],
+                start: 15,
+                type: "ObjectExpression",
+              },
+              end: 101,
+              loc: {
+                end: {
+                  column: 2,
+                  index: 101,
+                  line: 7,
+                },
+                start: {
+                  column: 0,
+                  index: 0,
+                  line: 1,
+                },
+              },
+              start: 0,
+              type: "ExportDefaultDeclaration",
+            },
+          ],
+          directives: [],
+          end: 101,
+          interpreter: null,
+          loc: {},
+          sourceType: "module",
+          start: 0,
+          type: "Program",
+        },
+        start: 0,
+        type: "File",
+      };
+
+      expect(filters(ast)).toStrictEqual(expected);
+    });
+
+    test("Should rename filters to methods if methods do not exist", () => {
+      const ast = {
+        type: "File",
+        start: 0,
+        end: 38,
+        loc: {
+          start: { line: 1, column: 0, index: 0 },
+          end: { line: 4, column: 0, index: 38 },
+        },
+        errors: [],
+        program: {
+          type: "Program",
+          start: 0,
+          end: 38,
+          loc: {},
+          sourceType: "module",
+          interpreter: null,
+          body: [
+            {
+              type: "ExportDefaultDeclaration",
+              start: 0,
+              end: 36,
+              loc: {
+                start: { line: 1, column: 0, index: 0 },
+                end: { line: 3, column: 2, index: 36 },
+              },
+              declaration: {
+                type: "ObjectExpression",
+                start: 15,
+                end: 35,
+                loc: {
+                  start: { line: 1, column: 15, index: 15 },
+                  end: { line: 3, column: 1, index: 35 },
+                },
+                properties: [
+                  {
+                    type: "ObjectProperty",
+                    start: 20,
+                    end: 31,
+                    loc: {
+                      start: { line: 2, column: 2, index: 20 },
+                      end: { line: 2, column: 13, index: 31 },
+                    },
+                    method: false,
+                    key: {
+                      type: "Identifier",
+                      start: 20,
+                      end: 27,
+                      loc: {
+                        end: { line: 2, column: 9, index: 27 },
+                        identifierName: "filters",
+                      },
+                      name: "filters",
+                    },
+                    computed: false,
+                    shorthand: false,
+                    value: {
+                      type: "ObjectExpression",
+                      start: 29,
+                      end: 31,
+                      loc: { start: { line: 2, column: 11, index: 29 } },
+                      properties: [],
+                    },
+                  },
+                ],
+                extra: { trailingComma: 31 },
+              },
+            },
+          ],
+          directives: [],
+        },
+        comments: [],
+      };
+
+      const expected = {
+        comments: [],
+        end: 38,
+        errors: [],
+        loc: {
+          end: {
+            column: 0,
+            index: 38,
+            line: 4,
+          },
+          start: {
+            column: 0,
+            index: 0,
+            line: 1,
+          },
+        },
+        program: {
+          body: [
+            {
+              declaration: {
+                end: 35,
+                extra: {
+                  trailingComma: 31,
+                },
+                loc: {
+                  end: {
+                    column: 1,
+                    index: 35,
+                    line: 3,
+                  },
+                  start: {
+                    column: 15,
+                    index: 15,
+                    line: 1,
+                  },
+                },
+                properties: [
+                  {
+                    computed: false,
+                    end: 31,
+                    key: {
+                      end: 27,
+                      loc: {
+                        end: {
+                          column: 9,
+                          index: 27,
+                          line: 2,
+                        },
+                        identifierName: "filters",
+                      },
+                      name: "methods",
+                      start: 20,
+                      type: "Identifier",
+                    },
+                    loc: {
+                      end: {
+                        column: 13,
+                        index: 31,
+                        line: 2,
+                      },
+                      start: {
+                        column: 2,
+                        index: 20,
+                        line: 2,
+                      },
+                    },
+                    method: false,
+                    shorthand: false,
+                    start: 20,
+                    type: "ObjectProperty",
+                    value: {
+                      end: 31,
+                      loc: {
+                        start: {
+                          column: 11,
+                          index: 29,
+                          line: 2,
+                        },
+                      },
+                      properties: [],
+                      start: 29,
+                      type: "ObjectExpression",
+                    },
+                  },
+                ],
+                start: 15,
+                type: "ObjectExpression",
+              },
+              end: 36,
+              loc: {
+                end: {
+                  column: 2,
+                  index: 36,
+                  line: 3,
+                },
+                start: {
+                  column: 0,
+                  index: 0,
+                  line: 1,
+                },
+              },
+              start: 0,
+              type: "ExportDefaultDeclaration",
+            },
+          ],
+          directives: [],
+          end: 38,
+          interpreter: null,
+          loc: {},
+          sourceType: "module",
+          start: 0,
+          type: "Program",
+        },
+        start: 0,
+        type: "File",
+      };
+      expect(filters(ast)).toStrictEqual(expected);
     });
   });
 });

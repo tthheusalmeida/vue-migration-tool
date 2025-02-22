@@ -377,40 +377,31 @@ function filters(ast) {
 
   traverse(currentAst, {
     ObjectExpression(path) {
-      let filtersNode = null;
-      let methodsNode = null;
+      let filtersIndex = -1;
+      let methodsIndex = -1;
 
-      path.node.properties.forEach((property) => {
-        if (
-          property.key?.name === "filters" &&
-          path.parent.type === "NewExpression"
-        ) {
-          filtersNode = property;
+      path.node.properties.forEach((property, index) => {
+        if (property.key?.name === "filters") {
+          filtersIndex = index;
         } else if (property.key?.name === "methods") {
-          methodsNode = property;
+          methodsIndex = index;
         }
       });
 
-      if (filtersNode) {
-        if (methodsNode) {
-          methodsNode.value.properties.push(...filtersNode.value.properties);
-          path.node.properties = path.node.properties.filter(
-            (property) => property !== filtersNode
+      if (filtersIndex !== -1) {
+        const filtersNode = path.node.properties[filtersIndex];
+
+        if (methodsIndex !== -1) {
+          path.node.properties[methodsIndex].value.properties.push(
+            ...filtersNode.value.properties
           );
-          breakingChanges.increaseCount();
-          showLog(MIGRATION.VUE.FILTERS);
+          path.node.properties.splice(filtersIndex, 1);
         } else {
           filtersNode.key.name = "methods";
-          breakingChanges.increaseCount();
-          showLog(MIGRATION.VUE.FILTERS);
         }
-      }
 
-      // Handle loc property
-      if (path.node?.loc) {
-        if (!path.node.loc.start || !path.node.loc.start.line) {
-          delete path.node.loc;
-        }
+        breakingChanges.increaseCount();
+        showLog(MIGRATION.VUE.FILTERS);
       }
     },
   });
