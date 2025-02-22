@@ -8,9 +8,15 @@ const {
   filters,
 } = require("../../../../../src/operations/transformer/vue/script/index");
 
+const breakingChanges = require("../../../../../src/singletons/breakingChanges");
 const existenceChecker = require("../../../../../src/singletons/existenceChecker");
 const stateManager = require("../../../../../src/singletons/stateManager");
 const t = require("@babel/types");
+
+breakingChanges.increaseCount = jest.fn();
+stateManager.get = jest.fn();
+stateManager.set = jest.fn();
+stateManager.getState = jest.fn().mockReturnValue({});
 
 describe("=> operations/transformer/vuex/script/index.js", () => {
   describe("setDefaultLoc()", () => {
@@ -232,53 +238,130 @@ describe("=> operations/transformer/vuex/script/index.js", () => {
     });
   });
 
-  // describe("existenceCheckerForRules()", () => {
-  //   test("ImportDeclaration()", () => {
-  //     const spyGetExistenceChecker = jest.spyOn(existenceChecker, "get");
-  //     const spySetStateManager = jest.spyOn(stateManager, "set");
+  describe("globalApiNewVue", () => {
+    test("transforma import Vue e new Vue() corretamente", () => {
+      const ast = {
+        type: "File",
+        program: {
+          type: "Program",
+          body: [
+            {
+              type: "ImportDeclaration",
+              specifiers: [
+                {
+                  type: "ImportDefaultSpecifier",
+                  local: { name: "Vue" },
+                },
+              ],
+              source: { type: "StringLiteral", value: "vue" },
+            },
+            {
+              type: "ExpressionStatement",
+              expression: {
+                type: "CallExpression",
+                callee: {
+                  object: {
+                    type: "NewExpression",
+                    callee: { type: "Identifier", name: "Vue" },
+                    arguments: [
+                      {
+                        type: "ObjectExpression",
+                        properties: [
+                          {
+                            type: "ObjectProperty",
+                            key: { type: "Identifier", name: "render" },
+                            value: {
+                              type: "FunctionExpression",
+                              body: { type: "BlockStatement", body: [] },
+                            },
+                          },
+                          {
+                            type: "ObjectProperty",
+                            key: { type: "Identifier", name: "foo" },
+                            value: { type: "StringLiteral", value: "bar" },
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+            {
+              type: "ExpressionStatement",
+              expression: {
+                type: "AssignmentExpression",
+                operator: "=",
+                left: {
+                  type: "MemberExpression",
+                  object: {
+                    type: "MemberExpression",
+                    object: { type: "Identifier", name: "Vue" },
+                    property: { type: "Identifier", name: "config" },
+                  },
+                  property: { type: "Identifier", name: "productionTip" },
+                },
+                right: { type: "BooleanLiteral", value: false },
+              },
+            },
+            {
+              type: "ExpressionStatement",
+              expression: {
+                type: "CallExpression",
+                callee: {
+                  type: "MemberExpression",
+                  object: { type: "Identifier", name: "Vue" },
+                  property: { type: "Identifier", name: "someMethod" },
+                },
+                arguments: [],
+              },
+            },
+            {
+              type: "ExpressionStatement",
+              expression: {
+                type: "CallExpression",
+                callee: {
+                  type: "MemberExpression",
+                  object: { type: "Identifier", name: "Vue" },
+                  property: { type: "Identifier", name: "use" },
+                },
+                arguments: [{ type: "Identifier", name: "SomePlugin" }],
+              },
+            },
+          ],
+        },
+      };
 
-  //     spyGetExistenceChecker.mockReturnValue(true);
+      const expected = {
+        program: {
+          body: [
+            {
+              expression: {
+                arguments: [],
+                callee: {
+                  object: {
+                    name: "Vue",
+                    type: "Identifier",
+                  },
+                  property: {
+                    name: "someMethod",
+                    type: "Identifier",
+                  },
+                  type: "MemberExpression",
+                },
+                type: "CallExpression",
+              },
+              type: "ExpressionStatement",
+            },
+          ],
+          type: "Program",
+        },
+        type: "File",
+      };
 
-  //     const ast = {
-  //       type: "Program",
-  //       body: [
-  //         {
-  //           type: "ImportDeclaration",
-  //           specifiers: [
-  //             {
-  //               type: "ImportSpecifier",
-  //               local: { type: "Identifier", name: "Vue" },
-  //               imported: { type: "Identifier", name: "Vue" },
-  //             },
-  //           ],
-  //           source: { type: "StringLiteral", value: "vue" },
-  //         },
-  //       ],
-  //       directives: [],
-  //       sourceType: "script",
-  //       interpreter: null,
-  //     };
-
-  //     globalApiNewVue(ast);
-
-  //     expect(spySetStateManager).toHaveBeenCalledWith("importVue", {
-  //       type: "ImportDeclaration",
-  //       specifiers: [
-  //         {
-  //           type: "ImportSpecifier",
-  //           local: { type: "Identifier", name: "createApp" },
-  //           imported: { type: "Identifier", name: "createApp" },
-  //         },
-  //         {
-  //           type: "ImportSpecifier",
-  //           local: { type: "Identifier", name: "h" },
-  //           imported: { type: "Identifier", name: "h" },
-  //         },
-  //       ],
-  //       source: { type: "StringLiteral", value: "vue" },
-  //     });
-  //   });
-  // });
+      expect(globalApiNewVue(ast)).toStrictEqual(expected);
+    });
+  });
 
   describe("destroyedToUnmouted()", () => {
     test("Should replace 'destroyed' with 'unmounted' in AST identifiers", () => {
