@@ -1,3 +1,7 @@
+<h3 align="center">
+  <img alt="Vue Migration Tool logo" width="50%" title="#logo" src="assets/logo.png">
+  <br>
+</h3>
 <h1 align="center">
   <strong style="font-size: 24px">Vue Migration Tool</strong>
 </h1>
@@ -27,17 +31,21 @@
 ## ⚙️ How to use
 
 To use [Vue Migration Tool](https://github.com/tthheusalmeida/vue-migration-tool), your code must follow the standards in this <strong>[Vue Guide](https://v2.vuejs.org/v2/guide/)</strong>.<br>
+
 > ⚠️ If your code has a different implementation than the guide, there may be inconsistencies after migration.<br>
 
 Here we go!
-___
 
-Clone the project: 
+---
+
+Clone the project:
+
 ```
 git clone https://github.com/tthheusalmeida/vue-migration-tool.git
 ```
 
 Install the dependencies:
+
 ```
 npm install
 ```
@@ -50,27 +58,35 @@ For run the project we have some environment variables:<br>
 Then run one of these commands
 
 #### For main branch:
+
 ```
 cross-env REPOSITORY=<repository-link> npm start
 ```
+
 Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git npm start`
 
 #### For a specific branch:
+
 ```
 cross-env REPOSITORY=<repository-link> BRANCH=<branch-name> npm start
 ```
+
 Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git BRANCH=migrate npm start`
 
 #### For main branch and log info:
+
 ```
 cross-env REPOSITORY=<repository-link> npm run start:log
 ```
+
 Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git npm run start:log`
 
 also works with `BRANCH`:
+
 ```
 cross-env REPOSITORY=<repository-link> BRANCH=migrate npm run start:log
 ```
+
 Example: `cross-env REPOSITORY=https://github.com/tthheusalmeida/pokedex.git BRANCH=migrate npm run start:log`
 
 At the end of the execution the code will be available in the `migrated` folder.
@@ -96,6 +112,7 @@ Over time, the project may receive more migrations of other plugins, libraries, 
 <a id="how-to-contribute"></a>
 
 ## 😃 How to contribute
+
 - First, leave ⭐ if you liked it!
 - Fork this repository.
 - Create a branch for your feature: `git checkout -b my-feature`
@@ -105,7 +122,7 @@ Over time, the project may receive more migrations of other plugins, libraries, 
   3. Create a constant containing all functions from this dependency as `{dependency}_TEMPLATE_TRANSFORM_LIST` or `{dependency}_SCRIPT_TRANSFORM_LIST`.
   4. In `src/operation/tranformer/index.js`, import your constant to `templateRules` or `scriptRules`.
   5. Create a `README.md` file to list breaking changes, whether they have been migrated or not.
-  5. Follow the steps below..
+  6. Follow the steps below..
 - If you are updating an existing dependency breaking change:
   1. Add a breaking change message in `src/utils/message.js`.
   2. Create a function in `src/operation/tranformer/{dependency}/template/index.js` or `src/operation/tranformer/{dependency}/script/index.js`.
